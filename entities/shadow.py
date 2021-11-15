@@ -1,5 +1,4 @@
 import pygame
-from settings import *
 
 class Shadow(pygame.sprite.Sprite):
     def __init__(self, position):
@@ -7,4 +6,4 @@ class Shadow(pygame.sprite.Sprite):
         shadow = pygame.image.load("images/characters/character_shadow.png").convert_alpha()
 
         self.image = shadow
-        self.rect = self.image.get_rect(midbottom = (position))
+        self.rect = self.image.get_rect(center = (position))

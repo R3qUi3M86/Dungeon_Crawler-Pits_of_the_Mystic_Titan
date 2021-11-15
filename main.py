@@ -1,5 +1,5 @@
 import pygame
-from settings import *
+from utilities import constants
 from sys import exit
 from entities import player
 from entities import level
@@ -7,7 +7,7 @@ from entities import level
 
 pygame.init()
 
-screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
+screen = pygame.display.set_mode((constants.SCREEN_WIDTH,constants.SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
 while True:
