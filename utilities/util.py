@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from utilities import constants
+from utilities import entity_manager
 from settings import *
 
 center_x = 0
@@ -37,9 +38,11 @@ def determine_quadrant(x,y):
         quartants_list[3] = True
 
 
-def get_total_angle(x,y):
-    rel_x = x - center_x
-    rel_y = center_y - y
+def get_total_angle(current_entity_pos,other_entity_pos):
+    set_center_coordinate(current_entity_pos[0],current_entity_pos[1])
+
+    rel_x = other_entity_pos[0] - center_x
+    rel_y = center_y - other_entity_pos[1]
 
     r = math.sqrt((rel_x*rel_x) + (rel_y*rel_y))
     if r != 0:
@@ -58,9 +61,8 @@ def get_total_angle(x,y):
     elif quartants_list[3]:
         return 360-angle_deg
 
-def get_facing_direction(entity_pos,facing_position):
-    set_center_coordinate(entity_pos[0],entity_pos[1])
-    angle = get_total_angle(facing_position[0],facing_position[1])
+def get_facing_direction(current_entity_pos,other_entity_pos):
+    angle = get_total_angle(current_entity_pos,other_entity_pos)
     if angle >= 337.5 or angle < 22.5:
         return constants.SECTOR_E
     elif angle >= 22.5 and angle < 67.5:
@@ -77,3 +79,11 @@ def get_facing_direction(entity_pos,facing_position):
         return constants.SECTOR_S
     elif angle >= 292.5 and angle < 337.5:
         return constants.SECTOR_SE
+
+def generate_entity_id():
+    if len(entity_manager.entities_id) == 0:
+        entity_manager.entities_id.append(0)
+        return entity_manager.entities_id[0]
+    else:
+        entity_manager.entities_id.append(len(entity_manager.entities_id))
+        return entity_manager.entities_id[len(entity_manager.entities_id)-1]
