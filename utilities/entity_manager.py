@@ -9,7 +9,7 @@ from entities.characters import player
 entities_id = []
 monster_sprites = []
 level_sprites = []
-movement_collision_sprites = []
+movement_and_melee_collision_sprites = []
 non_player_entities = []
 all_entities = [player.character]
 
@@ -47,6 +47,18 @@ def create_monster_character(monster_sprite, monster_shadow):
     character.add(monster_sprite)
     return character
 
+def kill_monster(id):
+    global monster_sprites
+    global movement_and_melee_collision_sprites
+    for entity in monster_sprites:
+        if entity.id == id:
+            monster_sprites.remove(entity)
+            break
+    for collision_sprite in movement_and_melee_collision_sprites:
+        if collision_sprite.id == id:
+            movement_and_melee_collision_sprites.remove(collision_sprite)
+            break
+
 def create_ettin_monster(position):
     monster_sprite = create_ettin_monster_sprite(position)
     add_auxilary_objects(monster_sprite)
@@ -58,11 +70,11 @@ def add_auxilary_objects(monster_sprite):
 
 def append_sprites_and_entities_lists(monster_sprite,monster_shadow,monster_character):
     global monster_sprites
-    global movement_collision_sprites
+    global movement_and_melee_collision_sprites
     global non_player_entities
     global all_entities
 
-    movement_collision_sprites.append(monster_shadow)
+    movement_and_melee_collision_sprites.append(monster_shadow)
     monster_sprites.append(monster_sprite)
     non_player_entities.append(monster_character)
     all_entities.append(monster_character)

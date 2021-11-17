@@ -1,6 +1,8 @@
 import pygame
+import random
 from settings import *
 from utilities import util
+from utilities import entity_manager
 from utilities.constants import *
 from utilities import monster_ai
 from sounds import sound_player
@@ -83,6 +85,26 @@ class Ettin(pygame.sprite.Sprite):
                                 [character_attack_south1,character_attack_south2,character_attack_south3],
                                 [character_attack_south_east1,character_attack_south_east2,character_attack_south_east3]]
         self.character_attack_index = [6,0]
+
+        character_death1 = pygame.image.load("images/characters/hexen/ettin/death_01.png").convert_alpha()
+        character_death2 = pygame.image.load("images/characters/hexen/ettin/death_02.png").convert_alpha()
+        character_death3 = pygame.image.load("images/characters/hexen/ettin/death_03.png").convert_alpha()
+        character_death4 = pygame.image.load("images/characters/hexen/ettin/death_04.png").convert_alpha()
+        character_death5 = pygame.image.load("images/characters/hexen/ettin/death_05.png").convert_alpha()
+        character_death6 = pygame.image.load("images/characters/hexen/ettin/death_06.png").convert_alpha()
+        character_death7 = pygame.image.load("images/characters/hexen/ettin/death_07.png").convert_alpha()
+        self.character_death = [character_death1,character_death2,character_death3,character_death4,character_death5,character_death6,character_death7]
+        self.character_death_index = 0
+
+        self.character_pain_east       = pygame.image.load("images/characters/hexen/ettin/east_pain.png").convert_alpha()
+        self.character_pain_north_east = pygame.image.load("images/characters/hexen/ettin/north_east_pain.png").convert_alpha()
+        self.character_pain_north      = pygame.image.load("images/characters/hexen/ettin/north_pain.png").convert_alpha()
+        self.character_pain_north_west = pygame.image.load("images/characters/hexen/ettin/north_west_pain.png").convert_alpha()
+        self.character_pain_west       = pygame.image.load("images/characters/hexen/ettin/west_pain.png").convert_alpha()
+        self.character_pain_south_west = pygame.image.load("images/characters/hexen/ettin/south_west_pain.png").convert_alpha()
+        self.character_pain_south      = pygame.image.load("images/characters/hexen/ettin/south_pain.png").convert_alpha()
+        self.character_pain_south_east = pygame.image.load("images/characters/hexen/ettin/south_east_pain.png").convert_alpha()
+        self.character_pain_timer = 0
         
         self.sprite_position = position
         self.monster_melee_e_sector_position = self.sprite_position[0]+30,self.sprite_position[1]
@@ -101,22 +123,69 @@ class Ettin(pygame.sprite.Sprite):
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         self.id = util.generate_entity_id()
+        self.name = ETTIN
+
+        self.living = True
+        self.dying = False
+        self.in_pain = False
+        self.health = 10
 
     def update(self):
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
-        self.set_facing_direction()
-        self.player_input()
+        if self.living == True:
+            self.set_facing_direction()
+            if self.in_pain == True:
+                print(self.in_pain)
+                self.character_pain_animation()
+        elif self.dying == True:
+            self.character_death_animation()
 
     def update_position(self, vector):
         self.sprite_position = self.sprite_position[0]-vector[0],self.sprite_position[1] - vector[1]
 
-    def player_input(self):
-        # keys = pygame.key.get_pressed()
-        
-        # if pygame.mouse.get_pressed()[0] or self.atack == True:
-        #     self.atack = True
-        #     self.character_attack_animation()
-        pass
+    def take_damage(self, damage):
+        self.health -= damage
+        if self.health <= 0:
+            sound_player.ettin_death_sound.play()
+            self.living = False
+            self.dying = True
+            entity_manager.kill_monster(self.id)
+        else:
+            self.in_pain = True
+            if random.choice(range(4)) == 0:
+                sound_player.ettin_pain_sound.play()
+    
+    def character_pain_animation(self):
+        self.character_pain_timer += 0.025
+        if self.facing_direction == SECTOR_E:
+            self.image = self.character_pain_east
+        elif self.facing_direction == SECTOR_NE:
+            self.image = self.character_pain_north_east
+        elif self.facing_direction == SECTOR_N:
+            self.image = self.character_pain_north
+        elif self.facing_direction == SECTOR_NW:
+            self.image = self.character_pain_north_west
+        elif self.facing_direction == SECTOR_W:
+            self.image = self.character_pain_west
+        elif self.facing_direction == SECTOR_SW:
+            self.image = self.character_pain_south_west
+        elif self.facing_direction == SECTOR_S:
+            self.image = self.character_pain_south
+        elif self.facing_direction == SECTOR_SE:
+            self.image = self.character_pain_south_east
+        if int(self.character_pain_timer) >= 1:
+            self.in_pain = False
+            self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
+            self.character_pain_timer = 0
+
+
+    def character_death_animation(self):
+        self.in_pain == False
+        self.character_death_index += 0.1
+        if int(self.character_death_index) == 7:
+            self.character_death_index = 6
+            self.dying == False
+        self.image = self.character_death[int(self.character_death_index)]
 
     def set_facing_direction(self):
         self.facing_direction = util.get_facing_direction(self.sprite_position,PLAYER_POSITION)

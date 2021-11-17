@@ -3,6 +3,7 @@ from copy import deepcopy
 from settings import *
 from utilities import util
 from utilities import game_manager
+from utilities import combat_manager
 from utilities.constants import *
 from sounds import sound_player
 
@@ -192,13 +193,14 @@ class Hero(pygame.sprite.Sprite):
 
             self.character_attack_index[1] += 0.05
             if round(self.character_attack_index[1],2) == 1.00:
-                sound_player.hero_melee_miss_sound.play()
+                combat_manager.attack_monster_with_melee_attack()
             if int(self.character_attack_index[1]) == 2:
                 self.atack = False
                 self.character_attack_index[1] = 0
                 self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
                 self.rect = self.image.get_rect(midbottom = (self.sprite_position))
 
+hero = Hero(PLAYER_POSITION)
 character = pygame.sprite.Group()
 character.add(PLAYER_MELEE_SPRITE_E)
 character.add(PLAYER_MELEE_SPRITE_NE)
@@ -209,7 +211,7 @@ character.add(PLAYER_MELEE_SPRITE_SW)
 character.add(PLAYER_MELEE_SPRITE_S)
 character.add(PLAYER_MELEE_SPRITE_SE)
 character.add(PLAYER_SHADOW_SPRITE)
-character.add(Hero(PLAYER_POSITION))
+character.add(hero)
 
 
 
