@@ -8,42 +8,11 @@ from utilities import game_manager
 from utilities import combat_manager
 from utilities.constants import *
 from sounds import sound_player
+from images.characters.fighter_images import *
 
 class Hero(pygame.sprite.Sprite):
     def __init__(self,position):
         super().__init__()
-        character_walk_east1       = pygame.image.load("images/characters/hexen/fighter/east_01.png").convert_alpha()
-        character_walk_east2       = pygame.image.load("images/characters/hexen/fighter/east_02.png").convert_alpha()
-        character_walk_east3       = pygame.image.load("images/characters/hexen/fighter/east_03.png").convert_alpha()
-        character_walk_east4       = pygame.image.load("images/characters/hexen/fighter/east_04.png").convert_alpha()
-        character_walk_north_east1 = pygame.image.load("images/characters/hexen/fighter/north_east_01.png").convert_alpha()
-        character_walk_north_east2 = pygame.image.load("images/characters/hexen/fighter/north_east_02.png").convert_alpha()
-        character_walk_north_east3 = pygame.image.load("images/characters/hexen/fighter/north_east_03.png").convert_alpha()
-        character_walk_north_east4 = pygame.image.load("images/characters/hexen/fighter/north_east_04.png").convert_alpha()
-        character_walk_north1      = pygame.image.load("images/characters/hexen/fighter/north_01.png").convert_alpha()
-        character_walk_north2      = pygame.image.load("images/characters/hexen/fighter/north_02.png").convert_alpha()
-        character_walk_north3      = pygame.image.load("images/characters/hexen/fighter/north_03.png").convert_alpha()
-        character_walk_north4      = pygame.image.load("images/characters/hexen/fighter/north_04.png").convert_alpha()
-        character_walk_north_west1 = pygame.image.load("images/characters/hexen/fighter/north_west_01.png").convert_alpha()
-        character_walk_north_west2 = pygame.image.load("images/characters/hexen/fighter/north_west_02.png").convert_alpha()
-        character_walk_north_west3 = pygame.image.load("images/characters/hexen/fighter/north_west_03.png").convert_alpha()
-        character_walk_north_west4 = pygame.image.load("images/characters/hexen/fighter/north_west_04.png").convert_alpha()
-        character_walk_west1       = pygame.image.load("images/characters/hexen/fighter/west_01.png").convert_alpha()
-        character_walk_west2       = pygame.image.load("images/characters/hexen/fighter/west_02.png").convert_alpha()
-        character_walk_west3       = pygame.image.load("images/characters/hexen/fighter/west_03.png").convert_alpha()
-        character_walk_west4       = pygame.image.load("images/characters/hexen/fighter/west_04.png").convert_alpha()
-        character_walk_south_west1 = pygame.image.load("images/characters/hexen/fighter/south_west_01.png").convert_alpha()
-        character_walk_south_west2 = pygame.image.load("images/characters/hexen/fighter/south_west_02.png").convert_alpha()
-        character_walk_south_west3 = pygame.image.load("images/characters/hexen/fighter/south_west_03.png").convert_alpha()
-        character_walk_south_west4 = pygame.image.load("images/characters/hexen/fighter/south_west_04.png").convert_alpha()
-        character_walk_south1      = pygame.image.load("images/characters/hexen/fighter/south_01.png").convert_alpha()
-        character_walk_south2      = pygame.image.load("images/characters/hexen/fighter/south_02.png").convert_alpha()
-        character_walk_south3      = pygame.image.load("images/characters/hexen/fighter/south_03.png").convert_alpha()
-        character_walk_south4      = pygame.image.load("images/characters/hexen/fighter/south_04.png").convert_alpha()
-        character_walk_south_east1 = pygame.image.load("images/characters/hexen/fighter/south_east_01.png").convert_alpha()
-        character_walk_south_east2 = pygame.image.load("images/characters/hexen/fighter/south_east_02.png").convert_alpha()
-        character_walk_south_east3 = pygame.image.load("images/characters/hexen/fighter/south_east_03.png").convert_alpha()
-        character_walk_south_east4 = pygame.image.load("images/characters/hexen/fighter/south_east_04.png").convert_alpha()
         self.character_walk =   [[character_walk_east1,character_walk_east2,character_walk_east3,character_walk_east4],
                                 [character_walk_north_east1,character_walk_north_east2,character_walk_north_east3,character_walk_north_east4],
                                 [character_walk_north1,character_walk_north2,character_walk_north3,character_walk_north4],
@@ -54,22 +23,6 @@ class Hero(pygame.sprite.Sprite):
                                 [character_walk_south_east1,character_walk_south_east2,character_walk_south_east3,character_walk_south_east4]]
         self.character_walk_index = [6,0]
         
-        character_attack_east1       = pygame.image.load("images/characters/hexen/fighter/east_attack_01.png").convert_alpha()
-        character_attack_east2       = pygame.image.load("images/characters/hexen/fighter/east_attack_02.png").convert_alpha()
-        character_attack_north_east1 = pygame.image.load("images/characters/hexen/fighter/north_east_attack_01.png").convert_alpha()
-        character_attack_north_east2 = pygame.image.load("images/characters/hexen/fighter/north_east_attack_02.png").convert_alpha()
-        character_attack_north1      = pygame.image.load("images/characters/hexen/fighter/north_attack_01.png").convert_alpha()
-        character_attack_north2      = pygame.image.load("images/characters/hexen/fighter/north_attack_02.png").convert_alpha()
-        character_attack_north_west1 = pygame.image.load("images/characters/hexen/fighter/north_west_attack_01.png").convert_alpha()
-        character_attack_north_west2 = pygame.image.load("images/characters/hexen/fighter/north_west_attack_02.png").convert_alpha()
-        character_attack_west1       = pygame.image.load("images/characters/hexen/fighter/west_attack_01.png").convert_alpha()
-        character_attack_west2       = pygame.image.load("images/characters/hexen/fighter/west_attack_02.png").convert_alpha()
-        character_attack_south_west1 = pygame.image.load("images/characters/hexen/fighter/south_west_attack_01.png").convert_alpha()
-        character_attack_south_west2 = pygame.image.load("images/characters/hexen/fighter/south_west_attack_02.png").convert_alpha()
-        character_attack_south1      = pygame.image.load("images/characters/hexen/fighter/south_attack_01.png").convert_alpha()
-        character_attack_south2      = pygame.image.load("images/characters/hexen/fighter/south_attack_02.png").convert_alpha()
-        character_attack_south_east1 = pygame.image.load("images/characters/hexen/fighter/south_east_attack_01.png").convert_alpha()
-        character_attack_south_east2 = pygame.image.load("images/characters/hexen/fighter/south_east_attack_02.png").convert_alpha()
         self.character_attack = [[character_attack_east1,character_attack_east2],
                                 [character_attack_north_east1,character_attack_north_east2],
                                 [character_attack_north1,character_attack_north2],
@@ -80,14 +33,19 @@ class Hero(pygame.sprite.Sprite):
                                 [character_attack_south_east1,character_attack_south_east2]]
         self.character_attack_index = [6,0]
         
-        self.atack = False
-        self.facing_direction = SECTOR_S
-        self.speed_vector = 0,0
-
         self.sprite_position = position
 
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+
+        self.atack = False
+        self.facing_direction = SECTOR_S
+        self.speed_vector = 0,0
+        
+        self.living = True
+        self.dying = False
+        self.in_pain = False
+        self.health = 20
 
     def update(self):
         self.set_facing_direction()
@@ -95,6 +53,16 @@ class Hero(pygame.sprite.Sprite):
 
     def update_position(self, vector):
         pass
+
+    def take_damage(self, damage):
+        self.health -= damage
+        if self.health <= 0:
+            sound_player.ettin_death_sound.play()
+            self.living = False
+            self.dying = True
+        else:
+            self.in_pain = True
+            sound_player.ettin_pain_sound.play()
 
     def player_input(self):
         keys = pygame.key.get_pressed()

@@ -1,15 +1,11 @@
 import pygame
 from settings import *
-from utilities import game_manager
 from utilities.constants import *
+from images.misc.melee_images import *
 
 class Melee(pygame.sprite.Sprite):
     def __init__(self, position, sector):
         super().__init__()
-        melee = pygame.image.load("images/characters/melee_range_sector_visible.png").convert_alpha()
-        melee_mask = pygame.image.load("images/characters/melee_range_sector_mask.png").convert_alpha()
-
-
         self.sector = sector
         self.sprite_position = position
         self.sector_position = self.get_sector_position(self.sector)
