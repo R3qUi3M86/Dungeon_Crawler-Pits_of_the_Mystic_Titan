@@ -1,8 +1,7 @@
 import pygame
 from utilities.constants import *
 from utilities import game_manager
-from entities import melee_range
-from entities import shadow
+from entities.characters import unique_player_objects
 from entities.characters import ettin
 from entities.characters import player
 
@@ -13,7 +12,7 @@ item_sprites = []
 projectiles = []
 movement_collision_sprites = []
 melee_collision_sprites = []
-all_entities = [player.character]
+all_entities = [unique_player_objects.CHARACTER]
 
 def get_collision_sprite_by_id(id):
     for collision_sprite in movement_collision_sprites:
@@ -26,7 +25,7 @@ def generate_monster(monster_type, position):
 
 def update_non_player_entities_position(entities):
     for entity in entities:
-        if player.hero.atack == True:
+        if unique_player_objects.HERO.atack == True:
             game_manager.speed_vector = 0,0
         entity.update_position(game_manager.speed_vector)
 

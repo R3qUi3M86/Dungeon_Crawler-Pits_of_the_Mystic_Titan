@@ -4,10 +4,8 @@ from utilities import entity_manager
 from utilities import game_manager
 from sys import exit
 from entities import cursor
-from entities.characters import player
 
 pygame.init()
-
 clock = pygame.time.Clock()
 
 entity_manager.generate_monsters()
@@ -58,30 +56,34 @@ def collision_detection():
     game_manager.player_movement_collision()
     #possible other collisions
 
+#Main game loop
 while True:
     SCREEN.fill([25, 23, 22])
     order_sprites()
 
+    #Inputs
     keys = pygame.key.get_pressed()
     get_player_wsad_input(keys)
     collision_detection()
 
+    #Updates
     entity_manager.update_non_player_entities_position(entity_manager.monster_sprites)
     entity_manager.update_all_entities(entity_manager.all_entities)
 
-
+    #Events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
 
+    #Drawing
     for entity in entity_manager.all_entities:
         entity.draw(SCREEN)
     
     cursor.cursor.draw(SCREEN)
     cursor.cursor.update()
-    
     #screen.blit(level.test_surface_scaled,(-800,0))
-
+    
+    #Other
     pygame.display.update()
     clock.tick(60)

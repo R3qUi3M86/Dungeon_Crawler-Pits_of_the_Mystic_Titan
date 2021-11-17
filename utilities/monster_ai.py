@@ -1,8 +1,7 @@
 import random
 from utilities.constants import *
 from utilities import util
-from utilities import entity_manager
-from entities.characters import player
+from entities.characters import unique_player_objects
 
 class Ai():
     def __init__(self,owner):
@@ -106,7 +105,7 @@ class Ai():
     def monster_can_melee_attack_player(self):
         self.player_direction_sector = util.get_facing_direction(self.owning_monster.sprite_position,PLAYER_POSITION)
         for melee_sprite in self.owning_monster.monster_melee_sprites:
-            if melee_sprite.rect.colliderect(player.PLAYER_SHADOW_SPRITE):
+            if melee_sprite.rect.colliderect(unique_player_objects.PLAYER_SHADOW_SPRITE):
                 self.melee_colliding_sprite = melee_sprite
                 return True
         return False

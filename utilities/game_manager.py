@@ -1,5 +1,4 @@
-import random
-from entities.characters import player
+from entities.characters import unique_player_objects
 from utilities.constants import *
 from utilities import entity_manager
 from utilities.constants import SECTOR_N
@@ -9,7 +8,7 @@ speed_vector = 0,0
 
 def player_movement_collision():
     for movement_collision_sprite in entity_manager.movement_collision_sprites:
-        mask_collision_coordinates = pygame.sprite.collide_mask(player.PLAYER_SHADOW_SPRITE, movement_collision_sprite)
+        mask_collision_coordinates = pygame.sprite.collide_mask(unique_player_objects.PLAYER_SHADOW_SPRITE, movement_collision_sprite)
         if mask_collision_coordinates != None:
             adjust_player_movement_vector(mask_collision_coordinates)
 
