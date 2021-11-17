@@ -1,5 +1,6 @@
 import pygame
 from utilities import constants
+from utilities import game_manager
 
 class Shadow(pygame.sprite.Sprite):
     def __init__(self, position, id, size):

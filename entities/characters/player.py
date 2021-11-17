@@ -1,6 +1,8 @@
 import pygame
 from copy import deepcopy
 from settings import *
+from entities import melee_range
+from entities import shadow
 from utilities import util
 from utilities import game_manager
 from utilities import combat_manager
@@ -199,6 +201,18 @@ class Hero(pygame.sprite.Sprite):
                 self.character_attack_index[1] = 0
                 self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
                 self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+
+PLAYER_MELEE_SPRITE_E  = melee_range.Melee(PLAYER_POSITION, SECTOR_E)
+PLAYER_MELEE_SPRITE_NE = melee_range.Melee(PLAYER_POSITION, SECTOR_NE)
+PLAYER_MELEE_SPRITE_N  = melee_range.Melee(PLAYER_POSITION, SECTOR_N)
+PLAYER_MELEE_SPRITE_NW = melee_range.Melee(PLAYER_POSITION, SECTOR_NW)
+PLAYER_MELEE_SPRITE_W  = melee_range.Melee(PLAYER_POSITION, SECTOR_W)
+PLAYER_MELEE_SPRITE_SW = melee_range.Melee(PLAYER_POSITION, SECTOR_SW)
+PLAYER_MELEE_SPRITE_S  = melee_range.Melee(PLAYER_POSITION, SECTOR_S)
+PLAYER_MELEE_SPRITE_SE = melee_range.Melee(PLAYER_POSITION, SECTOR_SE)
+PLAYER_SHADOW_SPRITE   = shadow.Shadow(PLAYER_POSITION, PLAYER_SHADOW_ID, SIZE_SMALL)
+
+PLAYER_MELEE_SPRITES = [PLAYER_MELEE_SPRITE_E,PLAYER_MELEE_SPRITE_NE,PLAYER_MELEE_SPRITE_N,PLAYER_MELEE_SPRITE_NW,PLAYER_MELEE_SPRITE_W,PLAYER_MELEE_SPRITE_SW,PLAYER_MELEE_SPRITE_S,PLAYER_MELEE_SPRITE_SE]
 
 hero = Hero(PLAYER_POSITION)
 character = pygame.sprite.Group()

@@ -4,6 +4,7 @@ from utilities import entity_manager
 from utilities import game_manager
 from sys import exit
 from entities import cursor
+from entities.characters import player
 
 pygame.init()
 
@@ -36,46 +37,16 @@ def get_player_wsad_input(keys):
     if not keys[pygame.K_d] and game_manager.acceleration_vector[X] > 0:
         game_manager.acceleration_vector = 0,game_manager.acceleration_vector[Y]
 
-    if game_manager.acceleration_vector[0] > 10 and game_manager.acceleration_vector[1] > 10:
-        game_manager.acceleration_vector = 11,11
-    elif game_manager.acceleration_vector[0] > 10 and game_manager.acceleration_vector[1] < -10:
-        game_manager.acceleration_vector = 11,-11
-    elif game_manager.acceleration_vector[0] < -10 and game_manager.acceleration_vector[1] > 10:
-        game_manager.acceleration_vector = -11,11
-    elif game_manager.acceleration_vector[0] < -10 and game_manager.acceleration_vector[1] < -10:
-        game_manager.acceleration_vector = -11,-11
+    if game_manager.acceleration_vector[X] > 21 and game_manager.acceleration_vector[Y] > 21:
+        game_manager.acceleration_vector = 21,21
+    elif game_manager.acceleration_vector[X] > 21 and game_manager.acceleration_vector[Y] < -21:
+        game_manager.acceleration_vector = 21,-21
+    elif game_manager.acceleration_vector[X] < -21 and game_manager.acceleration_vector[Y] > 21:
+        game_manager.acceleration_vector = -21,21
+    elif game_manager.acceleration_vector[X] < -21 and game_manager.acceleration_vector[Y] < -21:
+        game_manager.acceleration_vector = -21,-21
 
-
-
-    if game_manager.acceleration_vector[Y] > 20:
-        game_manager.speed_vector = game_manager.speed_vector[X], 3
-    elif 20 >= game_manager.acceleration_vector[Y] > 10:
-        game_manager.speed_vector = game_manager.speed_vector[X], 2
-    elif 10 >= game_manager.acceleration_vector[Y] > 0:
-        game_manager.speed_vector = game_manager.speed_vector[X], 1
-    elif game_manager.acceleration_vector[Y] == 0:
-        game_manager.speed_vector = game_manager.speed_vector[X], 0
-    elif -10 <= game_manager.acceleration_vector[Y] < 0:
-        game_manager.speed_vector = game_manager.speed_vector[X], -1
-    elif -20 <= game_manager.acceleration_vector[Y] < -10:
-        game_manager.speed_vector = game_manager.speed_vector[X], -2
-    elif game_manager.acceleration_vector[Y] < -20:
-        game_manager.speed_vector = game_manager.speed_vector[X], -3
-
-    if game_manager.acceleration_vector[X] > 20:
-        game_manager.speed_vector = 3, game_manager.speed_vector[Y]
-    elif 20 >= game_manager.acceleration_vector[X] > 10:
-        game_manager.speed_vector = 2, game_manager.speed_vector[Y]
-    elif 10 >= game_manager.acceleration_vector[X] > 0:
-        game_manager.speed_vector = 1, game_manager.speed_vector[Y]
-    elif game_manager.acceleration_vector[X] == 0:
-        game_manager.speed_vector = 0, game_manager.speed_vector[Y]
-    elif -10 <= game_manager.acceleration_vector[X] < 0:
-        game_manager.speed_vector = -1, game_manager.speed_vector[Y]
-    elif -20 <= game_manager.acceleration_vector[X] < -10:
-        game_manager.speed_vector = -2, game_manager.speed_vector[Y]
-    elif game_manager.acceleration_vector[X] < -20:
-        game_manager.speed_vector = -3, game_manager.speed_vector[Y]
+    game_manager.speed_vector = game_manager.acceleration_vector[X]/10, game_manager.acceleration_vector[Y]/10
 
 def order_sprites():
     for _ in range(len(entity_manager.all_entities)-1):
@@ -95,6 +66,10 @@ while True:
     get_player_wsad_input(keys)
     collision_detection()
 
+    entity_manager.update_non_player_entities_position(entity_manager.monster_sprites)
+    entity_manager.update_all_entities(entity_manager.all_entities)
+
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -107,8 +82,6 @@ while True:
     cursor.cursor.update()
     
     #screen.blit(level.test_surface_scaled,(-800,0))
-    entity_manager.update_all_entities(entity_manager.all_entities)
-    entity_manager.update_non_player_entities_position(entity_manager.non_player_entities)
 
     pygame.display.update()
     clock.tick(60)

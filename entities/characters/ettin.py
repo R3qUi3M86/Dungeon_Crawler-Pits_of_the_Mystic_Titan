@@ -1,7 +1,11 @@
 import pygame
 import random
 from settings import *
+from entities import shadow
+from entities import melee_range
 from utilities import util
+from utilities import combat_manager
+from utilities import game_manager
 from utilities import entity_manager
 from utilities.constants import *
 from utilities import monster_ai
@@ -105,20 +109,13 @@ class Ettin(pygame.sprite.Sprite):
         self.character_pain_south      = pygame.image.load("images/characters/hexen/ettin/south_pain.png").convert_alpha()
         self.character_pain_south_east = pygame.image.load("images/characters/hexen/ettin/south_east_pain.png").convert_alpha()
         self.character_pain_timer = 0
-        
+
         self.sprite_position = position
-        self.monster_melee_e_sector_position = self.sprite_position[0]+30,self.sprite_position[1]
-        self.monster_melee_ne_sector_position = self.sprite_position[0]+20,self.sprite_position[1]-13
-        self.monster_melee_n_sector_position = self.sprite_position[0],self.sprite_position[1]-20
-        self.monster_melee_nw_sector_position = self.sprite_position[0]-20,self.sprite_position[1]-13
-        self.monster_melee_w_sector_position = self.sprite_position[0]-30,self.sprite_position[1]
-        self.monster_melee_sw_sector_position = self.sprite_position[0]-20,self.sprite_position[1]+13
-        self.monster_melee_s_sector_position = self.sprite_position[0],self.sprite_position[1]+20
-        self.monster_melee_se_sector_position = self.sprite_position[0]+20,self.sprite_position[1]+13
 
         self.atack = False
         self.facing_direction = SECTOR_S
-        self.monster_ai = monster_ai.Ai(self.sprite_position)
+        self.walk_speed_vector = 0,0
+        self.monster_ai = monster_ai.Ai(self)
 
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
@@ -130,18 +127,42 @@ class Ettin(pygame.sprite.Sprite):
         self.in_pain = False
         self.health = 10
 
+        self.monster_shadow          = shadow.Shadow(self.sprite_position, self.id, SIZE_MEDIUM)
+        self.monster_melee_e_sector  = melee_range.Melee(self.sprite_position, SECTOR_E)
+        self.monster_melee_ne_sector = melee_range.Melee(self.sprite_position, SECTOR_NE)
+        self.monster_melee_n_sector  = melee_range.Melee(self.sprite_position, SECTOR_N)
+        self.monster_melee_nw_sector = melee_range.Melee(self.sprite_position, SECTOR_NW)
+        self.monster_melee_w_sector  = melee_range.Melee(self.sprite_position, SECTOR_W)
+        self.monster_melee_sw_sector = melee_range.Melee(self.sprite_position, SECTOR_SW)
+        self.monster_melee_s_sector  = melee_range.Melee(self.sprite_position, SECTOR_S)
+        self.monster_melee_se_sector = melee_range.Melee(self.sprite_position, SECTOR_SE)
+        self.monster_melee_sprites = [self.monster_melee_e_sector,self.monster_melee_ne_sector,self.monster_melee_n_sector,self.monster_melee_nw_sector,self.monster_melee_w_sector,self.monster_melee_sw_sector,self.monster_melee_s_sector,self.monster_melee_se_sector]
+        self.monster_auxilary_sprites = [self.monster_shadow,self.monster_melee_e_sector,self.monster_melee_ne_sector,self.monster_melee_n_sector,self.monster_melee_nw_sector,self.monster_melee_w_sector,self.monster_melee_sw_sector,self.monster_melee_s_sector,self.monster_melee_se_sector]
+
     def update(self):
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         if self.living == True:
             self.set_facing_direction()
+            if self.in_pain == False and self.dying == False:
+                self.set_walk_speed_vector()
+                if self.walk_speed_vector[0] != 0 or self.walk_speed_vector[1] != 0:
+                    self.character_walk_forward_animation()
             if self.in_pain == True:
-                print(self.in_pain)
                 self.character_pain_animation()
         elif self.dying == True:
+            self.walk_speed_vector = 0,0
             self.character_death_animation()
 
     def update_position(self, vector):
-        self.sprite_position = self.sprite_position[0]-vector[0],self.sprite_position[1] - vector[1]
+        if self.living == True:
+            if self.monster_ai.monster_can_melee_attack_player() == False:
+                self.monster_ai.increment_direction_change_decision_timer()
+            else:
+                self.facing_direction = self.monster_ai.player_direction_sector
+        self.sprite_position = self.sprite_position[0]-vector[0]+self.walk_speed_vector[0],self.sprite_position[1] - vector[1] +self.walk_speed_vector[1]
+        for auxilary_sprite in self.monster_auxilary_sprites:
+            auxilary_sprite.sprite_position = self.sprite_position
+        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
 
     def take_damage(self, damage):
         self.health -= damage
@@ -175,9 +196,8 @@ class Ettin(pygame.sprite.Sprite):
             self.image = self.character_pain_south_east
         if int(self.character_pain_timer) >= 1:
             self.in_pain = False
-            self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
+            self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
             self.character_pain_timer = 0
-
 
     def character_death_animation(self):
         self.in_pain == False
@@ -188,7 +208,6 @@ class Ettin(pygame.sprite.Sprite):
         self.image = self.character_death[int(self.character_death_index)]
 
     def set_facing_direction(self):
-        self.facing_direction = util.get_facing_direction(self.sprite_position,PLAYER_POSITION)
         self.set_character_animation_direction_indices()
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
@@ -218,6 +237,27 @@ class Ettin(pygame.sprite.Sprite):
             self.character_walk_index[0] = 7
             self.character_attack_index[0] = 7            
 
+    def set_walk_speed_vector(self):
+        if self.monster_ai.monster_can_melee_attack_player():
+            self.walk_speed_vector = 0,0
+        else:
+            if self.facing_direction == SECTOR_E:
+                self.walk_speed_vector = 1.4,0
+            elif self.facing_direction == SECTOR_NE:
+                self.walk_speed_vector = 1,-1
+            elif self.facing_direction == SECTOR_N:
+                self.walk_speed_vector = 0,-1.4
+            elif self.facing_direction == SECTOR_NW:
+                self.walk_speed_vector = -1,-1
+            elif self.facing_direction == SECTOR_W:
+                self.walk_speed_vector = -1.4,0
+            elif self.facing_direction == SECTOR_SW:
+                self.walk_speed_vector = -1,1
+            elif self.facing_direction == SECTOR_S:
+                self.walk_speed_vector = 0,1.4
+            elif self.facing_direction == SECTOR_SE:
+                self.walk_speed_vector = 1,1
+
     def character_walk_forward_animation(self):
         self.character_walk_index[1] += 0.1
         if int(self.character_walk_index[1]) == 4:
@@ -231,7 +271,7 @@ class Ettin(pygame.sprite.Sprite):
 
             self.character_attack_index[1] += 0.05
             if round(self.character_attack_index[1],2) == 2.00:
-                sound_player.monster_melee_miss_sound.play()
+                combat_manager.attack_player_with_melee_attack()
             if int(self.character_attack_index[1]) == 3:
                 self.atack = False
                 self.character_attack_index[1] = 0
