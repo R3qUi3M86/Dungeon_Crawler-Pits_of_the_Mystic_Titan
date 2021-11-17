@@ -34,8 +34,7 @@ class Ai():
                 self.avoidance_direction_sector = SECTOR_E
             else:
                 self.avoidance_direction_sector = SECTOR_W
-
-    
+ 
     def randomize_direction_change_decision_timer_limit(self):
         self.direction_change_decision_timer_limit += random.choice(range(12))
 
@@ -105,7 +104,7 @@ class Ai():
     def monster_can_melee_attack_player(self):
         self.player_direction_sector = util.get_facing_direction(self.owning_monster.sprite_position,PLAYER_POSITION)
         for melee_sprite in self.owning_monster.monster_melee_sprites:
-            if melee_sprite.rect.colliderect(unique_player_objects.PLAYER_SHADOW_SPRITE):
+            if pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE):
                 self.melee_colliding_sprite = melee_sprite
                 return True
         return False
