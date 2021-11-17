@@ -8,13 +8,13 @@ acceleration_vector = 0,0
 speed_vector = 0,0
 
 def player_movement_collision():
-    for movement_collision_sprite in entity_manager.movement_and_melee_collision_sprites:
+    for movement_collision_sprite in entity_manager.movement_collision_sprites:
         mask_collision_coordinates = pygame.sprite.collide_mask(player.PLAYER_SHADOW_SPRITE, movement_collision_sprite)
         if mask_collision_coordinates != None:
             adjust_player_movement_vector(mask_collision_coordinates)
 
 def monster_collision(current_monster_movement_collision_sprite):
-    for monster_movement_collision_sprite in entity_manager.movement_and_melee_collision_sprites:
+    for monster_movement_collision_sprite in entity_manager.movement_collision_sprites:
         if current_monster_movement_collision_sprite.id == monster_movement_collision_sprite.id:
             pass
         else:

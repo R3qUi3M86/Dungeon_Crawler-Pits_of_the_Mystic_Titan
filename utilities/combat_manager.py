@@ -13,7 +13,7 @@ def attack_monster_with_melee_attack():
     global hit_something
 
     hit_entity_list = []
-    for entity in entity_manager.movement_and_melee_collision_sprites:
+    for entity in entity_manager.melee_collision_sprites:
         if player.hero.facing_direction == SECTOR_E and pygame.sprite.collide_mask(player.PLAYER_MELEE_SPRITE_E, entity) != None:
             enemy_has_been_hit = True
         elif player.hero.facing_direction == SECTOR_NE and pygame.sprite.collide_mask(player.PLAYER_MELEE_SPRITE_NE, entity) != None:

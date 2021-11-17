@@ -127,7 +127,8 @@ class Ettin(pygame.sprite.Sprite):
         self.in_pain = False
         self.health = 10
 
-        self.monster_shadow          = shadow.Shadow(self.sprite_position, self.id, SIZE_MEDIUM)
+        self.monster_collision_shadow= shadow.Shadow(self.sprite_position, self.id, SIZE_MEDIUM_SMALL, True)
+        self.melee_collision_shadow  = shadow.Shadow(self.sprite_position, self.id, SIZE_MEDIUM, False)
         self.monster_melee_e_sector  = melee_range.Melee(self.sprite_position, SECTOR_E)
         self.monster_melee_ne_sector = melee_range.Melee(self.sprite_position, SECTOR_NE)
         self.monster_melee_n_sector  = melee_range.Melee(self.sprite_position, SECTOR_N)
@@ -137,7 +138,7 @@ class Ettin(pygame.sprite.Sprite):
         self.monster_melee_s_sector  = melee_range.Melee(self.sprite_position, SECTOR_S)
         self.monster_melee_se_sector = melee_range.Melee(self.sprite_position, SECTOR_SE)
         self.monster_melee_sprites = [self.monster_melee_e_sector,self.monster_melee_ne_sector,self.monster_melee_n_sector,self.monster_melee_nw_sector,self.monster_melee_w_sector,self.monster_melee_sw_sector,self.monster_melee_s_sector,self.monster_melee_se_sector]
-        self.monster_auxilary_sprites = [self.monster_shadow,self.monster_melee_e_sector,self.monster_melee_ne_sector,self.monster_melee_n_sector,self.monster_melee_nw_sector,self.monster_melee_w_sector,self.monster_melee_sw_sector,self.monster_melee_s_sector,self.monster_melee_se_sector]
+        self.monster_auxilary_sprites = [self.monster_collision_shadow,self.melee_collision_shadow,self.monster_melee_e_sector,self.monster_melee_ne_sector,self.monster_melee_n_sector,self.monster_melee_nw_sector,self.monster_melee_w_sector,self.monster_melee_sw_sector,self.monster_melee_s_sector,self.monster_melee_se_sector]
 
     def update(self):
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))

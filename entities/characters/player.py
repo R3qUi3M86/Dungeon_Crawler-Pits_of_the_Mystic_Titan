@@ -142,7 +142,7 @@ class Hero(pygame.sprite.Sprite):
 
     def set_facing_direction(self):
         mouse_pos = pygame.mouse.get_pos()
-        self.facing_direction = util.get_facing_direction(PLAYER_POSITION,mouse_pos)
+        self.facing_direction = util.get_facing_direction((PLAYER_POSITION[0],PLAYER_POSITION[1]-10),mouse_pos)
         self.set_character_animation_direction_indices()
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
@@ -210,7 +210,7 @@ PLAYER_MELEE_SPRITE_W  = melee_range.Melee(PLAYER_POSITION, SECTOR_W)
 PLAYER_MELEE_SPRITE_SW = melee_range.Melee(PLAYER_POSITION, SECTOR_SW)
 PLAYER_MELEE_SPRITE_S  = melee_range.Melee(PLAYER_POSITION, SECTOR_S)
 PLAYER_MELEE_SPRITE_SE = melee_range.Melee(PLAYER_POSITION, SECTOR_SE)
-PLAYER_SHADOW_SPRITE   = shadow.Shadow(PLAYER_POSITION, PLAYER_SHADOW_ID, SIZE_SMALL)
+PLAYER_SHADOW_SPRITE   = shadow.Shadow(PLAYER_POSITION, PLAYER_SHADOW_ID, SIZE_SMALL, True)
 
 PLAYER_MELEE_SPRITES = [PLAYER_MELEE_SPRITE_E,PLAYER_MELEE_SPRITE_NE,PLAYER_MELEE_SPRITE_N,PLAYER_MELEE_SPRITE_NW,PLAYER_MELEE_SPRITE_W,PLAYER_MELEE_SPRITE_SW,PLAYER_MELEE_SPRITE_S,PLAYER_MELEE_SPRITE_SE]
 
