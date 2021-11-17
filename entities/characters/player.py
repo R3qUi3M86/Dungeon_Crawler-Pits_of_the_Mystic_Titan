@@ -145,7 +145,7 @@ class Hero(pygame.sprite.Sprite):
             self.dying = True
         else:
             self.in_pain = True
-            sound_player.playe.play()
+            sound_player.player_pain_sound.play()
 
     #Misc
     def facing_southwards(self):
