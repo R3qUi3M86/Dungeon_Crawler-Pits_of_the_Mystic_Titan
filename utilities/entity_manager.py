@@ -13,6 +13,11 @@ item_sprites = []
 movement_and_melee_collision_sprites = []
 all_entities = [player.character]
 
+def get_collision_sprite_by_id(id):
+    for collision_sprite in movement_and_melee_collision_sprites:
+        if collision_sprite.id == id:
+            return collision_sprite
+
 def generate_monster(monster_type, position):
     if monster_type == ETTIN:
         create_ettin_monster(position)
@@ -25,7 +30,7 @@ def update_non_player_entities_position(entities):
 
 def get_monster_sprite(monster_id):
     for monster in monster_sprites:
-        if monster.monster_id == monster_id:
+        if monster.id == monster_id:
             return monster
 
 def create_ettin_monster_sprite(monster_sprite_position):
@@ -71,7 +76,7 @@ def append_sprites_and_entities_lists(monster_sprite,monster_shadow,monster_char
     all_entities.append(monster_character)
 
 def create_monster_shadow(monster_sprite):
-    return shadow.Shadow(monster_sprite.sprite_position, monster_sprite.id, SIZE_MEDIUM)
+    return shadow.Shadow(monster_sprite.sprite_position, monster_sprite.id, SIZE_MEDIUM_SMALL)
 
 def update_all_entities(all_entities):
     for entity in all_entities:

@@ -56,7 +56,7 @@ def order_sprites():
 
 def collision_detection():
     game_manager.player_movement_collision()
-    #other collisions
+    #game_manager.monster_collision()
 
 while True:
     SCREEN.fill([25, 23, 22])

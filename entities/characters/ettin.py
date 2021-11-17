@@ -239,8 +239,13 @@ class Ettin(pygame.sprite.Sprite):
 
     def set_walk_speed_vector(self):
         if self.monster_ai.monster_can_melee_attack_player():
+            if self.monster_ai.avoiding_obstacle == True:
+                if self.id == 0:
+                    print("monster 0 can melee attack player, finished avoiding obstacle")
+                self.monster_ai.finish_avoiding_obstacle()
             self.walk_speed_vector = 0,0
         else:
+            game_manager.monster_collision(entity_manager.get_collision_sprite_by_id(self.id))
             if self.facing_direction == SECTOR_E:
                 self.walk_speed_vector = 1.4,0
             elif self.facing_direction == SECTOR_NE:
@@ -257,7 +262,7 @@ class Ettin(pygame.sprite.Sprite):
                 self.walk_speed_vector = 0,1.4
             elif self.facing_direction == SECTOR_SE:
                 self.walk_speed_vector = 1,1
-
+            
     def character_walk_forward_animation(self):
         self.character_walk_index[1] += 0.1
         if int(self.character_walk_index[1]) == 4:
@@ -277,10 +282,3 @@ class Ettin(pygame.sprite.Sprite):
                 self.character_attack_index[1] = 0
                 self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
                 self.rect = self.image.get_rect(midbottom = (self.monster_sprite_position))
-
-
-
-
-
-
-

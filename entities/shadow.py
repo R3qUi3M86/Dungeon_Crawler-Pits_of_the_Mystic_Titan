@@ -17,6 +17,9 @@ class Shadow(pygame.sprite.Sprite):
         if size == constants.SIZE_SMALL:
             self.image = shadow_small
             self.mask = pygame.mask.from_surface(shadow_small_mask)
+        elif size == constants.SIZE_MEDIUM_SMALL:
+            self.image = shadow_medium
+            self.mask = pygame.mask.from_surface(shadow_small_mask)
         elif size == constants.SIZE_MEDIUM:
             self.image = shadow_medium
             self.mask = pygame.mask.from_surface(shadow_medium_mask)
@@ -26,6 +29,9 @@ class Shadow(pygame.sprite.Sprite):
     def update(self):
         if self.shadow_size == constants.SIZE_SMALL:
             self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+        elif self.shadow_size == constants.SIZE_MEDIUM_SMALL:
+            medium_shadow_sprite_position = self.get_shadow_position()
+            self.rect = self.image.get_rect(midbottom = (medium_shadow_sprite_position))
         elif self.shadow_size == constants.SIZE_MEDIUM:
             medium_shadow_sprite_position = self.get_shadow_position()
             self.rect = self.image.get_rect(midbottom = (medium_shadow_sprite_position))
