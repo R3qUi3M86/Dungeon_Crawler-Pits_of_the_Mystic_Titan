@@ -27,6 +27,7 @@ class Hero(pygame.sprite.Sprite):
 
         self.position = position
         self.sprite_position = self.position[0], self.position[1]+8
+        self.id = -1
 
         #Initial image definition
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
@@ -53,6 +54,9 @@ class Hero(pygame.sprite.Sprite):
         
         if self.dying == True:
             self.character_death_animation()
+
+    def update_position(self,vector):
+        pass
 
     def set_facing_direction(self):
         mouse_pos = pygame.mouse.get_pos()

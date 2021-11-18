@@ -56,14 +56,34 @@ def get_player_wsad_input(keys):
     game_manager.speed_vector = (game_manager.acceleration_vector[X]/30)*game_manager.player_speed, (game_manager.acceleration_vector[Y]/30)*game_manager.player_speed*0.55
 
 def order_sprites():
-    for _ in range(len(entity_manager.all_entities)-1):
-        for j in range(len(entity_manager.all_entities)-1):
-            if entity_manager.all_entities[j].sprites()[0].position[Y] > entity_manager.all_entities[j+1].sprites()[0].position[Y]:
-                    entity_manager.all_entities[j], entity_manager.all_entities[j+1] = entity_manager.all_entities[j+1], entity_manager.all_entities[j]
+    for _ in range(len(entity_manager.melee_sector_sprite_groups)-1):
+        for j in range(len(entity_manager.melee_sector_sprite_groups)-1):
+            first_sprite_from_current_group = entity_manager.melee_sector_sprite_groups[j].sprites()[0]
+            first_sprite_from_next_group = entity_manager.melee_sector_sprite_groups[j+1].sprites()[0]
+            if first_sprite_from_current_group.position[Y] > first_sprite_from_next_group.position[Y]:
+                    entity_manager.melee_sector_sprite_groups[j], entity_manager.melee_sector_sprite_groups[j+1] = entity_manager.melee_sector_sprite_groups[j+1], entity_manager.melee_sector_sprite_groups[j]
+
+    for _ in range(len(entity_manager.shadow_sprite_groups)-1):
+        for j in range(len(entity_manager.shadow_sprite_groups)-1):
+            if entity_manager.shadow_sprite_groups[j].sprite.position[Y] > entity_manager.shadow_sprite_groups[j+1].sprite.position[Y]:
+                    entity_manager.shadow_sprite_groups[j], entity_manager.shadow_sprite_groups[j+1] = entity_manager.shadow_sprite_groups[j+1], entity_manager.shadow_sprite_groups[j]
+    
+    for _ in range(len(entity_manager.charcter_sprite_groups)-1):
+        for j in range(len(entity_manager.charcter_sprite_groups)-1):
+            if entity_manager.charcter_sprite_groups[j].sprite.sprite_position[Y] > entity_manager.charcter_sprite_groups[j+1].sprite.sprite_position[Y]:
+                    entity_manager.charcter_sprite_groups[j], entity_manager.charcter_sprite_groups[j+1] = entity_manager.charcter_sprite_groups[j+1], entity_manager.charcter_sprite_groups[j]
 
 def collision_detection():
     game_manager.player_movement_collision()
     #possible other collisions
+
+def draw_sprites():
+    for melee_sectors in entity_manager.melee_sector_sprite_groups:
+        melee_sectors.draw(SCREEN)
+    for shadow in entity_manager.shadow_sprite_groups:
+        shadow.draw(SCREEN)
+    for character in entity_manager.charcter_sprite_groups:
+        character.draw(SCREEN)
 
 #Main game loop
 while True:
@@ -76,8 +96,8 @@ while True:
     collision_detection()
 
     #Updates
-    entity_manager.update_non_player_entities_position(entity_manager.monster_sprites)
-    entity_manager.update_all_entities(entity_manager.all_entities)
+    entity_manager.update_non_player_entities_position(entity_manager.charcter_sprite_groups)
+    entity_manager.update_all_entities()
 
     #Events
     for event in pygame.event.get():
@@ -86,8 +106,7 @@ while True:
             exit()
 
     #Drawing
-    for entity in entity_manager.all_entities:
-        entity.draw(SCREEN)
+    draw_sprites()
     
     cursor.cursor.draw(SCREEN)
     cursor.cursor.update()

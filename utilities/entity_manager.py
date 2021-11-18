@@ -1,23 +1,24 @@
 import pygame
+from pygame import sprite
 from utilities.constants import *
 from utilities import game_manager
 from entities.characters import unique_player_objects
 from entities.characters import ettin
-from entities.characters import player
 
 entities_id = []
-monster_sprites = []
-level_sprites = []
-item_sprites = []
-projectiles = []
-movement_collision_sprites = []
-melee_collision_sprites = []
-all_entities = [unique_player_objects.CHARACTER]
+charcter_sprite_groups = [unique_player_objects.HERO_SPRITE_GROUP]
+shadow_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
+movement_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
+melee_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
+item_sprite_groups = []
+melee_sector_sprite_groups = [unique_player_objects.HERO_MELEE_SECTOR_SPRITE_GROUP]
+level_sprite_groups = []
+projectile_sprite_groups = []
 
 def get_collision_sprite_by_id(id):
-    for collision_sprite in movement_collision_sprites:
-        if collision_sprite.id == id:
-            return collision_sprite
+    for collision_sprite in movement_collision_sprite_groups:
+        if collision_sprite.sprite.id == id:
+            return collision_sprite.sprite
 
 def generate_monster(monster_type, position):
     if monster_type == ETTIN:
@@ -25,17 +26,20 @@ def generate_monster(monster_type, position):
 
 def update_non_player_entities_position(entities):
     for entity in entities:
-        if unique_player_objects.HERO.attack == True or unique_player_objects.HERO.living == False:
+        if unique_player_objects.HERO_SPRITE_GROUP.sprite.attack == True or unique_player_objects.HERO_SPRITE_GROUP.sprite.living == False:
             game_manager.speed_vector = 0,0
-        entity.update_position(game_manager.speed_vector)
+        entity.sprite.update_position(game_manager.speed_vector)
 
 def get_monster_sprite(monster_id):
-    for monster in monster_sprites:
-        if monster.id == monster_id:
-            return monster
+    for monster in charcter_sprite_groups:
+        if monster.sprite.id == monster_id:
+            return monster.sprite
 
-def create_ettin_monster_sprite(monster_sprite_position):
-    return ettin.Ettin(monster_sprite_position)
+def create_ettin_monster_sprite_group(monster_sprite_position):
+    ettin_monster_sprite = ettin.Ettin(monster_sprite_position)
+    ettin_monster_sprite_grup = pygame.sprite.GroupSingle()
+    ettin_monster_sprite_grup.add(ettin_monster_sprite)
+    return ettin_monster_sprite_grup
 
 def create_monster_character(monster_sprite):
     character = pygame.sprite.Group()
@@ -53,39 +57,69 @@ def create_monster_character(monster_sprite):
     return character
 
 def kill_monster(id):
-    global monster_sprites
-    global movement_collision_sprites
-    for collision_sprite in movement_collision_sprites:
-        if collision_sprite.id == id:
-            movement_collision_sprites.remove(collision_sprite)
-    for collision_sprite in melee_collision_sprites:
-        if collision_sprite.id == id:
-            melee_collision_sprites.remove(collision_sprite)
+    global charcter_sprite_groups
+    global movement_collision_sprite_groups
+    for collision_sprite_group in movement_collision_sprite_groups:
+        if collision_sprite_group.sprite.id == id:
+            movement_collision_sprite_groups.remove(collision_sprite_group)
+    for collision_sprite_group in melee_collision_sprite_groups:
+        if collision_sprite_group.sprite.id == id:
+            melee_collision_sprite_groups.remove(collision_sprite_group)
 
 def create_ettin_monster(position):
-    monster_sprite = create_ettin_monster_sprite(position)
-    add_auxilary_objects(monster_sprite)
+    ettin_monster_sprite_grup = create_ettin_monster_sprite_group(position)
+    add_auxilary_objects(ettin_monster_sprite_grup)
 
-def add_auxilary_objects(monster_sprite):
-    movement_collision_shadow = monster_sprite.monster_collision_shadow
-    melee_collision_shadow = monster_sprite.melee_collision_shadow
-    monster_character = create_monster_character(monster_sprite)
-    append_sprites_and_entities_lists(monster_sprite,movement_collision_shadow,melee_collision_shadow,monster_character)
+def add_auxilary_objects(monster_sprite_grup):
+    movement_collision_shadow_sprite_group = monster_sprite_grup.sprite.movement_collision_shadow_sprite_group
+    shadow_sprite_group = monster_sprite_grup.sprite.shadow_group
+    melee_collision_shadow_sprite_group = monster_sprite_grup.sprite.melee_collision_shadow_sprite_group
+    melee_sector_sprite_group = monster_sprite_grup.sprite.melee_sector_sprite_group
+    append_sprites_and_entities_lists(monster_sprite_grup,movement_collision_shadow_sprite_group,melee_collision_shadow_sprite_group,shadow_sprite_group,melee_sector_sprite_group)
 
-def append_sprites_and_entities_lists(monster_sprite,movement_collision_shadow,melee_collision_shadow,monster_character):
-    global monster_sprites
-    global movement_collision_sprites
-    global melee_collision_sprites
-    global all_entities
+def append_sprites_and_entities_lists(monster_sprite_grup,movement_collision_shadow_sprite_group,melee_collision_shadow_sprite_group,shadow_sprite_group,melee_sector_sprite_group):
+    global charcter_sprite_groups
+    global shadow_sprite_groups
+    global movement_collision_sprite_groups
+    global melee_collision_sprite_groups
+    global melee_sector_sprite_groups
 
-    movement_collision_sprites.append(movement_collision_shadow)
-    melee_collision_sprites.append(melee_collision_shadow)
-    monster_sprites.append(monster_sprite)
-    all_entities.append(monster_character)
+    charcter_sprite_groups.append(monster_sprite_grup)
+    shadow_sprite_groups.append(shadow_sprite_group)
+    movement_collision_sprite_groups.append(movement_collision_shadow_sprite_group)
+    melee_collision_sprite_groups.append(melee_collision_shadow_sprite_group)
+    melee_sector_sprite_groups.append(melee_sector_sprite_group)
 
-def update_all_entities(all_entities):
-    for entity in all_entities:
-        entity.update()
+def update_all_entities():
+    for charcter_sprite_group in charcter_sprite_groups:
+        charcter_sprite_group.sprite.update()
+
+    for shadow_sprite_group in shadow_sprite_groups:
+        shadow_sprite_group.sprite.update()
+
+    for movement_collision_sprite_group in movement_collision_sprite_groups:
+        movement_collision_sprite_group.sprite.update()
+
+    for melee_collision_sprite_group in melee_collision_sprite_groups:
+        melee_collision_sprite_group.sprite.update()
+
+    for item_sprite_group in item_sprite_groups:
+        item_sprite_group.sprite.update()
+
+    for melee_sector_sprite_group in melee_sector_sprite_groups:
+        sprites = melee_sector_sprite_group.sprites()
+        for melee_sector_sprite in sprites:
+            melee_sector_sprite.update()
+
+    for projectile_sprite_group in projectile_sprite_groups:
+        sprites = projectile_sprite_group.sprites()
+        for projectile_sprite in sprites:
+            projectile_sprite.update()
+
+    for level_sprite_group in level_sprite_groups:
+        sprites = level_sprite_group.sprites()
+        for level_sprite in sprites:
+            level_sprite.update()
 
 def generate_monsters():
     generate_monster(ETTIN, (200,200))

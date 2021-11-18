@@ -35,8 +35,9 @@ class Ettin(pygame.sprite.Sprite):
         self.id = util.generate_entity_id()
 
         #Owned sprites
-        self.monster_collision_shadow= shadow.Shadow(self.position, self.id, SIZE_MEDIUM_SMALL, True)
+        self.monster_collision_shadow= shadow.Shadow(self.position, self.id, SIZE_SMALL, False)
         self.melee_collision_shadow  = shadow.Shadow(self.position, self.id, SIZE_MEDIUM, False)
+        self.shadow                  = shadow.Shadow(self.position, self.id, SIZE_MEDIUM, True)
         self.monster_melee_e_sector  = melee_range.Melee(self.position, SECTOR_E)
         self.monster_melee_ne_sector = melee_range.Melee(self.position, SECTOR_NE)
         self.monster_melee_n_sector  = melee_range.Melee(self.position, SECTOR_N)
@@ -46,7 +47,16 @@ class Ettin(pygame.sprite.Sprite):
         self.monster_melee_s_sector  = melee_range.Melee(self.position, SECTOR_S)
         self.monster_melee_se_sector = melee_range.Melee(self.position, SECTOR_SE)
         self.monster_melee_sprites = [self.monster_melee_e_sector,self.monster_melee_ne_sector,self.monster_melee_n_sector,self.monster_melee_nw_sector,self.monster_melee_w_sector,self.monster_melee_sw_sector,self.monster_melee_s_sector,self.monster_melee_se_sector]
-        self.monster_auxilary_sprites = [self.monster_collision_shadow,self.melee_collision_shadow]
+        self.monster_auxilary_sprites = [self.monster_collision_shadow,self.melee_collision_shadow,self.shadow]
+        self.movement_collision_shadow_sprite_group = pygame.sprite.GroupSingle()
+        self.movement_collision_shadow_sprite_group.add(self.monster_collision_shadow)
+        self.melee_collision_shadow_sprite_group = pygame.sprite.GroupSingle()
+        self.melee_collision_shadow_sprite_group.add(self.melee_collision_shadow)
+        self.shadow_group = pygame.sprite.GroupSingle()
+        self.shadow_group.add(self.shadow)
+        self.melee_sector_sprite_group = pygame.sprite.Group()
+        self.melee_sector_sprite_group.add(self.monster_melee_sprites)
+
 
         #Initial image definition
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]

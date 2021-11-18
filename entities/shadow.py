@@ -30,7 +30,7 @@ class Shadow(pygame.sprite.Sprite):
             else:
                 return invisible_shadow_small
         
-        elif self.shadow_size == constants.SIZE_MEDIUM_SMALL or self.shadow_size == constants.SIZE_MEDIUM:
+        elif self.shadow_size == constants.SIZE_MEDIUM:
             if self.visible:
                 return shadow_medium
             else:
@@ -39,8 +39,6 @@ class Shadow(pygame.sprite.Sprite):
     def get_self_mask(self):
         if self.shadow_size == constants.SIZE_SMALL:
             return pygame.mask.from_surface(shadow_small_mask)
-        elif self.shadow_size == constants.SIZE_MEDIUM_SMALL:
-            return pygame.mask.from_surface(shadow_medium_small_mask)
         elif self.shadow_size == constants.SIZE_MEDIUM:
             return pygame.mask.from_surface(shadow_medium_mask)
 

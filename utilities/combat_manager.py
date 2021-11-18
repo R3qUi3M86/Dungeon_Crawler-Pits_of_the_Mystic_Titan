@@ -11,16 +11,17 @@ def attack_monster_with_melee_attack():
     global hit_something
 
     hit_entity_list = []
-    for entity in entity_manager.melee_collision_sprites:
-        for PLAYER_MELEE_SPRITE in unique_player_objects.PLAYER_MELEE_SPRITES:
-            if PLAYER_MELEE_SPRITE.sector == unique_player_objects.HERO.facing_direction and pygame.sprite.collide_mask(PLAYER_MELEE_SPRITE, entity) != None:
-                enemy_has_been_hit = True
-                break
-        
-        if enemy_has_been_hit == True:
-            hit_something = True
-            hit_entity_list.append(entity)
-        enemy_has_been_hit = False
+    for entity in entity_manager.melee_collision_sprite_groups:
+        if entity != unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP:
+            for PLAYER_MELEE_SPRITE in unique_player_objects.PLAYER_MELEE_SPRITES:
+                if PLAYER_MELEE_SPRITE.sector == unique_player_objects.HERO.facing_direction and pygame.sprite.collide_mask(PLAYER_MELEE_SPRITE, entity.sprite) != None:
+                    enemy_has_been_hit = True
+                    break
+            
+            if enemy_has_been_hit == True:
+                hit_something = True
+                hit_entity_list.append(entity)
+            enemy_has_been_hit = False
 
     play_melee_attack_sound(PLAYER)
     hit_something = False
@@ -40,10 +41,10 @@ def attack_player_with_melee_attack(current_attacking_monster):
     hit_something = False
 
 def deal_damage_to_monster(entity, damage):
-    id = entity.id
-    for monster in entity_manager.monster_sprites:
-        if id == monster.id:
-            monster.take_damage(damage)
+    id = entity.sprite.id
+    for monster in entity_manager.charcter_sprite_groups:
+        if id == monster.sprite.id:
+            monster.sprite.take_damage(damage)
 
 def deal_damage_to_player(damage):
     unique_player_objects.HERO.take_damage(damage)
