@@ -131,6 +131,7 @@ class Ai():
         self.attack_decision_timer += 0.05
         if int(self.attack_decision_timer) == self.attack_decision_timer_limit:
             self.owning_monster.attack = True
+            self.owning_monster.attack_can_be_interrupted = True
             self.attack_decision_timer = 0.0
     
     #Misc

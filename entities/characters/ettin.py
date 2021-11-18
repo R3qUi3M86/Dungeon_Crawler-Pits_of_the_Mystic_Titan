@@ -54,6 +54,8 @@ class Ettin(pygame.sprite.Sprite):
         #Character properties        
         self.name = ETTIN
         self.attack = False
+        self.attack_interruption_chance = 0
+        self.attack_can_be_interrupted = True
         self.facing_direction = SECTOR_S
         self.walk_speed_vector = 0,0
         self.monster_ai = monster_ai.Ai(self)
@@ -76,12 +78,18 @@ class Ettin(pygame.sprite.Sprite):
                 if self.walk_speed_vector[0] != 0 or self.walk_speed_vector[1] != 0:
                     self.character_walk_forward_animation()
             
-            elif self.attack == True and self.in_pain == False:
-                self.character_attack_animation()
-            
-            elif self.in_pain == True:
-                self.interrupt_attack()
+            elif self.attack == True and self.in_pain == True:
+                self.walk_speed_vector = 0,0
+                if self.attack_can_be_interrupted and self.attack_interupted():
+                    self.interrupt_attack()
+
+            if self.in_pain == True and self.attack == False:
+                self.walk_speed_vector = 0,0
                 self.character_pain_animation()
+
+            elif self.attack == True:
+                self.walk_speed_vector = 0,0
+                self.character_attack_animation()
         
         elif self.dying == True:
             self.interrupt_attack()
@@ -221,3 +229,9 @@ class Ettin(pygame.sprite.Sprite):
     def interrupt_attack(self):
         self.attack = False
         self.character_attack_index[1] = 0
+
+    def attack_interupted(self):
+        if random.choice(range(1,101)) <= self.attack_interruption_chance:
+            return True
+        self.attack_can_be_interrupted = False
+        return False
