@@ -122,8 +122,9 @@ class Ai():
         if unique_player_objects.HERO.living == True:
             self.player_direction_sector = util.get_facing_direction(self.owning_monster.position,PLAYER_POSITION)
             for melee_sprite in self.owning_monster.monster_melee_sprites:
-                if pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE):
-                    return True
+                if melee_sprite.rect.colliderect(unique_player_objects.PLAYER_SHADOW_SPRITE):
+                    if pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE):
+                        return True
         return False
 
     #Combat decisions timer

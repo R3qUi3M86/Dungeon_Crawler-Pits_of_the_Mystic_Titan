@@ -1,7 +1,7 @@
 import pygame
 from settings import *
 from utilities import util
-from utilities import game_manager
+from utilities import movement_manager
 from utilities import combat_manager
 from utilities.constants import *
 from sounds import sound_player
@@ -125,14 +125,14 @@ class Hero(pygame.sprite.Sprite):
         self.image = self.character_death[int(self.character_death_index)]
 
     def character_walk_forward_animation(self):
-        if game_manager.speed_vector[0] != 0 or game_manager.speed_vector[1] != 0:
+        if movement_manager.speed_vector[0] != 0 or movement_manager.speed_vector[1] != 0:
             self.character_walk_index[1] += 0.1
             if int(self.character_walk_index[1]) == 4:
                 self.character_walk_index[1] = 0
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_walk_backward_animation(self):
-        if game_manager.speed_vector[0] != 0 or game_manager.speed_vector[1] != 0:
+        if movement_manager.speed_vector[0] != 0 or movement_manager.speed_vector[1] != 0:
             self.character_walk_index[1] -= 0.1
             if int(self.character_walk_index[1]) == -4:
                 self.character_walk_index[1] = 0
@@ -140,8 +140,8 @@ class Hero(pygame.sprite.Sprite):
 
     def character_attack_animation(self):
         if self.attack:
-            game_manager.speed_vector = 0,0
-            game_manager.acceleration_vector = 0,0
+            movement_manager.speed_vector = 0,0
+            movement_manager.acceleration_vector = 0,0
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
             self.rect = self.image.get_rect(midbottom = (self.sprite_position))
 

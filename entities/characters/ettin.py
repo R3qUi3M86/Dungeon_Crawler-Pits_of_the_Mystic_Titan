@@ -5,7 +5,7 @@ from entities import shadow
 from entities import melee_range
 from utilities import util
 from utilities import combat_manager
-from utilities import game_manager
+from utilities import movement_manager
 from utilities import entity_manager
 from utilities.constants import *
 from utilities import monster_ai
@@ -79,7 +79,8 @@ class Ettin(pygame.sprite.Sprite):
     def update(self):
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         if self.living == True:
-            self.set_facing_direction()
+            if self.attack == False and self.in_pain == False:
+                self.set_facing_direction()
 
             if self.monster_ai.monster_can_melee_attack_player():
                 self.monster_ai.increment_attack_decision_timer()
@@ -209,7 +210,7 @@ class Ettin(pygame.sprite.Sprite):
                 self.monster_ai.finish_avoiding_obstacle()
             self.walk_speed_vector = 0,0
         else:
-            game_manager.monster_collision(entity_manager.get_collision_sprite_by_id(self.id))
+            movement_manager.monster_collision(entity_manager.get_collision_sprite_by_id(self.id))
             if self.facing_direction == SECTOR_E:
                 self.walk_speed_vector = 1.4,0
             elif self.facing_direction == SECTOR_NE:

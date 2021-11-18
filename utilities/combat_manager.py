@@ -14,9 +14,10 @@ def attack_monster_with_melee_attack():
     for entity in entity_manager.melee_collision_sprite_groups:
         if entity != unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP:
             for PLAYER_MELEE_SPRITE in unique_player_objects.PLAYER_MELEE_SPRITES:
-                if PLAYER_MELEE_SPRITE.sector == unique_player_objects.HERO.facing_direction and pygame.sprite.collide_mask(PLAYER_MELEE_SPRITE, entity.sprite) != None:
-                    enemy_has_been_hit = True
-                    break
+                if PLAYER_MELEE_SPRITE.sector == unique_player_objects.HERO.facing_direction and PLAYER_MELEE_SPRITE.rect.colliderect(entity.sprite.rect):
+                    if PLAYER_MELEE_SPRITE.sector == unique_player_objects.HERO.facing_direction and pygame.sprite.collide_mask(PLAYER_MELEE_SPRITE, entity.sprite) != None:
+                        enemy_has_been_hit = True
+                        break
             
             if enemy_has_been_hit == True:
                 hit_something = True

@@ -1,7 +1,6 @@
 import pygame
-from pygame import sprite
 from utilities.constants import *
-from utilities import game_manager
+from utilities import movement_manager
 from entities.characters import unique_player_objects
 from entities.characters import ettin
 
@@ -27,8 +26,8 @@ def generate_monster(monster_type, position):
 def update_non_player_entities_position(entities):
     for entity in entities:
         if unique_player_objects.HERO_SPRITE_GROUP.sprite.attack == True or unique_player_objects.HERO_SPRITE_GROUP.sprite.living == False:
-            game_manager.speed_vector = 0,0
-        entity.sprite.update_position(game_manager.speed_vector)
+            movement_manager.speed_vector = 0,0
+        entity.sprite.update_position(movement_manager.speed_vector)
 
 def get_monster_sprite(monster_id):
     for monster in character_sprite_groups:

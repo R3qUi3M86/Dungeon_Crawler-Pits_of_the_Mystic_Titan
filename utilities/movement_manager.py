@@ -5,27 +5,29 @@ from utilities.constants import SECTOR_N
 
 acceleration_vector = 0,0
 speed_vector = 0,0
-player_speed = 3
+player_speed = 15
 
 def player_movement_collision():
     for movement_collision_sprite_group in entity_manager.movement_collision_sprite_groups:
         if movement_collision_sprite_group == unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP:
             pass
         else:
-            mask_collision_coordinates = pygame.sprite.collide_mask(unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP.sprite, movement_collision_sprite_group.sprite)
-            if mask_collision_coordinates != None:
-                adjust_player_movement_vector(mask_collision_coordinates)
+            if unique_player_objects.PLAYER_SHADOW_SPRITE.rect.colliderect(movement_collision_sprite_group.sprite.rect):
+                mask_collision_coordinates = pygame.sprite.collide_mask(unique_player_objects.PLAYER_SHADOW_SPRITE, movement_collision_sprite_group.sprite)
+                if mask_collision_coordinates != None:
+                    adjust_player_movement_vector(mask_collision_coordinates)
 
 def monster_collision(current_monster_movement_collision_sprite):
-    for monster_movement_collision_sprite_group in entity_manager.movement_collision_sprite_groups:
-        monster_movement_collision_sprite = monster_movement_collision_sprite_group.sprite
-        if current_monster_movement_collision_sprite.id == monster_movement_collision_sprite.id:
+    for movement_collision_sprite_group in entity_manager.movement_collision_sprite_groups:
+        movement_collision_sprite = movement_collision_sprite_group.sprite
+        if movement_collision_sprite_group == unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP or current_monster_movement_collision_sprite == movement_collision_sprite:
             pass
         else:
-            mask_collision_coordinates = pygame.sprite.collide_mask(current_monster_movement_collision_sprite, monster_movement_collision_sprite)
-            if mask_collision_coordinates != None:
-                monster = entity_manager.get_monster_sprite(current_monster_movement_collision_sprite.id)
-                adjust_monster_movement_vector(mask_collision_coordinates, monster, current_monster_movement_collision_sprite)
+            if movement_collision_sprite.rect.colliderect(current_monster_movement_collision_sprite):
+                mask_collision_coordinates = pygame.sprite.collide_mask(current_monster_movement_collision_sprite, movement_collision_sprite)
+                if mask_collision_coordinates != None:
+                    monster = entity_manager.get_monster_sprite(current_monster_movement_collision_sprite.id)
+                    adjust_monster_movement_vector(mask_collision_coordinates, monster, current_monster_movement_collision_sprite)
 
 def adjust_player_movement_vector(mask_collision_coordinates):
     global speed_vector
