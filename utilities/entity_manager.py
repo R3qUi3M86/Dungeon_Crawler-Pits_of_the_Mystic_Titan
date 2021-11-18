@@ -128,3 +128,8 @@ def generate_monsters():
     generate_monster(ETTIN, (200,600))
     generate_monster(ETTIN, (400,600))
     generate_monster(ETTIN, (600,600))
+
+def fix_all_dead_bodies_to_pixel_accuracy():
+    for character in charcter_sprite_groups:
+        if character.sprite.living == False:
+            character.sprite.position = int(character.sprite.position[0]), int(character.sprite.position[1])

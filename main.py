@@ -53,7 +53,7 @@ def get_player_wsad_input(keys):
     elif game_manager.acceleration_vector[Y] < -30.0:
         game_manager.acceleration_vector = game_manager.acceleration_vector[X], -30.0
 
-    game_manager.speed_vector = (game_manager.acceleration_vector[X]/30)*game_manager.player_speed, (game_manager.acceleration_vector[Y]/30)*game_manager.player_speed*0.55
+    game_manager.speed_vector = round(((game_manager.acceleration_vector[X]/30)*game_manager.player_speed),2), round(((game_manager.acceleration_vector[Y]/30)*game_manager.player_speed*0.55),2)
 
 def order_sprites():
     for _ in range(len(entity_manager.melee_sector_sprite_groups)-1):

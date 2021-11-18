@@ -114,7 +114,7 @@ class Ettin(pygame.sprite.Sprite):
                 self.monster_ai.increment_direction_change_decision_timer()
             else:
                 self.facing_direction = self.monster_ai.player_direction_sector
-        self.position = self.position[0]-vector[0]+self.walk_speed_vector[0],self.position[1] - vector[1] +self.walk_speed_vector[1]
+        self.position = round((self.position[0]-vector[0]+self.walk_speed_vector[0]),2),round((self.position[1] - vector[1] +self.walk_speed_vector[1]),2)
         for auxilary_sprite in self.monster_auxilary_sprites:
             auxilary_sprite.position = self.position
         for melee_sprite  in self.monster_melee_sprites:
@@ -234,7 +234,10 @@ class Ettin(pygame.sprite.Sprite):
             sound_player.ettin_death_sound.play()
             self.living = False
             self.dying = True
+            self.walk_speed_vector = 0,0
             entity_manager.kill_monster(self.id)
+            entity_manager.fix_all_dead_bodies_to_pixel_accuracy()
+            print(self.position)
         else:
             self.in_pain = True
             if random.choice(range(4)) == 0:
