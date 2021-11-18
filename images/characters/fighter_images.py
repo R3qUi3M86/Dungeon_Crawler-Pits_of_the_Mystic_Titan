@@ -50,6 +50,23 @@ character_attack_south2      = pygame.image.load("images/characters/fighter/sout
 character_attack_south_east1 = pygame.image.load("images/characters/fighter/south_east_attack_01.png").convert_alpha()
 character_attack_south_east2 = pygame.image.load("images/characters/fighter/south_east_attack_02.png").convert_alpha()
 
+character_death1 = pygame.image.load("images/characters/fighter/death_01.png").convert_alpha()
+character_death2 = pygame.image.load("images/characters/fighter/death_02.png").convert_alpha()
+character_death3 = pygame.image.load("images/characters/fighter/death_03.png").convert_alpha()
+character_death4 = pygame.image.load("images/characters/fighter/death_04.png").convert_alpha()
+character_death5 = pygame.image.load("images/characters/fighter/death_05.png").convert_alpha()
+character_death6 = pygame.image.load("images/characters/fighter/death_06.png").convert_alpha()
+character_death7 = pygame.image.load("images/characters/fighter/death_07.png").convert_alpha()
+
+character_pain_east       = pygame.image.load("images/characters/fighter/east_pain.png").convert_alpha()
+character_pain_north_east = pygame.image.load("images/characters/fighter/north_east_pain.png").convert_alpha()
+character_pain_north      = pygame.image.load("images/characters/fighter/north_pain.png").convert_alpha()
+character_pain_north_west = pygame.image.load("images/characters/fighter/north_west_pain.png").convert_alpha()
+character_pain_west       = pygame.image.load("images/characters/fighter/west_pain.png").convert_alpha()
+character_pain_south_west = pygame.image.load("images/characters/fighter/south_west_pain.png").convert_alpha()
+character_pain_south      = pygame.image.load("images/characters/fighter/south_pain.png").convert_alpha()
+character_pain_south_east = pygame.image.load("images/characters/fighter/south_east_pain.png").convert_alpha()
+
 character_walk =[[character_walk_east1,character_walk_east2,character_walk_east3,character_walk_east4],
                 [character_walk_north_east1,character_walk_north_east2,character_walk_north_east3,character_walk_north_east4],
                 [character_walk_north1,character_walk_north2,character_walk_north3,character_walk_north4],
@@ -68,3 +85,4 @@ character_attack = [[character_attack_east1,character_attack_east2],
                 [character_attack_south1,character_attack_south2],
                 [character_attack_south_east1,character_attack_south_east2]]
 
+character_death = [character_death1,character_death2,character_death3,character_death4,character_death5,character_death6,character_death7]

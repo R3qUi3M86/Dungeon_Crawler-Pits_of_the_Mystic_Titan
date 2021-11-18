@@ -8,20 +8,33 @@ class Ai():
         self.owning_monster = owner
         self.moving_direction = SECTOR_S
         self.player_direction_sector = SECTOR_S
-        self.melee_colliding_sprite = None
-        #self.player_direction_angle = self.get_player_direction_angle(self.owning_monster.sprite_position)
+
         self.direction_change_decision_timer = 0.0
         self.direction_change_decision_timer_limit = 6
+
+        self.attack_decision_timer = 0.0
+        self.attack_decision_timer_limit = 3
         
         self.avoiding_obstacle = False
         self.obstacle_sector = None
         self.avoidance_direction_sector = None
         self.diagonal_avoidance = False
         self.final_approach = False
+    
+    #Movement directional change timer
+    def increment_direction_change_decision_timer(self):
+        self.direction_change_decision_timer += 0.1
+        if int(self.direction_change_decision_timer) == self.direction_change_decision_timer_limit:
+            self.direction_change()
+            self.direction_change_decision_timer = 0.0
+            if self.avoiding_obstacle == False:
+                self.direction_change_decision_timer_limit = 6
+                self.randomize_direction_change_decision_timer_limit() 
 
-    def get_player_direction_angle(self,monster_position):
-        return util.get_total_angle(monster_position,PLAYER_POSITION)
+    def randomize_direction_change_decision_timer_limit(self):
+        self.direction_change_decision_timer_limit += random.choice(range(12))
 
+    #Obstacle avoidance logic
     def set_avoidance_direction_sector(self, monster_position,horizontal_vertial):
         player_direction_angle = self.get_player_direction_angle(monster_position)
         if horizontal_vertial == VERTICAL:
@@ -34,18 +47,21 @@ class Ai():
                 self.avoidance_direction_sector = SECTOR_E
             else:
                 self.avoidance_direction_sector = SECTOR_W
- 
-    def randomize_direction_change_decision_timer_limit(self):
-        self.direction_change_decision_timer_limit += random.choice(range(12))
 
-    def increment_direction_change_decision_timer(self):
-        self.direction_change_decision_timer += 0.1
-        if int(self.direction_change_decision_timer) == self.direction_change_decision_timer_limit:
-            self.direction_change()
-            self.direction_change_decision_timer = 0.0
-            if self.avoiding_obstacle == False:
-                self.direction_change_decision_timer_limit = 6
-                self.randomize_direction_change_decision_timer_limit()
+    def avoid_obstacle(self,sector):
+        self.finish_avoiding_obstacle()
+        self.direction_change_decision_timer_limit = 1
+        self.direction_change_decision_timer = 0
+        self.avoiding_obstacle = True
+        self.obstacle_sector = sector
+        if sector == SECTOR_N:
+            self.owning_monster.facing_direction = SECTOR_S
+        elif sector == SECTOR_S:
+            self.owning_monster.facing_direction = SECTOR_N
+        elif sector == SECTOR_E:
+            self.owning_monster.facing_direction = SECTOR_W
+        elif sector == SECTOR_W:
+            self.owning_monster.facing_direction = SECTOR_E
 
     def direction_change(self):
         if self.avoiding_obstacle == False:
@@ -67,13 +83,6 @@ class Ai():
             self.final_approach = True
         else:
             self.finish_avoiding_obstacle()
-    
-    def finish_avoiding_obstacle(self):
-            self.avoiding_obstacle = False
-            self.obstacle_sector = None
-            self.avoidance_direction_sector = None
-            self.diagonal_avoidance = False
-            self.final_approach = False
 
     def change_to_parallel_direction(self):
             if self.obstacle_sector == SECTOR_N or self.obstacle_sector == SECTOR_S:
@@ -100,31 +109,33 @@ class Ai():
                 self.owning_monster.facing_direction = SECTOR_NW
             elif self.obstacle_sector == SECTOR_W and self.avoidance_direction_sector == SECTOR_S:
                 self.owning_monster.facing_direction = SECTOR_SW
-    
+
+    def finish_avoiding_obstacle(self):
+            self.avoiding_obstacle = False
+            self.obstacle_sector = None
+            self.avoidance_direction_sector = None
+            self.diagonal_avoidance = False
+            self.final_approach = False
+
+    #Combat decisions
     def monster_can_melee_attack_player(self):
-        self.player_direction_sector = util.get_facing_direction(self.owning_monster.sprite_position,PLAYER_POSITION)
-        for melee_sprite in self.owning_monster.monster_melee_sprites:
-            if pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE):
-                self.melee_colliding_sprite = melee_sprite
-                return True
+        if unique_player_objects.HERO.living == True:
+            self.player_direction_sector = util.get_facing_direction(self.owning_monster.sprite_position,PLAYER_POSITION)
+            for melee_sprite in self.owning_monster.monster_melee_sprites:
+                if pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE):
+                    return True
         return False
+
+    #Combat decisions timer
+    def increment_attack_decision_timer(self):
+        self.attack_decision_timer += 0.05
+        if int(self.attack_decision_timer) == self.attack_decision_timer_limit:
+            self.owning_monster.attack = True
+            self.attack_decision_timer = 0.0
     
-    def avoid_obstacle(self,sector):
-        self.finish_avoiding_obstacle()
-        self.direction_change_decision_timer_limit = 1
-        self.direction_change_decision_timer = 0
-        self.avoiding_obstacle = True
-        self.obstacle_sector = sector
-        if sector == SECTOR_N:
-            self.owning_monster.facing_direction = SECTOR_S
-        elif sector == SECTOR_S:
-            self.owning_monster.facing_direction = SECTOR_N
-        elif sector == SECTOR_E:
-            self.owning_monster.facing_direction = SECTOR_W
-        elif sector == SECTOR_W:
-            self.owning_monster.facing_direction = SECTOR_E
-
-
+    #Misc
+    def get_player_direction_angle(self,monster_position):
+        return util.get_total_angle(monster_position,PLAYER_POSITION)
 
 
 

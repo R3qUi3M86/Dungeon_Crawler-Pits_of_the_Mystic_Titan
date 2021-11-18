@@ -25,7 +25,7 @@ def generate_monster(monster_type, position):
 
 def update_non_player_entities_position(entities):
     for entity in entities:
-        if unique_player_objects.HERO.atack == True:
+        if unique_player_objects.HERO.attack == True or unique_player_objects.HERO.living == False:
             game_manager.speed_vector = 0,0
         entity.update_position(game_manager.speed_vector)
 

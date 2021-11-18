@@ -19,6 +19,8 @@ class Hero(pygame.sprite.Sprite):
         self.character_attack_index = [6,0]
         
         #Death assets
+        self.character_death = character_death
+        self.character_death_index = 0
 
         #Pain assets
         self.character_pain_timer = 0
@@ -29,7 +31,7 @@ class Hero(pygame.sprite.Sprite):
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
 
-        self.atack = False
+        self.attack = False
         self.facing_direction = SECTOR_S
         self.speed_vector = 0,0
         self.living = True
@@ -40,7 +42,15 @@ class Hero(pygame.sprite.Sprite):
     #Update functions
     def update(self):
         self.set_facing_direction()
-        self.player_input()
+       
+        if self.living:
+            self.player_input()
+
+        if self.in_pain == True:
+            self.character_pain_animation()
+        
+        if self.dying == True:
+            self.character_death_animation()
 
     def set_facing_direction(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -69,16 +79,44 @@ class Hero(pygame.sprite.Sprite):
             elif keys[pygame.K_d] and self.facing_westwards():
                 self.character_walk_backward_animation()
         
-        if pygame.mouse.get_pressed()[0] or self.atack == True:
-            self.atack = True
+        if pygame.mouse.get_pressed()[0] or self.attack == True:
+            self.attack = True
             self.character_attack_animation()
     
     #Animations
     def character_pain_animation(self):
-        pass
+        if self.attack or self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
+            self.in_pain = False
+        else:
+            self.character_pain_timer += 0.05
+            if self.facing_direction == SECTOR_E:
+                self.image = character_pain_east
+            elif self.facing_direction == SECTOR_NE:
+                self.image = character_pain_north_east
+            elif self.facing_direction == SECTOR_N:
+                self.image = character_pain_north
+            elif self.facing_direction == SECTOR_NW:
+                self.image = character_pain_north_west
+            elif self.facing_direction == SECTOR_W:
+                self.image = character_pain_west
+            elif self.facing_direction == SECTOR_SW:
+                self.image = character_pain_south_west
+            elif self.facing_direction == SECTOR_S:
+                self.image = character_pain_south
+            elif self.facing_direction == SECTOR_SE:
+                self.image = character_pain_south_east
+            if int(self.character_pain_timer) >= 1:
+                self.in_pain = False
+                self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
+                self.character_pain_timer = 0
 
     def character_death_animation(self):
-        pass
+        self.in_pain == False
+        self.character_death_index += 0.1
+        if int(self.character_death_index) == 7:
+            self.character_death_index = 6
+            self.dying == False
+        self.image = self.character_death[int(self.character_death_index)]
 
     def character_walk_forward_animation(self):
         if game_manager.speed_vector[0] != 0 or game_manager.speed_vector[1] != 0:
@@ -95,7 +133,7 @@ class Hero(pygame.sprite.Sprite):
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_attack_animation(self):
-        if self.atack:
+        if self.attack:
             game_manager.speed_vector = 0,0
             game_manager.acceleration_vector = 0,0
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
@@ -105,7 +143,7 @@ class Hero(pygame.sprite.Sprite):
             if round(self.character_attack_index[1],2) == 1.00:
                 combat_manager.attack_monster_with_melee_attack()
             if int(self.character_attack_index[1]) == 2:
-                self.atack = False
+                self.attack = False
                 self.character_attack_index[1] = 0
                 self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
                 self.rect = self.image.get_rect(midbottom = (self.sprite_position))

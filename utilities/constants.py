@@ -23,6 +23,7 @@ Y = 1
 
 CHARACTER_SPRITE_INDEX = 9
 
+PLAYER = "player"
 ETTIN = "ettin"
 
 SIZE_SMALL = 'small'

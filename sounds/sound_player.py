@@ -8,6 +8,8 @@ hero_melee_hit_sound = pygame.mixer.Sound('sounds/attack/hit/ETHIT1.wav')
 hero_melee_hit_sound.set_volume(0.1)
 monster_melee_miss_sound = pygame.mixer.Sound('sounds/attack/WTRSWIP.wav')
 monster_melee_miss_sound.set_volume(0.1)
+monster_melee_hit_sound = pygame.mixer.Sound('sounds/attack/hit/MUMPUN5.wav')
+monster_melee_hit_sound.set_volume(0.1)
 
 player_pain_sound = pygame.mixer.Sound('sounds/player/FGTPAIN.wav')
 player_pain_sound.set_volume(0.1)
