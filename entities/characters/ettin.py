@@ -36,7 +36,7 @@ class Ettin(pygame.sprite.Sprite):
         #Owned sprites
         self.monster_collision_shadow= shadow.Shadow(self.sprite_position, self.id, SIZE_MEDIUM_SMALL, True)
         self.melee_collision_shadow  = shadow.Shadow(self.sprite_position, self.id, SIZE_MEDIUM, False)
-        self.monster_melee_e_sector  = melee_range.Melee(self.sprite_position, SECTOR_E)
+        self.monster_melee_e_sector  = melee_range.Melee((self.sprite_position[0],self.sprite_position[1]-50), SECTOR_E)
         self.monster_melee_ne_sector = melee_range.Melee(self.sprite_position, SECTOR_NE)
         self.monster_melee_n_sector  = melee_range.Melee(self.sprite_position, SECTOR_N)
         self.monster_melee_nw_sector = melee_range.Melee(self.sprite_position, SECTOR_NW)
@@ -45,7 +45,7 @@ class Ettin(pygame.sprite.Sprite):
         self.monster_melee_s_sector  = melee_range.Melee(self.sprite_position, SECTOR_S)
         self.monster_melee_se_sector = melee_range.Melee(self.sprite_position, SECTOR_SE)
         self.monster_melee_sprites = [self.monster_melee_e_sector,self.monster_melee_ne_sector,self.monster_melee_n_sector,self.monster_melee_nw_sector,self.monster_melee_w_sector,self.monster_melee_sw_sector,self.monster_melee_s_sector,self.monster_melee_se_sector]
-        self.monster_auxilary_sprites = [self.monster_collision_shadow,self.melee_collision_shadow,self.monster_melee_e_sector,self.monster_melee_ne_sector,self.monster_melee_n_sector,self.monster_melee_nw_sector,self.monster_melee_w_sector,self.monster_melee_sw_sector,self.monster_melee_s_sector,self.monster_melee_se_sector]
+        self.monster_auxilary_sprites = [self.monster_collision_shadow,self.melee_collision_shadow]
 
         #Initial image definition
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
@@ -54,7 +54,7 @@ class Ettin(pygame.sprite.Sprite):
         #Character properties        
         self.name = ETTIN
         self.attack = False
-        self.attack_interruption_chance = 0
+        self.attack_interruption_chance = 50
         self.attack_can_be_interrupted = True
         self.facing_direction = SECTOR_S
         self.walk_speed_vector = 0,0
@@ -105,7 +105,9 @@ class Ettin(pygame.sprite.Sprite):
                 self.facing_direction = self.monster_ai.player_direction_sector
         self.sprite_position = self.sprite_position[0]-vector[0]+self.walk_speed_vector[0],self.sprite_position[1] - vector[1] +self.walk_speed_vector[1]
         for auxilary_sprite in self.monster_auxilary_sprites:
-            auxilary_sprite.sprite_position = self.sprite_position
+            auxilary_sprite.sprite_position = self.sprite_position[0], self.sprite_position[1]-3
+        for melee_sprite  in self.monster_melee_sprites:
+            melee_sprite.sprite_position = self.sprite_position[0], self.sprite_position[1]-12
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
     
     def set_facing_direction(self):

@@ -6,36 +6,38 @@ from images.misc.melee_images import *
 class Melee(pygame.sprite.Sprite):
     def __init__(self, position, sector):
         super().__init__()
+        self.position = position
         self.sector = sector
-        self.sprite_position = position
-        self.sector_position = self.get_sector_position(self.sector)
-        self.image = melee
-        self.rect = self.image.get_rect(midbottom = (self.sector_position))
-        self.mask = pygame.mask.from_surface(melee_mask)
+        self.image = melee_mask_image
+        self.sprite_position = self.get_position()
+        self.rect = self.image.get_rect(center = (self.position))
+        self.mask = pygame.mask.from_surface(self.get_sector_image())
 
     #Update functions
     def update(self):
-        self.sector_position = self.get_sector_position(self.sector)
-        self.rect = self.image.get_rect(midbottom = (self.sector_position))
+        self.rect = self.image.get_rect(center = (self.sprite_position))
 
     def update_position(self, vector):
         self.sprite_position = self.sprite_position[0] - vector[0], self.sprite_position[1] - vector[1]
 
     #Misc
-    def get_sector_position(self,sector):
-        if sector == SECTOR_E:
-            return self.sprite_position[0]+30,self.sprite_position[1]
-        elif sector == SECTOR_NE:
-            return self.sprite_position[0]+20,self.sprite_position[1]-13
-        elif sector == SECTOR_N:
-            return self.sprite_position[0],self.sprite_position[1]-20
-        elif sector == SECTOR_NW:
-            return self.sprite_position[0]-20,self.sprite_position[1]-13
-        elif sector == SECTOR_W:
-            return self.sprite_position[0]-30,self.sprite_position[1]
-        elif sector == SECTOR_SW:
-            return self.sprite_position[0]-20,self.sprite_position[1]+13
-        elif sector == SECTOR_S:
-            return self.sprite_position[0],self.sprite_position[1]+20
-        elif sector == SECTOR_SE:
-            return self.sprite_position[0]+20,self.sprite_position[1]+13
+    def get_position(self):
+        return self.position[0],self.position[1]-10
+
+    def get_sector_image(self):
+        if self.sector == SECTOR_E:
+            return melee_mask_e
+        elif self.sector == SECTOR_NE:
+            return melee_mask_ne
+        elif self.sector == SECTOR_N:
+            return melee_mask_n
+        elif self.sector == SECTOR_NW:
+            return melee_mask_nw
+        elif self.sector == SECTOR_W:
+            return melee_mask_w
+        elif self.sector == SECTOR_SW:
+            return melee_mask_sw
+        elif self.sector == SECTOR_S:
+            return melee_mask_s
+        elif self.sector == SECTOR_SE:
+            return melee_mask_se
