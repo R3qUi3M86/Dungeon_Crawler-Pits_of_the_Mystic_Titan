@@ -69,7 +69,7 @@ class Ai():
             if decision == 0:
                 self.owning_monster.facing_direction = random.choice(SECTORS)
             else:
-                self.owning_monster.facing_direction = util.get_facing_direction(self.owning_monster.sprite_position,PLAYER_POSITION)
+                self.owning_monster.facing_direction = util.get_facing_direction(self.owning_monster.position,PLAYER_POSITION)
         
         elif self.avoiding_obstacle == True and self.avoidance_direction_sector == None:
             self.change_to_parallel_direction()
@@ -79,16 +79,16 @@ class Ai():
             self.diagonal_avoidance = True
 
         elif self.final_approach == False:
-            self.owning_monster.facing_direction = util.get_facing_direction(self.owning_monster.sprite_position,PLAYER_POSITION)
+            self.owning_monster.facing_direction = util.get_facing_direction(self.owning_monster.position,PLAYER_POSITION)
             self.final_approach = True
         else:
             self.finish_avoiding_obstacle()
 
     def change_to_parallel_direction(self):
             if self.obstacle_sector == SECTOR_N or self.obstacle_sector == SECTOR_S:
-                self.set_avoidance_direction_sector(self.owning_monster.sprite_position, HORIZONTAL)
+                self.set_avoidance_direction_sector(self.owning_monster.position, HORIZONTAL)
             else:
-                self.set_avoidance_direction_sector(self.owning_monster.sprite_position, VERTICAL)
+                self.set_avoidance_direction_sector(self.owning_monster.position, VERTICAL)
             self.owning_monster.facing_direction = self.avoidance_direction_sector
             self.direction_change_decision_timer_limit = 6
 
@@ -120,7 +120,7 @@ class Ai():
     #Combat decisions
     def monster_can_melee_attack_player(self):
         if unique_player_objects.HERO.living == True:
-            self.player_direction_sector = util.get_facing_direction(self.owning_monster.sprite_position,PLAYER_POSITION)
+            self.player_direction_sector = util.get_facing_direction(self.owning_monster.position,PLAYER_POSITION)
             for melee_sprite in self.owning_monster.monster_melee_sprites:
                 if pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE):
                     return True

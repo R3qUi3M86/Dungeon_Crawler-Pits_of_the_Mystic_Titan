@@ -5,6 +5,7 @@ from utilities.constants import SECTOR_N
 
 acceleration_vector = 0,0
 speed_vector = 0,0
+player_speed = 3
 
 def player_movement_collision():
     for movement_collision_sprite in entity_manager.movement_collision_sprites:

@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from utilities import constants
+from utilities.constants import *
 from utilities import entity_manager
 from settings import *
 
@@ -64,21 +64,21 @@ def get_total_angle(current_entity_pos,other_entity_pos):
 def get_facing_direction(current_entity_pos,other_entity_pos):
     angle = get_total_angle(current_entity_pos,other_entity_pos)
     if angle >= 346.5 or angle < 13.5:
-        return constants.SECTOR_E
+        return SECTOR_E
     elif angle >= 13.5 and angle < 55:
-        return constants.SECTOR_NE
+        return SECTOR_NE
     elif angle >= 55 and angle < 125:
-        return constants.SECTOR_N
+        return SECTOR_N
     elif angle >= 125 and angle < 166.5:
-        return constants.SECTOR_NW
+        return SECTOR_NW
     elif angle >= 166.5 and angle < 193.5:
-        return constants.SECTOR_W
+        return SECTOR_W
     elif angle >= 193.5 and angle < 235:
-        return constants.SECTOR_SW
+        return SECTOR_SW
     elif angle >= 235 and angle < 305:
-        return constants.SECTOR_S
+        return SECTOR_S
     elif angle >= 305 and angle < 346.5:
-        return constants.SECTOR_SE
+        return SECTOR_SE
 
 def generate_entity_id():
     if len(entity_manager.entities_id) == 0:

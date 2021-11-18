@@ -11,45 +11,54 @@ clock = pygame.time.Clock()
 entity_manager.generate_monsters()
 
 def get_player_wsad_input(keys):
-    if keys[pygame.K_s] and game_manager.acceleration_vector[Y] < 30:
+    if keys[pygame.K_s] and game_manager.acceleration_vector[Y] < 30.0:
         game_manager.acceleration_vector = game_manager.acceleration_vector[X],game_manager.acceleration_vector[Y]+1
 
     if not keys[pygame.K_s] and game_manager.acceleration_vector[Y] > 0:
         game_manager.acceleration_vector = game_manager.acceleration_vector[X],0
     
-    if keys[pygame.K_w] and game_manager.acceleration_vector[Y] > -30:
+    if keys[pygame.K_w] and game_manager.acceleration_vector[Y] > -30.0:
         game_manager.acceleration_vector = game_manager.acceleration_vector[X],game_manager.acceleration_vector[Y]-1
 
     if not keys[pygame.K_w] and game_manager.acceleration_vector[Y] < 0:
         game_manager.acceleration_vector = game_manager.acceleration_vector[X],0
 
-    if keys[pygame.K_a] and game_manager.acceleration_vector[X] > -30:
+    if keys[pygame.K_a] and game_manager.acceleration_vector[X] > -30.0:
         game_manager.acceleration_vector = game_manager.acceleration_vector[X]-1,game_manager.acceleration_vector[1]
 
     if not keys[pygame.K_a] and game_manager.acceleration_vector[X] < 0:
         game_manager.acceleration_vector = 0,game_manager.acceleration_vector[Y]
     
-    if keys[pygame.K_d] and game_manager.acceleration_vector[X] < 30:
+    if keys[pygame.K_d] and game_manager.acceleration_vector[X] < 30.0:
         game_manager.acceleration_vector = game_manager.acceleration_vector[X]+1,game_manager.acceleration_vector[Y]
 
     if not keys[pygame.K_d] and game_manager.acceleration_vector[X] > 0:
         game_manager.acceleration_vector = 0,game_manager.acceleration_vector[Y]
 
-    if game_manager.acceleration_vector[X] > 21 and game_manager.acceleration_vector[Y] > 21:
-        game_manager.acceleration_vector = 21,21
-    elif game_manager.acceleration_vector[X] > 21 and game_manager.acceleration_vector[Y] < -21:
-        game_manager.acceleration_vector = 21,-21
-    elif game_manager.acceleration_vector[X] < -21 and game_manager.acceleration_vector[Y] > 21:
-        game_manager.acceleration_vector = -21,21
-    elif game_manager.acceleration_vector[X] < -21 and game_manager.acceleration_vector[Y] < -21:
-        game_manager.acceleration_vector = -21,-21
+    if game_manager.acceleration_vector[X] > 21.2 and game_manager.acceleration_vector[Y] > 22.54:
+        game_manager.acceleration_vector = 21.2,22.54
+    elif game_manager.acceleration_vector[X] > 21.2 and game_manager.acceleration_vector[Y] < -22.54:
+        game_manager.acceleration_vector = 21.2,-22.54
+    elif game_manager.acceleration_vector[X] < -21.2 and game_manager.acceleration_vector[Y] > 22.54:
+        game_manager.acceleration_vector = -21.2,22.54
+    elif game_manager.acceleration_vector[X] < -21.2 and game_manager.acceleration_vector[Y] < -22.54:
+        game_manager.acceleration_vector = -21.2,-22.54
 
-    game_manager.speed_vector = game_manager.acceleration_vector[X]/10, game_manager.acceleration_vector[Y]/10
+    if game_manager.acceleration_vector[X] > 30.0:
+        game_manager.acceleration_vector = 30.0, game_manager.acceleration_vector[Y]
+    elif game_manager.acceleration_vector[X] < -30.0:
+        game_manager.acceleration_vector = -30.0, game_manager.acceleration_vector[Y]
+    if game_manager.acceleration_vector[Y] > 30.0:
+        game_manager.acceleration_vector = game_manager.acceleration_vector[X], 30.0
+    elif game_manager.acceleration_vector[Y] < -30.0:
+        game_manager.acceleration_vector = game_manager.acceleration_vector[X], -30.0
+
+    game_manager.speed_vector = (game_manager.acceleration_vector[X]/30)*game_manager.player_speed, (game_manager.acceleration_vector[Y]/30)*game_manager.player_speed*0.55
 
 def order_sprites():
     for _ in range(len(entity_manager.all_entities)-1):
         for j in range(len(entity_manager.all_entities)-1):
-            if entity_manager.all_entities[j].sprites()[0].sprite_position[Y] > entity_manager.all_entities[j+1].sprites()[0].sprite_position[Y]:
+            if entity_manager.all_entities[j].sprites()[0].position[Y] > entity_manager.all_entities[j+1].sprites()[0].position[Y]:
                     entity_manager.all_entities[j], entity_manager.all_entities[j+1] = entity_manager.all_entities[j+1], entity_manager.all_entities[j]
 
 def collision_detection():

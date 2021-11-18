@@ -15,7 +15,7 @@ class Melee(pygame.sprite.Sprite):
 
     #Update functions
     def update(self):
-        self.rect = self.image.get_rect(center = (self.sprite_position))
+        self.rect = self.image.get_rect(center = (self.position))
 
     def update_position(self, vector):
         self.sprite_position = self.sprite_position[0] - vector[0], self.sprite_position[1] - vector[1]

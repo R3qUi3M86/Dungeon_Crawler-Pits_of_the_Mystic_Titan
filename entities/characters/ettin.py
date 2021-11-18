@@ -30,20 +30,21 @@ class Ettin(pygame.sprite.Sprite):
         #Pain assets
         self.character_pain_timer = 0
 
-        self.sprite_position = position
+        self.position = position
+        self.sprite_position = position[0], position[1]+12
         self.id = util.generate_entity_id()
 
         #Owned sprites
-        self.monster_collision_shadow= shadow.Shadow(self.sprite_position, self.id, SIZE_MEDIUM_SMALL, True)
-        self.melee_collision_shadow  = shadow.Shadow(self.sprite_position, self.id, SIZE_MEDIUM, False)
-        self.monster_melee_e_sector  = melee_range.Melee((self.sprite_position[0],self.sprite_position[1]-50), SECTOR_E)
-        self.monster_melee_ne_sector = melee_range.Melee(self.sprite_position, SECTOR_NE)
-        self.monster_melee_n_sector  = melee_range.Melee(self.sprite_position, SECTOR_N)
-        self.monster_melee_nw_sector = melee_range.Melee(self.sprite_position, SECTOR_NW)
-        self.monster_melee_w_sector  = melee_range.Melee(self.sprite_position, SECTOR_W)
-        self.monster_melee_sw_sector = melee_range.Melee(self.sprite_position, SECTOR_SW)
-        self.monster_melee_s_sector  = melee_range.Melee(self.sprite_position, SECTOR_S)
-        self.monster_melee_se_sector = melee_range.Melee(self.sprite_position, SECTOR_SE)
+        self.monster_collision_shadow= shadow.Shadow(self.position, self.id, SIZE_MEDIUM_SMALL, True)
+        self.melee_collision_shadow  = shadow.Shadow(self.position, self.id, SIZE_MEDIUM, False)
+        self.monster_melee_e_sector  = melee_range.Melee(self.position, SECTOR_E)
+        self.monster_melee_ne_sector = melee_range.Melee(self.position, SECTOR_NE)
+        self.monster_melee_n_sector  = melee_range.Melee(self.position, SECTOR_N)
+        self.monster_melee_nw_sector = melee_range.Melee(self.position, SECTOR_NW)
+        self.monster_melee_w_sector  = melee_range.Melee(self.position, SECTOR_W)
+        self.monster_melee_sw_sector = melee_range.Melee(self.position, SECTOR_SW)
+        self.monster_melee_s_sector  = melee_range.Melee(self.position, SECTOR_S)
+        self.monster_melee_se_sector = melee_range.Melee(self.position, SECTOR_SE)
         self.monster_melee_sprites = [self.monster_melee_e_sector,self.monster_melee_ne_sector,self.monster_melee_n_sector,self.monster_melee_nw_sector,self.monster_melee_w_sector,self.monster_melee_sw_sector,self.monster_melee_s_sector,self.monster_melee_se_sector]
         self.monster_auxilary_sprites = [self.monster_collision_shadow,self.melee_collision_shadow]
 
@@ -103,11 +104,12 @@ class Ettin(pygame.sprite.Sprite):
                 self.monster_ai.increment_direction_change_decision_timer()
             else:
                 self.facing_direction = self.monster_ai.player_direction_sector
-        self.sprite_position = self.sprite_position[0]-vector[0]+self.walk_speed_vector[0],self.sprite_position[1] - vector[1] +self.walk_speed_vector[1]
+        self.position = self.position[0]-vector[0]+self.walk_speed_vector[0],self.position[1] - vector[1] +self.walk_speed_vector[1]
         for auxilary_sprite in self.monster_auxilary_sprites:
-            auxilary_sprite.sprite_position = self.sprite_position[0], self.sprite_position[1]-3
+            auxilary_sprite.position = self.position
         for melee_sprite  in self.monster_melee_sprites:
-            melee_sprite.sprite_position = self.sprite_position[0], self.sprite_position[1]-12
+            melee_sprite.position = self.position
+        self.sprite_position = self.position[0], self.position[1]+12
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
     
     def set_facing_direction(self):
@@ -201,19 +203,19 @@ class Ettin(pygame.sprite.Sprite):
             if self.facing_direction == SECTOR_E:
                 self.walk_speed_vector = 1.4,0
             elif self.facing_direction == SECTOR_NE:
-                self.walk_speed_vector = 1,-1
+                self.walk_speed_vector = 0.99,-0.58
             elif self.facing_direction == SECTOR_N:
-                self.walk_speed_vector = 0,-1.4
+                self.walk_speed_vector = 0,-0.77
             elif self.facing_direction == SECTOR_NW:
-                self.walk_speed_vector = -1,-1
+                self.walk_speed_vector = -0.99,-0.58
             elif self.facing_direction == SECTOR_W:
                 self.walk_speed_vector = -1.4,0
             elif self.facing_direction == SECTOR_SW:
-                self.walk_speed_vector = -1,1
+                self.walk_speed_vector = -0.99,0.58
             elif self.facing_direction == SECTOR_S:
-                self.walk_speed_vector = 0,1.4
+                self.walk_speed_vector = 0,0.77
             elif self.facing_direction == SECTOR_SE:
-                self.walk_speed_vector = 1,1
+                self.walk_speed_vector = 0.99,0.58
             
     #Combat functions
     def take_damage(self, damage):

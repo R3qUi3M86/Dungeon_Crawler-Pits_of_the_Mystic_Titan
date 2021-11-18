@@ -25,7 +25,8 @@ class Hero(pygame.sprite.Sprite):
         #Pain assets
         self.character_pain_timer = 0
 
-        self.sprite_position = position
+        self.position = position
+        self.sprite_position = self.position[0], self.position[1]+8
 
         #Initial image definition
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
@@ -41,6 +42,7 @@ class Hero(pygame.sprite.Sprite):
 
     #Update functions
     def update(self):
+        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         self.set_facing_direction()
        
         if self.living:
@@ -54,7 +56,7 @@ class Hero(pygame.sprite.Sprite):
 
     def set_facing_direction(self):
         mouse_pos = pygame.mouse.get_pos()
-        self.facing_direction = util.get_facing_direction((PLAYER_POSITION[0],PLAYER_POSITION[1]-10),mouse_pos)
+        self.facing_direction = util.get_facing_direction(PLAYER_POSITION,mouse_pos)
         self.set_character_animation_direction_indices()
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
     

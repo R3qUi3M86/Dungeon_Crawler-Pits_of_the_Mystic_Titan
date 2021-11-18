@@ -8,30 +8,19 @@ class Shadow(pygame.sprite.Sprite):
 
         self.visible = visible
         self.shadow_size = size
-        self.sprite_position = position
+        self.position = position
         self.id = id
 
         self.image = self.get_self_image()
-        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+        self.rect = self.image.get_rect(center = (self.position))
         self.mask = self.get_self_mask()
 
     #Update functions    
     def update(self):
-        if self.shadow_size == constants.SIZE_SMALL:
-            self.rect = self.image.get_rect(midbottom = (self.sprite_position))
-        elif self.shadow_size == constants.SIZE_MEDIUM_SMALL:
-            medium_shadow_sprite_position = self.get_shadow_position()
-            self.rect = self.image.get_rect(midbottom = (medium_shadow_sprite_position))
-        elif self.shadow_size == constants.SIZE_MEDIUM:
-            medium_shadow_sprite_position = self.get_shadow_position()
-            self.rect = self.image.get_rect(midbottom = (medium_shadow_sprite_position))
+        self.rect = self.image.get_rect(center = (self.position))
 
     def update_position(self, vector):
-        self.sprite_position = self.sprite_position[0] - vector[0], self.sprite_position[1] - vector[1]
-
-    def get_shadow_position(self):
-        medium_shadow_sprite_position = self.sprite_position[0], self.sprite_position[1]+7
-        return medium_shadow_sprite_position
+        self.position = self.position[0] - vector[0], self.position[1] - vector[1]
 
     #Misc
     def get_self_image(self):
