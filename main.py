@@ -68,10 +68,10 @@ def order_sprites():
             if entity_manager.shadow_sprite_groups[j].sprite.position[Y] > entity_manager.shadow_sprite_groups[j+1].sprite.position[Y]:
                     entity_manager.shadow_sprite_groups[j], entity_manager.shadow_sprite_groups[j+1] = entity_manager.shadow_sprite_groups[j+1], entity_manager.shadow_sprite_groups[j]
     
-    for _ in range(len(entity_manager.charcter_sprite_groups)-1):
-        for j in range(len(entity_manager.charcter_sprite_groups)-1):
-            if entity_manager.charcter_sprite_groups[j].sprite.sprite_position[Y] > entity_manager.charcter_sprite_groups[j+1].sprite.sprite_position[Y]:
-                    entity_manager.charcter_sprite_groups[j], entity_manager.charcter_sprite_groups[j+1] = entity_manager.charcter_sprite_groups[j+1], entity_manager.charcter_sprite_groups[j]
+    for _ in range(len(entity_manager.character_sprite_groups)-1):
+        for j in range(len(entity_manager.character_sprite_groups)-1):
+            if entity_manager.character_sprite_groups[j].sprite.sprite_position[Y] > entity_manager.character_sprite_groups[j+1].sprite.sprite_position[Y]:
+                    entity_manager.character_sprite_groups[j], entity_manager.character_sprite_groups[j+1] = entity_manager.character_sprite_groups[j+1], entity_manager.character_sprite_groups[j]
 
 def collision_detection():
     game_manager.player_movement_collision()
@@ -82,7 +82,7 @@ def draw_sprites():
         melee_sectors.draw(SCREEN)
     for shadow in entity_manager.shadow_sprite_groups:
         shadow.draw(SCREEN)
-    for character in entity_manager.charcter_sprite_groups:
+    for character in entity_manager.character_sprite_groups:
         character.draw(SCREEN)
 
 #Main game loop
@@ -96,7 +96,7 @@ while True:
     collision_detection()
 
     #Updates
-    entity_manager.update_non_player_entities_position(entity_manager.charcter_sprite_groups)
+    entity_manager.update_non_player_entities_position(entity_manager.character_sprite_groups)
     entity_manager.update_all_entities()
 
     #Events

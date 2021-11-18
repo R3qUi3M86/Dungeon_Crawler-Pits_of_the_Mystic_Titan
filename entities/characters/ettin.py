@@ -235,7 +235,7 @@ class Ettin(pygame.sprite.Sprite):
             self.living = False
             self.dying = True
             self.walk_speed_vector = 0,0
-            entity_manager.kill_monster(self.id)
+            entity_manager.kill_monster_auxilary_entities(self.id)
             entity_manager.fix_all_dead_bodies_to_pixel_accuracy()
             print(self.position)
         else:

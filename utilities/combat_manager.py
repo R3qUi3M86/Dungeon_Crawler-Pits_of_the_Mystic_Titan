@@ -42,7 +42,7 @@ def attack_player_with_melee_attack(current_attacking_monster):
 
 def deal_damage_to_monster(entity, damage):
     id = entity.sprite.id
-    for monster in entity_manager.charcter_sprite_groups:
+    for monster in entity_manager.character_sprite_groups:
         if id == monster.sprite.id:
             monster.sprite.take_damage(damage)
 
