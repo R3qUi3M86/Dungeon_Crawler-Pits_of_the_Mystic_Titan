@@ -63,21 +63,21 @@ def get_total_angle(current_entity_pos,other_entity_pos):
 
 def get_facing_direction(current_entity_pos,other_entity_pos):
     angle = get_total_angle(current_entity_pos,other_entity_pos)
-    if angle >= 337.5 or angle < 22.5:
+    if angle >= 346.5 or angle < 13.5:
         return constants.SECTOR_E
-    elif angle >= 22.5 and angle < 67.5:
+    elif angle >= 13.5 and angle < 55:
         return constants.SECTOR_NE
-    elif angle >= 67.5 and angle < 112.5:
+    elif angle >= 55 and angle < 125:
         return constants.SECTOR_N
-    elif angle >= 112.5 and angle < 157.5:
+    elif angle >= 125 and angle < 166.5:
         return constants.SECTOR_NW
-    elif angle >= 157.5 and angle < 202.5:
+    elif angle >= 166.5 and angle < 193.5:
         return constants.SECTOR_W
-    elif angle >= 202.5 and angle < 247.5:
+    elif angle >= 193.5 and angle < 235:
         return constants.SECTOR_SW
-    elif angle >= 247.5 and angle < 292.5:
+    elif angle >= 235 and angle < 305:
         return constants.SECTOR_S
-    elif angle >= 292.5 and angle < 337.5:
+    elif angle >= 305 and angle < 346.5:
         return constants.SECTOR_SE
 
 def generate_entity_id():
