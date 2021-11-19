@@ -4,7 +4,7 @@ level_01_map = [
 "XXEEEXXXXXXXXXXXXXXXXX",
 "XXEEEXXXXXXX XXXX  XXX",
 "XXEEEXXXXX  ; XX  XXXX",
-"XXEEEXXXXXXXX XX  XX X",
+"XX   XXXXXXXX XX  XX X",
 "X        XXXX.    XX X",
 "X  ,    :XXXX   ``   X",
 "XXQ       0     ``XXXX",
@@ -22,7 +22,7 @@ level_01_map = [
 "XVVVX.   XXXX~~  ~~ ~X",
 "X        XXXX~~~    ~X",
 "XXXXXXXXXXXXX~~~~ ~~~X",
-"XXXXXXXXXXXXX~~~~~~~~X"     
+"XXXXXXXXXXXXXXXXXXXXXX"     
 ]
 
 #Legend

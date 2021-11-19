@@ -82,17 +82,17 @@ def collision_detection():
 
 def draw_sprites():
     for level_tile in entity_manager.level_sprite_groups:
-        level_tile.draw(SCREEN)
+        level_tile.draw(screen)
     for melee_sectors in entity_manager.melee_sector_sprite_groups:
-        melee_sectors.draw(SCREEN)
+        melee_sectors.draw(screen)
     for shadow in entity_manager.shadow_sprite_groups:
-        shadow.draw(SCREEN)
+        shadow.draw(screen)
     for character in entity_manager.character_sprite_groups:
-        character.draw(SCREEN)
+        character.draw(screen)
 
 #Main game loop
 while True:
-    SCREEN.fill([25, 23, 22])
+    screen.fill([25, 23, 22])
     order_sprites()
 
     #Inputs
@@ -113,7 +113,7 @@ while True:
     #Drawing
     draw_sprites()
     
-    cursor.cursor.draw(SCREEN)
+    cursor.cursor.draw(screen)
     cursor.cursor.update()
     #screen.blit(level.test_surface_scaled,(-800,0))
     

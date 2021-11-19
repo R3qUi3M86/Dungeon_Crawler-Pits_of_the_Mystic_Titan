@@ -1,10 +1,7 @@
 import pygame
 from settings import *
 
-SCREEN = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
-
 PLAYER_SHADOW_ID = -1
-PLAYER_POSITION = 600,400
 
 X = 0
 Y = 1

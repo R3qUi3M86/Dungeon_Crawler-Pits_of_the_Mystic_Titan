@@ -76,7 +76,7 @@ class Hero(pygame.sprite.Sprite):
 
     def set_facing_direction(self):
         mouse_pos = pygame.mouse.get_pos()
-        self.facing_direction = util.get_facing_direction(PLAYER_POSITION,mouse_pos)
+        self.facing_direction = util.get_facing_direction(player_position,mouse_pos)
         self.set_character_animation_direction_indices()
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
     
