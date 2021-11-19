@@ -7,6 +7,7 @@ from utilities import util
 from utilities import combat_manager
 from utilities import movement_manager
 from utilities import entity_manager
+from entities.characters import unique_player_objects
 from utilities.constants import *
 from utilities import monster_ai
 from sounds import sound_player
@@ -30,11 +31,15 @@ class Ettin(pygame.sprite.Sprite):
         #Pain assets
         self.character_pain_timer = 0
 
+        #Position variables
         self.position = position
-        self.sprite_position = position[0], position[1]+12
+        self.sprite_display_correction = 12
+        self.sprite_position = position[0], position[1] + self.sprite_display_correction
+        
+        #Object ID
         self.id = util.generate_entity_id()
 
-        #Owned sprites
+        #Owned sprites and sprite groups
         self.monster_collision_shadow= shadow.Shadow(self.position, self.id, SIZE_SMALL, False)
         self.melee_collision_shadow  = shadow.Shadow(self.position, self.id, SIZE_MEDIUM, False)
         self.shadow                  = shadow.Shadow(self.position, self.id, SIZE_MEDIUM, True)
@@ -77,7 +82,6 @@ class Ettin(pygame.sprite.Sprite):
 
     #Update functions
     def update(self):
-        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         if self.living == True:
             if self.attack == False and self.in_pain == False:
                 self.set_facing_direction()
@@ -85,7 +89,7 @@ class Ettin(pygame.sprite.Sprite):
             if self.monster_ai.monster_can_melee_attack_player():
                 self.monster_ai.increment_attack_decision_timer()
 
-            if self.attack == False and self.in_pain == False:
+            if self.attack == False and self.in_pain == False and unique_player_objects.HERO.living == True:
                 self.set_walk_speed_vector()
                 if self.walk_speed_vector[0] != 0 or self.walk_speed_vector[1] != 0:
                     self.character_walk_forward_animation()
@@ -109,24 +113,39 @@ class Ettin(pygame.sprite.Sprite):
             self.walk_speed_vector = 0,0
             self.character_death_animation()
 
+        if  unique_player_objects.HERO.living == False:
+            self.walk_speed_vector = 0,0
+      
+        self.position = round((self.position[0] + self.walk_speed_vector[0]),2),round((self.position[1] + self.walk_speed_vector[1]),2)
+        self.sprite_position = self.position[0], self.position[1] + self.sprite_display_correction
+        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+        self.update_owned_sprites_position()
+
     def update_position(self, vector):
         if self.living == True:
             if self.monster_ai.monster_can_melee_attack_player() == False and self.attack == False:
                 self.monster_ai.increment_direction_change_decision_timer()
             else:
                 self.facing_direction = self.monster_ai.player_direction_sector
-        self.position = round((self.position[0]-vector[0]+self.walk_speed_vector[0]),2),round((self.position[1] - vector[1] +self.walk_speed_vector[1]),2)
-        for auxilary_sprite in self.monster_auxilary_sprites:
-            auxilary_sprite.position = self.position
-        for melee_sprite  in self.monster_melee_sprites:
-            melee_sprite.position = self.position
-        self.sprite_position = self.position[0], self.position[1]+12
+        
+        self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
+        self.sprite_position = self.position[0], self.position[1] + self.sprite_display_correction
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+        self.update_owned_sprites_position()
     
     def set_facing_direction(self):
         self.set_character_animation_direction_indices()
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
     
+    def update_owned_sprites_position(self):
+        for auxilary_sprite in self.monster_auxilary_sprites:
+            auxilary_sprite.position = self.position
+            auxilary_sprite.update()
+        
+        for melee_sprite  in self.monster_melee_sprites:
+            melee_sprite.position = self.position
+            melee_sprite.update()
+
     #Animations
     def character_pain_animation(self):
         self.character_pain_timer += 0.05
@@ -238,7 +257,6 @@ class Ettin(pygame.sprite.Sprite):
             self.walk_speed_vector = 0,0
             entity_manager.kill_monster_auxilary_entities(self.id)
             entity_manager.fix_all_dead_bodies_to_pixel_accuracy()
-            print(self.position)
         else:
             self.in_pain = True
             if random.choice(range(4)) == 0:

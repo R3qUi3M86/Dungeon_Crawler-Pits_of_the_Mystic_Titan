@@ -93,11 +93,11 @@ while True:
     #Inputs
     keys = pygame.key.get_pressed()
     get_player_wsad_input(keys)
-    collision_detection()
 
     #Updates
-    entity_manager.update_non_player_entities_position(entity_manager.character_sprite_groups)
     entity_manager.update_all_entities()
+    entity_manager.update_all_non_player_entities_position(movement_manager.speed_vector)
+    collision_detection()
 
     #Events
     for event in pygame.event.get():

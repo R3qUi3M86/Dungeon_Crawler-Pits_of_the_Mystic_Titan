@@ -19,9 +19,6 @@ class Shadow(pygame.sprite.Sprite):
     def update(self):
         self.rect = self.image.get_rect(center = (self.position))
 
-    def update_position(self, vector):
-        self.position = self.position[0] - vector[0], self.position[1] - vector[1]
-
     #Misc
     def get_self_image(self):
         if self.shadow_size == constants.SIZE_SMALL:

@@ -8,8 +8,7 @@ class Melee(pygame.sprite.Sprite):
         super().__init__()
         self.position = position
         self.sector = sector
-        self.image = melee_mask_image
-        self.sprite_position = self.get_position()
+        self.image = self.get_sector_image()
         self.rect = self.image.get_rect(center = (self.position))
         self.mask = pygame.mask.from_surface(self.get_sector_image())
 
@@ -17,13 +16,7 @@ class Melee(pygame.sprite.Sprite):
     def update(self):
         self.rect = self.image.get_rect(center = (self.position))
 
-    def update_position(self, vector):
-        self.sprite_position = self.sprite_position[0] - vector[0], self.sprite_position[1] - vector[1]
-
     #Misc
-    def get_position(self):
-        return self.position[0],self.position[1]-10
-
     def get_sector_image(self):
         if self.sector == SECTOR_E:
             return melee_mask_e

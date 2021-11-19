@@ -23,11 +23,20 @@ def generate_monster(monster_type, position):
     if monster_type == ETTIN:
         create_ettin_monster(position)
 
-def update_non_player_entities_position(entities):
+def update_non_player_group_single_entities_position(vector,entities):
     for entity in entities:
         if unique_player_objects.HERO_SPRITE_GROUP.sprite.attack == True or unique_player_objects.HERO_SPRITE_GROUP.sprite.living == False:
             movement_manager.speed_vector = 0,0
-        entity.sprite.update_position(movement_manager.speed_vector)
+        entity.sprite.update_position(vector)
+
+def update_non_player_group_entities_position(vector,entities):
+    pass
+
+def update_all_non_player_entities_position(vector):
+    update_non_player_group_single_entities_position(vector,character_sprite_groups)
+    update_non_player_group_single_entities_position(vector,item_sprite_groups)
+    update_non_player_group_single_entities_position(vector,level_sprite_groups)
+    update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
 
 def get_monster_sprite(monster_id):
     for monster in character_sprite_groups:
@@ -76,14 +85,14 @@ def add_auxilary_objects(monster_sprite_grup):
     melee_sector_sprite_group = monster_sprite_grup.sprite.melee_sector_sprite_group
     append_sprites_and_entities_lists(monster_sprite_grup,movement_collision_shadow_sprite_group,melee_collision_shadow_sprite_group,shadow_sprite_group,melee_sector_sprite_group)
 
-def append_sprites_and_entities_lists(monster_sprite_grup,movement_collision_shadow_sprite_group,melee_collision_shadow_sprite_group,shadow_sprite_group,melee_sector_sprite_group):
+def append_sprites_and_entities_lists(monster_sprite_group,movement_collision_shadow_sprite_group,melee_collision_shadow_sprite_group,shadow_sprite_group,melee_sector_sprite_group):
     global character_sprite_groups
     global shadow_sprite_groups
     global movement_collision_sprite_groups
     global melee_collision_sprite_groups
     global melee_sector_sprite_groups
 
-    character_sprite_groups.append(monster_sprite_grup)
+    character_sprite_groups.append(monster_sprite_group)
     shadow_sprite_groups.append(shadow_sprite_group)
     movement_collision_sprite_groups.append(movement_collision_shadow_sprite_group)
     melee_collision_sprite_groups.append(melee_collision_shadow_sprite_group)

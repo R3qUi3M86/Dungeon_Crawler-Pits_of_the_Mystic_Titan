@@ -25,17 +25,21 @@ class Hero(pygame.sprite.Sprite):
         #Pain assets
         self.character_pain_timer = 0
 
+        #Position variables
         self.position = position
-        self.sprite_position = self.position[0], self.position[1]+8
+        self.sprite_display_correction = 8
+        self.sprite_position = self.position[0], self.position[1] + self.sprite_display_correction
+        
+        #Object ID
         self.id = -1
 
         #Initial image definition
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
 
+        #Character properties
         self.attack = False
         self.facing_direction = SECTOR_S
-        self.speed_vector = 0,0
         self.living = True
         self.dying = False
         self.in_pain = False
@@ -45,8 +49,10 @@ class Hero(pygame.sprite.Sprite):
     def update(self):
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         self.set_facing_direction()
-       
-        if self.living:
+        
+        if self.living == False:
+            movement_manager.speed_vector = 0,0
+        else:
             self.player_input()
 
         if self.in_pain == True:
@@ -91,7 +97,7 @@ class Hero(pygame.sprite.Sprite):
     
     #Animations
     def character_pain_animation(self):
-        if self.attack or self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
+        if self.attack or movement_manager.speed_vector[0] != 0 or movement_manager.speed_vector[1] != 0:
             self.in_pain = False
         else:
             self.character_pain_timer += 0.05

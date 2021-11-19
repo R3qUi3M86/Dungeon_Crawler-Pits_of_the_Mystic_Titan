@@ -48,7 +48,8 @@ def deal_damage_to_monster(entity, damage):
             monster.sprite.take_damage(damage)
 
 def deal_damage_to_player(damage):
-    unique_player_objects.HERO.take_damage(damage)
+    if unique_player_objects.HERO.health > 0:
+        unique_player_objects.HERO.take_damage(damage)
 
 def play_melee_attack_sound(attacking_entity):
     if hit_something:
