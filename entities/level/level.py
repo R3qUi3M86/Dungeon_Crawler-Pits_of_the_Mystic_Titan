@@ -1,7 +1,6 @@
-import pygame
 from settings import *
 
-level_map = [
+level_01_map = [
 "XXEEEXXXXXXXXXXXXXXXXX",
 "XXEEEXXXXXXX XXXX  XXX",
 "XXEEEXXXXX  ; XX  XXXX",
@@ -18,36 +17,29 @@ level_map = [
 "XX  XXXX~~~~~ ~~~~~XXX",
 "XXXXXXX~~*        ~XXX",
 "XXXXXX    ~~~      XXX", 
-"XQQQXX  `XXX~~~~ ~~~XX",
-"XQQQXX  `XXX~~~~ ~~~~X",
-"XQQQX.   XXXX~~  ~~ ~X",
+"XVVVXX  `XXX~~~~ ~~~XX",
+"XVVVXX  `XXX~~~~ ~~~~X",
+"XVVVX.   XXXX~~  ~~ ~X",
 "X        XXXX~~~    ~X",
 "XXXXXXXXXXXXX~~~~ ~~~X",
 "XXXXXXXXXXXXX~~~~~~~~X"     
 ]
 
-'''
-legend:
-E level_entrance
-Q level_exit
-X wall
-~ water
-  floor
-. floor_debree_01
-, floor_debree_02
-; floor_debree_03
-: floor_debree_04
-- floor_debree_05
-_ floor_debree_06
-O floor_pit_01
-Q floor_pit_02
-0 floor_pit_03
-+ cross_crack
-* web_crack
-` corner_crack
-'''
-
-
-test_surface = pygame.image.load("images/map/cave/test.png").convert()
-
-test_surface_scaled = pygame.transform.scale(test_surface, (2400,1800))
+#Legend
+LEVEL_ENTRANCE = "E" 
+LEVEL_EXIT = "V"
+WALL = "X"
+WATER = "~"
+FLOOR = " "
+FLOOR_DEBREE_01 = "."
+FLOOR_DEBREE_02 = ","
+FLOOR_DEBREE_03 = ";"
+FLOOR_DEBREE_04 = ":"
+FLOOR_DEBREE_05 = "-"
+FLOOR_DEBREE_06 = "_"
+FLOOR_PIT_01 = "O"
+FLOOR_PIT_02 = "Q"
+FLOOR_PIT_03 = "0"
+CROSS_CRACK = "+"
+WEB_CRACK = "*"
+CORNER_CRACK = "`"

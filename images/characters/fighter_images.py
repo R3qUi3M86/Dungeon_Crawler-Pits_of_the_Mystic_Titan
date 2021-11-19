@@ -58,6 +58,17 @@ character_death5 = pygame.image.load("images/characters/fighter/death_05.png").c
 character_death6 = pygame.image.load("images/characters/fighter/death_06.png").convert_alpha()
 character_death7 = pygame.image.load("images/characters/fighter/death_07.png").convert_alpha()
 
+character_overkill1 = pygame.image.load("images/characters/fighter/overkill_01.png").convert_alpha()
+character_overkill2 = pygame.image.load("images/characters/fighter/overkill_02.png").convert_alpha()
+character_overkill3 = pygame.image.load("images/characters/fighter/overkill_03.png").convert_alpha()
+character_overkill4 = pygame.image.load("images/characters/fighter/overkill_04.png").convert_alpha()
+character_overkill5 = pygame.image.load("images/characters/fighter/overkill_05.png").convert_alpha()
+character_overkill6 = pygame.image.load("images/characters/fighter/overkill_06.png").convert_alpha()
+character_overkill7 = pygame.image.load("images/characters/fighter/overkill_07.png").convert_alpha()
+character_overkill8 = pygame.image.load("images/characters/fighter/overkill_08.png").convert_alpha()
+character_overkill9 = pygame.image.load("images/characters/fighter/overkill_09.png").convert_alpha()
+character_overkill10 = pygame.image.load("images/characters/fighter/overkill_10.png").convert_alpha()
+
 character_pain_east       = pygame.image.load("images/characters/fighter/east_pain.png").convert_alpha()
 character_pain_north_east = pygame.image.load("images/characters/fighter/north_east_pain.png").convert_alpha()
 character_pain_north      = pygame.image.load("images/characters/fighter/north_pain.png").convert_alpha()
@@ -86,3 +97,5 @@ character_attack = [[character_attack_east1,character_attack_east2],
                 [character_attack_south_east1,character_attack_south_east2]]
 
 character_death = [character_death1,character_death2,character_death3,character_death4,character_death5,character_death6,character_death7]
+
+character_overkill = [character_overkill1,character_overkill2,character_overkill3,character_overkill4,character_overkill5,character_overkill6,character_overkill7,character_overkill8,character_overkill9,character_overkill10]

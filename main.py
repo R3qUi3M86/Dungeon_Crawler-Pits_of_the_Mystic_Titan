@@ -1,4 +1,6 @@
 import pygame
+from sounds.sound_player import *
+from utilities.text_printer import *
 from utilities.constants import *
 from utilities import entity_manager
 from utilities import movement_manager
@@ -8,6 +10,7 @@ from entities import cursor
 pygame.init()
 clock = pygame.time.Clock()
 
+set_volume_for_all_sounds(VOLUME)
 entity_manager.generate_monsters()
 
 def get_player_wsad_input(keys):
@@ -78,6 +81,8 @@ def collision_detection():
     #possible other collisions
 
 def draw_sprites():
+    for level_tile in entity_manager.level_sprite_groups:
+        level_tile.draw(SCREEN)
     for melee_sectors in entity_manager.melee_sector_sprite_groups:
         melee_sectors.draw(SCREEN)
     for shadow in entity_manager.shadow_sprite_groups:

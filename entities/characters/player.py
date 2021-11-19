@@ -1,4 +1,5 @@
 import pygame
+import random
 from settings import *
 from utilities import util
 from utilities import movement_manager
@@ -22,6 +23,10 @@ class Hero(pygame.sprite.Sprite):
         self.character_death = character_death
         self.character_death_index = 0
 
+        #Overkill assets
+        self.character_overkill = character_overkill
+        self.character_overkill_index = 0
+
         #Pain assets
         self.character_pain_timer = 0
 
@@ -42,7 +47,9 @@ class Hero(pygame.sprite.Sprite):
         self.facing_direction = SECTOR_S
         self.living = True
         self.dying = False
+        self.overkill = False
         self.in_pain = False
+        self.maxhealth = 20
         self.health = 20
 
     #Update functions
@@ -58,8 +65,11 @@ class Hero(pygame.sprite.Sprite):
         if self.in_pain == True:
             self.character_pain_animation()
         
-        if self.dying == True:
+        elif self.dying == True and self.overkill == False:
             self.character_death_animation()
+
+        elif self.overkill == True:
+            self.character_overkill_animation()
 
     def update_position(self,vector):
         pass
@@ -123,12 +133,19 @@ class Hero(pygame.sprite.Sprite):
                 self.character_pain_timer = 0
 
     def character_death_animation(self):
-        self.in_pain == False
         self.character_death_index += 0.1
         if int(self.character_death_index) == 7:
             self.character_death_index = 6
             self.dying == False
         self.image = self.character_death[int(self.character_death_index)]
+
+    def character_overkill_animation(self):
+        self.character_overkill_index += 0.1
+        if int(self.character_overkill_index) == 10:
+            self.character_overkill_index = 9
+            self.dying == False
+            self.overkill == False
+        self.image = self.character_overkill[int(self.character_overkill_index)]       
 
     def character_walk_forward_animation(self):
         if movement_manager.speed_vector[0] != 0 or movement_manager.speed_vector[1] != 0:
@@ -189,13 +206,27 @@ class Hero(pygame.sprite.Sprite):
     #Combat functions
     def take_damage(self, damage):
         self.health -= damage
-        if self.health <= 0:
-            sound_player.player_death_sound.play()
-            self.living = False
-            self.dying = True
-        else:
+        print(self.health)
+
+        if self.health > 0:
             self.in_pain = True
             sound_player.player_pain_sound.play()
+
+        else:
+            if self.living == True:
+                sound_player.player_pain_sound.stop()
+                sound_player.player_death_sound.play()
+                self.living = False
+                self.in_pain = False
+                self.dying = True
+
+            if self.overkill == False and -(self.maxhealth//2) >= self.health:
+                sound_player.player_death_sound.stop()
+                random.choice(sound_player.player_overkill_sounds).play()
+                self.living = False
+                self.in_pain = False
+                self.dying = True
+                self.overkill = True
 
     #Misc
     def facing_southwards(self):
