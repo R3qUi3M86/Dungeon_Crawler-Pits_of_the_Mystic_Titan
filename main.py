@@ -96,7 +96,7 @@ while True:
 
     #Updates
     entity_manager.update_all_entities()
-    entity_manager.update_all_non_player_entities_position(movement_manager.speed_vector)
+    entity_manager.update_all_non_player_entities_player_position(movement_manager.speed_vector)
     collision_detection()
 
     #Events

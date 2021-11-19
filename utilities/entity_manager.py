@@ -32,7 +32,7 @@ def update_non_player_group_single_entities_position(vector,entities):
 def update_non_player_group_entities_position(vector,entities):
     pass
 
-def update_all_non_player_entities_position(vector):
+def update_all_non_player_entities_player_position(vector):
     update_non_player_group_single_entities_position(vector,character_sprite_groups)
     update_non_player_group_single_entities_position(vector,item_sprite_groups)
     update_non_player_group_single_entities_position(vector,level_sprite_groups)

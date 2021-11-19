@@ -8,7 +8,7 @@ class Melee(pygame.sprite.Sprite):
         super().__init__()
         self.position = position
         self.sector = sector
-        self.image = self.get_sector_image()
+        self.image = melee_mask_image
         self.rect = self.image.get_rect(center = (self.position))
         self.mask = pygame.mask.from_surface(self.get_sector_image())
 
