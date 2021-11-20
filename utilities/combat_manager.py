@@ -31,7 +31,7 @@ def attack_monster_with_melee_attack():
 
 def attack_player_with_melee_attack(current_attacking_monster):
     global hit_something
-    for melee_sprite in current_attacking_monster.monster_melee_sprites:
+    for melee_sprite in current_attacking_monster.character_melee_sprites:
         if melee_sprite.sector == current_attacking_monster.facing_direction and pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE) != None:
             hit_something = True
             break

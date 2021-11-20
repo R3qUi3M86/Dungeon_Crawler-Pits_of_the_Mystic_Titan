@@ -7,6 +7,7 @@ from utilities import combat_manager
 from utilities.constants import *
 from sounds import sound_player
 from images.characters.fighter_images import *
+from entities import shadow
 
 class Hero(pygame.sprite.Sprite):
     def __init__(self,position):
@@ -37,6 +38,13 @@ class Hero(pygame.sprite.Sprite):
         
         #Object ID
         self.id = -1
+
+        #Owned sprites
+        self.character_collision_mask_nw = shadow.Shadow(player_position, PLAYER_SHADOW_ID, SIZE_SMALL, False, SECTOR_NW)
+        self.character_collision_mask_ne = shadow.Shadow(player_position, PLAYER_SHADOW_ID, SIZE_SMALL, False, SECTOR_NE)
+        self.character_collision_mask_sw = shadow.Shadow(player_position, PLAYER_SHADOW_ID, SIZE_SMALL, False, SECTOR_SW)
+        self.character_collision_mask_se = shadow.Shadow(player_position, PLAYER_SHADOW_ID, SIZE_SMALL, False, SECTOR_SE)
+        self.shadow = shadow.Shadow(player_position, PLAYER_SHADOW_ID, SIZE_SMALL, True)
 
         #Initial image definition
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]

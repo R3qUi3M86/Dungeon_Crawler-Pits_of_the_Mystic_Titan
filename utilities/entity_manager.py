@@ -17,7 +17,7 @@ melee_sector_sprite_groups = [unique_player_objects.HERO_MELEE_SECTOR_SPRITE_GRO
 level_sprite_groups = []
 projectile_sprite_groups = []
 
-collision_sprites = [pygame.sprite.GroupSingle(unique_player_objects.PLAYER_COLISION_MASK_NE),pygame.sprite.GroupSingle(unique_player_objects.PLAYER_COLISION_MASK_NW),pygame.sprite.GroupSingle(unique_player_objects.PLAYER_COLISION_MASK_SE),pygame.sprite.GroupSingle(unique_player_objects.PLAYER_COLISION_MASK_SW)]
+collision_sprites = [pygame.sprite.GroupSingle(unique_player_objects.HERO.character_collision_mask_ne),pygame.sprite.GroupSingle(unique_player_objects.HERO.character_collision_mask_nw),pygame.sprite.GroupSingle(unique_player_objects.HERO.character_collision_mask_se),pygame.sprite.GroupSingle(unique_player_objects.HERO.character_collision_mask_sw)]
 
 def get_collision_sprite_by_id(id):
     for collision_sprite in player_and_monster_movement_collision_sprite_groups:
@@ -79,7 +79,7 @@ def create_monster_character(monster_sprite):
     character.add(monster_sprite)
     return character
 
-def kill_monster_auxilary_entities(id):
+def kill_character_auxilary_entities(id):
     global character_sprite_groups
     global player_and_monster_movement_collision_sprite_groups
     for collision_sprite_group in player_and_monster_movement_collision_sprite_groups:
@@ -143,12 +143,13 @@ def update_all_entities():
             projectile_sprite.update()
 
 def generate_monsters():
-    generate_monster(ETTIN, (15,10))
-    generate_monster(ETTIN, (2,10))
-    generate_monster(ETTIN, (3,10))
-    generate_monster(ETTIN, (5,9))
-    generate_monster(ETTIN, (7,8))
-    generate_monster(ETTIN, (6,7))
+    generate_monster(ETTIN, (6,6))
+    # generate_monster(ETTIN, (2,10))
+    # generate_monster(ETTIN, (3,10))
+    # generate_monster(ETTIN, (5,9))
+    # generate_monster(ETTIN, (7,8))
+    # generate_monster(ETTIN, (6,7))
+    pass
 
 def fix_all_dead_bodies_to_pixel_accuracy():
     for character in character_sprite_groups:

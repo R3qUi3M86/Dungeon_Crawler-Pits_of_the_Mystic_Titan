@@ -48,11 +48,15 @@ class Shadow(pygame.sprite.Sprite):
                 return pygame.mask.from_surface(shadow_medium_mask)
         
         elif self.sector == SECTOR_NW:
+            self.image = collision_sector_nw
             return pygame.mask.from_surface(collision_sector_nw)
         elif self.sector == SECTOR_NE:
+            self.image = collision_sector_ne
             return pygame.mask.from_surface(collision_sector_ne)
         elif self.sector == SECTOR_SW:
+            self.image = collision_sector_sw
             return pygame.mask.from_surface(collision_sector_sw)
         elif self.sector == SECTOR_SE:
+            self.image = collision_sector_se
             return pygame.mask.from_surface(collision_sector_se)
 

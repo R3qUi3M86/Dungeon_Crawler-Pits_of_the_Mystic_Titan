@@ -121,7 +121,7 @@ class Ai():
     def monster_can_melee_attack_player(self):
         if unique_player_objects.HERO.living == True:
             self.player_direction_sector = util.get_facing_direction(self.owning_monster.position,player_position)
-            for melee_sprite in self.owning_monster.monster_melee_sprites:
+            for melee_sprite in self.owning_monster.character_melee_sprites:
                 if melee_sprite.rect.colliderect(unique_player_objects.PLAYER_SHADOW_SPRITE):
                     if pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE):
                         return True
