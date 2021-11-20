@@ -9,7 +9,7 @@ from entities.characters import ettin
 entities_id = []
 character_sprite_groups = [unique_player_objects.HERO_SPRITE_GROUP]
 shadow_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
-player_and_monster_movement_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
+monster_movement_collision_sprite_groups = []
 level_collision_sprite_groups = []
 melee_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
 item_sprite_groups = []
@@ -20,7 +20,7 @@ projectile_sprite_groups = []
 collision_sprites = [pygame.sprite.GroupSingle(unique_player_objects.HERO.character_collision_mask_ne),pygame.sprite.GroupSingle(unique_player_objects.HERO.character_collision_mask_nw),pygame.sprite.GroupSingle(unique_player_objects.HERO.character_collision_mask_se),pygame.sprite.GroupSingle(unique_player_objects.HERO.character_collision_mask_sw)]
 
 def get_collision_sprite_by_id(id):
-    for collision_sprite in player_and_monster_movement_collision_sprite_groups:
+    for collision_sprite in monster_movement_collision_sprite_groups:
         if collision_sprite.sprite.id == id:
             return collision_sprite.sprite
 
@@ -81,10 +81,10 @@ def create_monster_character(monster_sprite):
 
 def kill_character_auxilary_entities(id):
     global character_sprite_groups
-    global player_and_monster_movement_collision_sprite_groups
-    for collision_sprite_group in player_and_monster_movement_collision_sprite_groups:
+    global monster_movement_collision_sprite_groups
+    for collision_sprite_group in monster_movement_collision_sprite_groups:
         if collision_sprite_group.sprite.id == id:
-            player_and_monster_movement_collision_sprite_groups.remove(collision_sprite_group)
+            monster_movement_collision_sprite_groups.remove(collision_sprite_group)
     for collision_sprite_group in melee_collision_sprite_groups:
         if collision_sprite_group.sprite.id == id:
             melee_collision_sprite_groups.remove(collision_sprite_group)
@@ -103,13 +103,13 @@ def add_auxilary_objects(monster_sprite_grup):
 def append_sprites_and_entities_lists(monster_sprite_group,movement_collision_shadow_sprite_group,melee_collision_shadow_sprite_group,shadow_sprite_group,melee_sector_sprite_group):
     global character_sprite_groups
     global shadow_sprite_groups
-    global player_and_monster_movement_collision_sprite_groups
+    global monster_movement_collision_sprite_groups
     global melee_collision_sprite_groups
     global melee_sector_sprite_groups
 
     character_sprite_groups.append(monster_sprite_group)
     shadow_sprite_groups.append(shadow_sprite_group)
-    player_and_monster_movement_collision_sprite_groups.append(movement_collision_shadow_sprite_group)
+    monster_movement_collision_sprite_groups.append(movement_collision_shadow_sprite_group)
     melee_collision_sprite_groups.append(melee_collision_shadow_sprite_group)
     melee_sector_sprite_groups.append(melee_sector_sprite_group)
 
@@ -120,7 +120,7 @@ def update_all_entities():
     for shadow_sprite_group in shadow_sprite_groups:
         shadow_sprite_group.sprite.update()
 
-    for movement_collision_sprite_group in player_and_monster_movement_collision_sprite_groups:
+    for movement_collision_sprite_group in monster_movement_collision_sprite_groups:
         movement_collision_sprite_group.sprite.update()
 
     for melee_collision_sprite_group in melee_collision_sprite_groups:

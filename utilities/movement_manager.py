@@ -10,7 +10,7 @@ player_position_on_map = 0,0
 player_tile_index = 0,0
 
 def player_vs_monster_movement_collision():
-    for movement_collision_sprite_group in entity_manager.player_and_monster_movement_collision_sprite_groups:
+    for movement_collision_sprite_group in entity_manager.monster_movement_collision_sprite_groups:
         if movement_collision_sprite_group == unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP:
             pass
         else:
@@ -24,13 +24,13 @@ def player_vs_monster_movement_collision():
 
 def character_vs_level_movement_collision(entity):
     for level_collision_sprite_group in entity_manager.level_collision_sprite_groups:
-            if entity.sprite.shadow.rect.colliderect(level_collision_sprite_group.sprite.rect) and pygame.sprite.collide_mask(entity.sprite.shadow, level_collision_sprite_group.sprite) != None:
+            if entity.sprite.shadow.rect.colliderect(level_collision_sprite_group.sprite.rect) and any_sector_mask_collides(entity.sprite,level_collision_sprite_group.sprite):
                 correct_character_position_by_vector(entity.sprite,level_collision_sprite_group.sprite)
 
 def monster_vs_monster_collision(current_monster_movement_collision_sprite):
-    for movement_collision_sprite_group in entity_manager.player_and_monster_movement_collision_sprite_groups:
-        movement_collision_sprite = movement_collision_sprite_group.sprite
-        if movement_collision_sprite_group == unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP or current_monster_movement_collision_sprite == movement_collision_sprite:
+    for monster_movement_collision_sprite_group in entity_manager.monster_movement_collision_sprite_groups:
+        movement_collision_sprite = monster_movement_collision_sprite_group.sprite
+        if monster_movement_collision_sprite_group == unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP or current_monster_movement_collision_sprite == movement_collision_sprite:
             pass
         else:
             if movement_collision_sprite.rect.colliderect(current_monster_movement_collision_sprite):
@@ -200,6 +200,16 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 correction_vector = 0, -1
 
+        elif character_not_moving(current_entity_sprite):
+            if north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = 1, 1
+            elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = -1, 1
+            elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = -1, -1
+            elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = 1, -1
+
         if current_entity_sprite == unique_player_objects.HERO:
             entity_manager.update_all_non_player_entities_position_by_vector(correction_vector)
         else:
@@ -274,6 +284,15 @@ def character_moving_south_west(current_entity_sprite):
             return True
     else:
         if current_entity_sprite.speed_vector[0] < 0 and current_entity_sprite.speed_vector[1] > 0:
+            return True
+    return False
+
+def character_not_moving(current_entity_sprite):
+    if current_entity_sprite == unique_player_objects.HERO:
+        if speed_vector[0] == 0 and speed_vector[1] == 0:
+            return True
+    else:
+        if current_entity_sprite.speed_vector[0] == 0 and current_entity_sprite.speed_vector[1] == 0:
             return True
     return False
 

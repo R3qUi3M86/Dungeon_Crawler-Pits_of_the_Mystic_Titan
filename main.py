@@ -89,8 +89,8 @@ def draw_sprites():
         tile.draw(screen)
     for melee_sectors in entity_manager.melee_sector_sprite_groups:
         melee_sectors.draw(screen)
-    for collision_sector in entity_manager.collision_sprites:
-        collision_sector.draw(screen)
+    # for collision_sector in entity_manager.collision_sprites:
+    #     collision_sector.draw(screen)
     for shadow in entity_manager.shadow_sprite_groups:
         shadow.draw(screen)
     for character in entity_manager.character_sprite_groups:
