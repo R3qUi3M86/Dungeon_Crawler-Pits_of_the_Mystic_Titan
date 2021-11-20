@@ -1,4 +1,5 @@
 import pygame
+import math
 from pygame.display import update
 from utilities.constants import *
 from utilities import movement_manager
@@ -154,8 +155,12 @@ def generate_monsters():
 def fix_all_dead_bodies_to_pixel_accuracy():
     for character in character_sprite_groups:
         if character.sprite.living == False:
-            character.sprite.position = int(character.sprite.position[0]), int(character.sprite.position[1])
+            character.sprite.position = math.floor(character.sprite.position[0]), math.floor(character.sprite.position[1])
 
 def fix_all_tiles_to_pixel_accuracy():
     for level_sprite_group in level_sprite_groups:
-        level_sprite_group.sprite.position = int(level_sprite_group.sprite.position[0]), int(level_sprite_group.sprite.position[1])
+        level_sprite_group.sprite.position = math.floor(level_sprite_group.sprite.position[0]), math.floor(level_sprite_group.sprite.position[1])
+
+def fix_player_position_to_pixel_accuracy():
+    unique_player_objects.HERO.position = math.floor(unique_player_objects.HERO.position[0]), math.floor(unique_player_objects.HERO.position[1])
+    movement_manager.player_position_on_map = math.floor(movement_manager.player_position_on_map[0]), math.floor(movement_manager.player_position_on_map[1])
