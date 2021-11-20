@@ -4,9 +4,10 @@ from entities.level.level import *
 from images.level.cave_images import *
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self,type,pos,size,vicinity_matrix):
+    def __init__(self,type,level_pos_index,pos,size,vicinity_matrix):
         super().__init__()
         self.type = type
+        self.level_pos_index = level_pos_index
         self.position = pos
         self.size = size
         self.vicinity_matrix = vicinity_matrix
@@ -46,6 +47,9 @@ class Tile(pygame.sprite.Sprite):
         if self.type in IMPASSABLE_TILES:
             return False
         return True
+
+    def get_index(self):
+        return self.level_pos_index
 
 # LEVEL_EXIT = "N"
 # WALL = "X"

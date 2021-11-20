@@ -229,7 +229,7 @@ class Ettin(pygame.sprite.Sprite):
                 self.monster_ai.finish_avoiding_obstacle()
             self.walk_speed_vector = 0,0
         else:
-            movement_manager.monster_collision(entity_manager.get_collision_sprite_by_id(self.id))
+            movement_manager.monster_vs_monster_collision(entity_manager.get_collision_sprite_by_id(self.id))
             if self.facing_direction == SECTOR_E:
                 self.walk_speed_vector = 1.4,0
             elif self.facing_direction == SECTOR_NE:

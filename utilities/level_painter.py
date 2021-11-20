@@ -28,13 +28,14 @@ def create_all_level_tiles():
     for row_index,level_layout_row in enumerate(level):
         for col_index,cell in enumerate(level_layout_row):
             type = cell
+            level_position_index = row_index,col_index
             level_tile_index = row_index,col_index
             position = get_tile_position(level_tile_index)
             vicinity_matrix = get_vicinity_matrix_for_tile(level_tile_index)
-            create_level_tile(type,position,TILE_SIZE,vicinity_matrix)
+            create_level_tile(type,level_position_index,position,TILE_SIZE,vicinity_matrix)
 
-def create_level_tile(type,position,size,vicinity_matrix):
-    new_tile_sprite = Tile(type,position,size,vicinity_matrix)
+def create_level_tile(type,level_position_index,position,size,vicinity_matrix):
+    new_tile_sprite = Tile(type,level_position_index,position,size,vicinity_matrix)
     entity_manager.level_sprite_groups.append(pygame.sprite.GroupSingle(new_tile_sprite))
     if new_tile_sprite.passable == False:
         entity_manager.level_collision_sprite_groups.append(pygame.sprite.GroupSingle(new_tile_sprite))

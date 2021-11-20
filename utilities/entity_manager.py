@@ -17,10 +17,17 @@ melee_sector_sprite_groups = [unique_player_objects.HERO_MELEE_SECTOR_SPRITE_GRO
 level_sprite_groups = []
 projectile_sprite_groups = []
 
+collision_sprites = [pygame.sprite.GroupSingle(unique_player_objects.PLAYER_COLISION_MASK_NE),pygame.sprite.GroupSingle(unique_player_objects.PLAYER_COLISION_MASK_NW),pygame.sprite.GroupSingle(unique_player_objects.PLAYER_COLISION_MASK_SE),pygame.sprite.GroupSingle(unique_player_objects.PLAYER_COLISION_MASK_SW)]
+
 def get_collision_sprite_by_id(id):
     for collision_sprite in player_and_monster_movement_collision_sprite_groups:
         if collision_sprite.sprite.id == id:
             return collision_sprite.sprite
+
+def get_level_collision_sprite_by_index(index):
+    for level_collision_sprite_group in level_collision_sprite_groups:
+        if level_collision_sprite_group.sprite.get_index() == index:
+            return level_collision_sprite_group.sprite
 
 def generate_monster(monster_type, position):
     if monster_type == ETTIN:
@@ -38,7 +45,7 @@ def update_non_player_group_entities_position(vector,entities):
         for entity_sprite in entity_sprites:
             entity_sprite.update_position(vector)
 
-def update_all_non_player_entities_player_position(vector):
+def update_all_non_player_entities_position_by_vector(vector):
     update_non_player_group_single_entities_position(vector,character_sprite_groups)
     update_non_player_group_single_entities_position(vector,item_sprite_groups)
     update_non_player_group_single_entities_position(vector,level_sprite_groups)

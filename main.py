@@ -14,7 +14,7 @@ clock = pygame.time.Clock()
 set_volume_for_all_sounds(VOLUME)
 
 level_painter.create_all_level_tiles()
-#entity_manager.generate_monsters()
+entity_manager.generate_monsters()
 
 def get_player_wsad_input(keys):
     if keys[pygame.K_s] and movement_manager.acceleration_vector[Y] < 30.0:
@@ -88,6 +88,8 @@ def draw_sprites():
         tile.draw(screen)
     for melee_sectors in entity_manager.melee_sector_sprite_groups:
         melee_sectors.draw(screen)
+    # for collision_sector in entity_manager.collision_sprites:
+    #     collision_sector.draw(screen)
     for shadow in entity_manager.shadow_sprite_groups:
         shadow.draw(screen)
     for character in entity_manager.character_sprite_groups:
@@ -104,7 +106,7 @@ while True:
 
     #Updates
     entity_manager.update_all_entities()
-    entity_manager.update_all_non_player_entities_player_position(movement_manager.speed_vector)
+    entity_manager.update_all_non_player_entities_position_by_vector(movement_manager.speed_vector)
     collision_detection()
 
     #Events
@@ -120,7 +122,6 @@ while True:
     
     cursor.cursor.draw(screen)
     cursor.cursor.update()
-    #screen.blit(level.test_surface_scaled,(-800,0))
     
     #Other
     pygame.display.update()
