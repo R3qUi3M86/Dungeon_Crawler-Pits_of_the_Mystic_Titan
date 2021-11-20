@@ -81,7 +81,8 @@ def order_sprites():
 
 def collision_detection():
     movement_manager.player_vs_monster_movement_collision()
-    movement_manager.player_vs_level_movement_collision()
+    for collision_sprite_group in entity_manager.player_and_monster_movement_collision_sprite_groups:
+        movement_manager.character_vs_level_movement_collision(collision_sprite_group)
 
 def draw_sprites():
     for tile in entity_manager.level_sprite_groups:

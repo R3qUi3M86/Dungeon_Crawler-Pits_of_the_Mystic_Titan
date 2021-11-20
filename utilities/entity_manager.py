@@ -29,9 +29,9 @@ def get_level_collision_sprite_by_index(index):
         if level_collision_sprite_group.sprite.get_index() == index:
             return level_collision_sprite_group.sprite
 
-def generate_monster(monster_type, position):
+def generate_monster(monster_type, tile_index):
     if monster_type == ETTIN:
-        create_ettin_monster(position)
+        create_ettin_monster(level_painter.get_tile_position(tile_index))
 
 def update_non_player_group_single_entities_position(vector,entities):
     for entity in entities:
@@ -143,14 +143,18 @@ def update_all_entities():
             projectile_sprite.update()
 
 def generate_monsters():
-    generate_monster(ETTIN, (200,200))
-    generate_monster(ETTIN, (400,200))
-    generate_monster(ETTIN, (600,200))
-    generate_monster(ETTIN, (200,600))
-    generate_monster(ETTIN, (400,600))
-    generate_monster(ETTIN, (600,600))
+    generate_monster(ETTIN, (15,10))
+    generate_monster(ETTIN, (2,10))
+    generate_monster(ETTIN, (3,10))
+    generate_monster(ETTIN, (5,9))
+    generate_monster(ETTIN, (7,8))
+    generate_monster(ETTIN, (6,7))
 
 def fix_all_dead_bodies_to_pixel_accuracy():
     for character in character_sprite_groups:
         if character.sprite.living == False:
             character.sprite.position = int(character.sprite.position[0]), int(character.sprite.position[1])
+
+def fix_all_tiles_to_pixel_accuracy():
+    for level_sprite_group in level_sprite_groups:
+        level_sprite_group.sprite.position = int(level_sprite_group.sprite.position[0]), int(level_sprite_group.sprite.position[1])

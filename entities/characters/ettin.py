@@ -257,6 +257,7 @@ class Ettin(pygame.sprite.Sprite):
             self.walk_speed_vector = 0,0
             entity_manager.kill_monster_auxilary_entities(self.id)
             entity_manager.fix_all_dead_bodies_to_pixel_accuracy()
+            entity_manager.fix_all_tiles_to_pixel_accuracy()
         else:
             self.in_pain = True
             if random.choice(range(4)) == 0:
