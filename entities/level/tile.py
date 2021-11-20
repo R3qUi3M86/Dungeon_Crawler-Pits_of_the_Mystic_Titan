@@ -17,7 +17,7 @@ class Tile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (self.position))
 
     def update_position(self, vector):
-        self.position = self.position[0] - vector[0], self.position[1] - vector[1]
+        self.position = round(self.position[0] - vector[0],2), round(self.position[1] - vector[1],2)
         self.rect = self.image.get_rect(center = (self.position))
 
     def get_tile_image(self):

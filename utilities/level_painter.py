@@ -30,7 +30,7 @@ def create_all_level_tiles():
 
 def create_level_tile(type,position,size,vicinity_matrix):
     new_tile_sprite = Tile(type,position,size,vicinity_matrix)
-    entity_manager.level_sprite_group.add(new_tile_sprite)
+    entity_manager.level_sprite_groups.append(pygame.sprite.GroupSingle(new_tile_sprite))
 
 def cell_is_starting_position(row_index,col_index,cell):
     if level[row_index-1][col_index-1] == ENTRANCE and level[row_index-1][col_index] == ENTRANCE and level[row_index-1][col_index+1] == ENTRANCE and cell == FLOOR:

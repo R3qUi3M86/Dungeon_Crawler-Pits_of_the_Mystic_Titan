@@ -12,7 +12,7 @@ movement_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_G
 melee_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
 item_sprite_groups = []
 melee_sector_sprite_groups = [unique_player_objects.HERO_MELEE_SECTOR_SPRITE_GROUP]
-level_sprite_group = pygame.sprite.Group()
+level_sprite_groups = []
 projectile_sprite_groups = []
 
 def get_collision_sprite_by_id(id):
@@ -31,14 +31,15 @@ def update_non_player_group_single_entities_position(vector,entities):
         entity.sprite.update_position(vector)
 
 def update_non_player_group_entities_position(vector,entities):
-    level_tile_sprites = entities.sprites()
-    for level_tile_sprite in level_tile_sprites:
-        level_tile_sprite.update_position(vector)
+    for _ in entities:
+        entity_sprites = entities.sprites()
+        for entity_sprite in entity_sprites:
+            entity_sprite.update_position(vector)
 
 def update_all_non_player_entities_player_position(vector):
     update_non_player_group_single_entities_position(vector,character_sprite_groups)
     update_non_player_group_single_entities_position(vector,item_sprite_groups)
-    update_non_player_group_entities_position(vector,level_sprite_group)
+    update_non_player_group_single_entities_position(vector,level_sprite_groups)
     update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
 
 def get_monster_sprite(monster_id):
@@ -117,6 +118,9 @@ def update_all_entities():
     for item_sprite_group in item_sprite_groups:
         item_sprite_group.sprite.update()
 
+    for level_sprite_group in level_sprite_groups:
+        level_sprite_group.sprite.update()
+
     for melee_sector_sprite_group in melee_sector_sprite_groups:
         sprites = melee_sector_sprite_group.sprites()
         for melee_sector_sprite in sprites:
@@ -126,9 +130,6 @@ def update_all_entities():
         sprites = projectile_sprite_group.sprites()
         for projectile_sprite in sprites:
             projectile_sprite.update()
-
-    level_sprite_group.update()
-
 
 def generate_monsters():
     generate_monster(ETTIN, (200,200))

@@ -84,7 +84,8 @@ def collision_detection():
     #possible other collisions
 
 def draw_sprites():
-    entity_manager.level_sprite_group.draw(screen)
+    for tile in entity_manager.level_sprite_groups:
+        tile.draw(screen)
     for melee_sectors in entity_manager.melee_sector_sprite_groups:
         melee_sectors.draw(screen)
     for shadow in entity_manager.shadow_sprite_groups:
