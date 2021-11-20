@@ -2,13 +2,15 @@ import pygame
 from pygame.display import update
 from utilities.constants import *
 from utilities import movement_manager
+from utilities import level_painter
 from entities.characters import unique_player_objects
 from entities.characters import ettin
 
 entities_id = []
 character_sprite_groups = [unique_player_objects.HERO_SPRITE_GROUP]
 shadow_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
-movement_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
+player_and_monster_movement_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
+level_collision_sprite_groups = []
 melee_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
 item_sprite_groups = []
 melee_sector_sprite_groups = [unique_player_objects.HERO_MELEE_SECTOR_SPRITE_GROUP]
@@ -16,7 +18,7 @@ level_sprite_groups = []
 projectile_sprite_groups = []
 
 def get_collision_sprite_by_id(id):
-    for collision_sprite in movement_collision_sprite_groups:
+    for collision_sprite in player_and_monster_movement_collision_sprite_groups:
         if collision_sprite.sprite.id == id:
             return collision_sprite.sprite
 
@@ -41,6 +43,8 @@ def update_all_non_player_entities_player_position(vector):
     update_non_player_group_single_entities_position(vector,item_sprite_groups)
     update_non_player_group_single_entities_position(vector,level_sprite_groups)
     update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
+    movement_manager.player_position_on_map = round(movement_manager.player_position_on_map[0] + vector[0],2),round(movement_manager.player_position_on_map[1] + vector[1],2)
+    movement_manager.player_tile_index = int(movement_manager.player_position_on_map[1] // level_painter.TILE_SIZE[X]), int(movement_manager.player_position_on_map[0]// level_painter.TILE_SIZE[Y])
 
 def get_monster_sprite(monster_id):
     for monster in character_sprite_groups:
@@ -70,10 +74,10 @@ def create_monster_character(monster_sprite):
 
 def kill_monster_auxilary_entities(id):
     global character_sprite_groups
-    global movement_collision_sprite_groups
-    for collision_sprite_group in movement_collision_sprite_groups:
+    global player_and_monster_movement_collision_sprite_groups
+    for collision_sprite_group in player_and_monster_movement_collision_sprite_groups:
         if collision_sprite_group.sprite.id == id:
-            movement_collision_sprite_groups.remove(collision_sprite_group)
+            player_and_monster_movement_collision_sprite_groups.remove(collision_sprite_group)
     for collision_sprite_group in melee_collision_sprite_groups:
         if collision_sprite_group.sprite.id == id:
             melee_collision_sprite_groups.remove(collision_sprite_group)
@@ -92,13 +96,13 @@ def add_auxilary_objects(monster_sprite_grup):
 def append_sprites_and_entities_lists(monster_sprite_group,movement_collision_shadow_sprite_group,melee_collision_shadow_sprite_group,shadow_sprite_group,melee_sector_sprite_group):
     global character_sprite_groups
     global shadow_sprite_groups
-    global movement_collision_sprite_groups
+    global player_and_monster_movement_collision_sprite_groups
     global melee_collision_sprite_groups
     global melee_sector_sprite_groups
 
     character_sprite_groups.append(monster_sprite_group)
     shadow_sprite_groups.append(shadow_sprite_group)
-    movement_collision_sprite_groups.append(movement_collision_shadow_sprite_group)
+    player_and_monster_movement_collision_sprite_groups.append(movement_collision_shadow_sprite_group)
     melee_collision_sprite_groups.append(melee_collision_shadow_sprite_group)
     melee_sector_sprite_groups.append(melee_sector_sprite_group)
 
@@ -109,7 +113,7 @@ def update_all_entities():
     for shadow_sprite_group in shadow_sprite_groups:
         shadow_sprite_group.sprite.update()
 
-    for movement_collision_sprite_group in movement_collision_sprite_groups:
+    for movement_collision_sprite_group in player_and_monster_movement_collision_sprite_groups:
         movement_collision_sprite_group.sprite.update()
 
     for melee_collision_sprite_group in melee_collision_sprite_groups:

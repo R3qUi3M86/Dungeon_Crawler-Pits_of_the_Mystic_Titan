@@ -80,8 +80,8 @@ def order_sprites():
                     entity_manager.character_sprite_groups[j], entity_manager.character_sprite_groups[j+1] = entity_manager.character_sprite_groups[j+1], entity_manager.character_sprite_groups[j]
 
 def collision_detection():
-    movement_manager.player_movement_collision()
-    #possible other collisions
+    movement_manager.player_vs_monster_movement_collision()
+    movement_manager.player_vs_level_movement_collision()
 
 def draw_sprites():
     for tile in entity_manager.level_sprite_groups:
@@ -115,6 +115,8 @@ while True:
 
     #Drawing
     draw_sprites()
+    debug_text(f"{movement_manager.player_position_on_map}")
+    debug_text(f"{movement_manager.player_tile_index}",'Black',10,30)
     
     cursor.cursor.draw(screen)
     cursor.cursor.update()

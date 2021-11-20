@@ -14,6 +14,7 @@ class Tile(pygame.sprite.Sprite):
         
         self.image_surface_unscaled = self.get_tile_image()
         self.image = pygame.transform.scale(self.image_surface_unscaled, size)
+        self.mask = self.get_tile_mask()
         self.rect = self.image.get_rect(center = (self.position))
 
     def update_position(self, vector):
@@ -35,6 +36,11 @@ class Tile(pygame.sprite.Sprite):
         else:
             return blank
 
+    def get_tile_mask(self):
+        if self.passable == True:
+            return pygame.mask.from_surface(empty_tile_image)
+        else:
+            return pygame.mask.from_surface(self.image)
 
     def get_passable(self):
         if self.type in IMPASSABLE_TILES:

@@ -1,5 +1,7 @@
 import pygame
 
+empty_tile_image = pygame.image.load("images/level/cave/floors/empty_tile_mask.png").convert_alpha()
+
 ###########################################
 ###### Level entrance and exit images #####
 ###########################################

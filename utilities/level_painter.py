@@ -4,6 +4,7 @@ from settings import *
 from entities.level.level import *
 from entities.level.tile import Tile
 from utilities import entity_manager
+from utilities import movement_manager
 
 TILE_SIZE = 48,48
 player_starting_tile_index = None
@@ -16,10 +17,14 @@ def set_player_tile_index():
         for col_index,cell in enumerate(level_layout_row):
             if cell_is_starting_position(row_index,col_index,cell):
                 player_starting_tile_index = row_index,col_index
-                print(player_starting_tile_index)
+                movement_manager.player_tile_index = player_starting_tile_index
+
+def set_player_position_on_map():
+    movement_manager.player_position_on_map = TILE_SIZE[0]//2+(48*player_starting_tile_index[0]),TILE_SIZE[1]//2+(48*player_starting_tile_index[1])
 
 def create_all_level_tiles():
     set_player_tile_index()
+    set_player_position_on_map()
     for row_index,level_layout_row in enumerate(level):
         for col_index,cell in enumerate(level_layout_row):
             type = cell
@@ -31,6 +36,8 @@ def create_all_level_tiles():
 def create_level_tile(type,position,size,vicinity_matrix):
     new_tile_sprite = Tile(type,position,size,vicinity_matrix)
     entity_manager.level_sprite_groups.append(pygame.sprite.GroupSingle(new_tile_sprite))
+    if new_tile_sprite.passable == False:
+        entity_manager.level_collision_sprite_groups.append(pygame.sprite.GroupSingle(new_tile_sprite))
 
 def cell_is_starting_position(row_index,col_index,cell):
     if level[row_index-1][col_index-1] == ENTRANCE and level[row_index-1][col_index] == ENTRANCE and level[row_index-1][col_index+1] == ENTRANCE and cell == FLOOR:
