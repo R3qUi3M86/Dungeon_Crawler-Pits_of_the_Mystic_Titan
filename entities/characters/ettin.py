@@ -129,7 +129,7 @@ class Ettin(pygame.sprite.Sprite):
       
         self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
         self.map_position = round(self.position[0]-player_position[0]+movement_manager.player_position_on_map[0],2), round(self.position[1]-player_position[1]+movement_manager.player_position_on_map[1],2)
-        self.tile_position = int(self.map_position[1])//48 , int(self.map_position[0])//48
+        self.tile_position = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
         self.sprite_position = self.position[0], self.position[1] + self.sprite_display_correction
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         self.update_owned_sprites_position()
