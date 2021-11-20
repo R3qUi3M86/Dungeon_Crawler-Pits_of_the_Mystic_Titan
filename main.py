@@ -4,6 +4,7 @@ from utilities.text_printer import *
 from utilities.constants import *
 from utilities import entity_manager
 from utilities import movement_manager
+from utilities import level_painter
 from sys import exit
 from entities import cursor
 
@@ -11,7 +12,9 @@ pygame.init()
 clock = pygame.time.Clock()
 
 set_volume_for_all_sounds(VOLUME)
-entity_manager.generate_monsters()
+
+level_painter.create_all_level_tiles()
+#entity_manager.generate_monsters()
 
 def get_player_wsad_input(keys):
     if keys[pygame.K_s] and movement_manager.acceleration_vector[Y] < 30.0:
@@ -81,8 +84,7 @@ def collision_detection():
     #possible other collisions
 
 def draw_sprites():
-    for level_tile in entity_manager.level_sprite_groups:
-        level_tile.draw(screen)
+    entity_manager.level_sprite_group.draw(screen)
     for melee_sectors in entity_manager.melee_sector_sprite_groups:
         melee_sectors.draw(screen)
     for shadow in entity_manager.shadow_sprite_groups:

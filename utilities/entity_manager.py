@@ -1,4 +1,5 @@
 import pygame
+from pygame.display import update
 from utilities.constants import *
 from utilities import movement_manager
 from entities.characters import unique_player_objects
@@ -11,7 +12,7 @@ movement_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_G
 melee_collision_sprite_groups = [unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP]
 item_sprite_groups = []
 melee_sector_sprite_groups = [unique_player_objects.HERO_MELEE_SECTOR_SPRITE_GROUP]
-level_sprite_groups = []
+level_sprite_group = pygame.sprite.Group()
 projectile_sprite_groups = []
 
 def get_collision_sprite_by_id(id):
@@ -30,12 +31,14 @@ def update_non_player_group_single_entities_position(vector,entities):
         entity.sprite.update_position(vector)
 
 def update_non_player_group_entities_position(vector,entities):
-    pass
+    level_tile_sprites = entities.sprites()
+    for level_tile_sprite in level_tile_sprites:
+        level_tile_sprite.update_position(vector)
 
 def update_all_non_player_entities_player_position(vector):
     update_non_player_group_single_entities_position(vector,character_sprite_groups)
     update_non_player_group_single_entities_position(vector,item_sprite_groups)
-    update_non_player_group_single_entities_position(vector,level_sprite_groups)
+    update_non_player_group_entities_position(vector,level_sprite_group)
     update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
 
 def get_monster_sprite(monster_id):
@@ -124,10 +127,8 @@ def update_all_entities():
         for projectile_sprite in sprites:
             projectile_sprite.update()
 
-    for level_sprite_group in level_sprite_groups:
-        sprites = level_sprite_group.sprites()
-        for level_sprite in sprites:
-            level_sprite.update()
+    level_sprite_group.update()
+
 
 def generate_monsters():
     generate_monster(ETTIN, (200,200))

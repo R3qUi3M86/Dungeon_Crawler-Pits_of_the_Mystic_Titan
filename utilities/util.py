@@ -37,7 +37,6 @@ def determine_quadrant(x,y):
     else:
         quartants_list[3] = True
 
-
 def get_total_angle(current_entity_pos,other_entity_pos):
     set_center_coordinate(current_entity_pos[0],current_entity_pos[1])
 
