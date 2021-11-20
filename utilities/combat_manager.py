@@ -38,7 +38,7 @@ def attack_player_with_melee_attack(current_attacking_monster):
     
     play_melee_attack_sound(current_attacking_monster.name)
     if hit_something == True:
-        unique_player_objects.HERO.take_damage(damage=19)
+        unique_player_objects.HERO.take_damage(damage=0)
     hit_something = False
 
 def deal_damage_to_monster(entity, damage):

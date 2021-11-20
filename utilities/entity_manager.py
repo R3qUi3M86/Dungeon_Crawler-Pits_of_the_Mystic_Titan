@@ -31,7 +31,7 @@ def get_level_collision_sprite_by_index(index):
 
 def generate_monster(monster_type, tile_index):
     if monster_type == ETTIN:
-        create_ettin_monster(level_painter.get_tile_position(tile_index))
+        create_ettin_monster(tile_index)
 
 def update_non_player_group_single_entities_position(vector,entities):
     for entity in entities:
@@ -58,8 +58,8 @@ def get_monster_sprite(monster_id):
         if monster.sprite.id == monster_id:
             return monster.sprite
 
-def create_ettin_monster_sprite_group(monster_sprite_position):
-    ettin_monster_sprite = ettin.Ettin(monster_sprite_position)
+def create_ettin_monster_sprite_group(monster_sprite_tile_position):
+    ettin_monster_sprite = ettin.Ettin(monster_sprite_tile_position)
     ettin_monster_sprite_grup = pygame.sprite.GroupSingle()
     ettin_monster_sprite_grup.add(ettin_monster_sprite)
     return ettin_monster_sprite_grup
@@ -143,7 +143,7 @@ def update_all_entities():
             projectile_sprite.update()
 
 def generate_monsters():
-    generate_monster(ETTIN, (6,6))
+    generate_monster(ETTIN,(3,4))
     # generate_monster(ETTIN, (2,10))
     # generate_monster(ETTIN, (3,10))
     # generate_monster(ETTIN, (5,9))

@@ -57,6 +57,7 @@ def get_tile_position(level_tile_index):
 
     return position_x,position_y
 
+
 def get_vicinity_matrix_for_tile(level_tile_index):
     vicinity_matrix = []
     for i in range(3):
