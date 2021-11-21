@@ -2,13 +2,16 @@ import pygame
 import random
 from entities.level.level import *
 from images.level.cave_images import *
+from utilities import movement_manager
+from utilities import level_painter
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self,type,level_pos_index,pos,size,vicinity_matrix):
+    def __init__(self,type,tile_index,pos,size,vicinity_matrix):
         super().__init__()
         self.type = type
-        self.level_pos_index = level_pos_index
+        self.tile_index = tile_index
         self.position = pos
+        self.map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
         self.size = size
         self.vicinity_matrix = vicinity_matrix
         self.passable = self.get_passable()
@@ -49,7 +52,7 @@ class Tile(pygame.sprite.Sprite):
         return True
 
     def get_index(self):
-        return self.level_pos_index
+        return self.tile_index
 
 # LEVEL_EXIT = "N"
 # WALL = "X"

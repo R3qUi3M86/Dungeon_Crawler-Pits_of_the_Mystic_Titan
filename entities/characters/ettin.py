@@ -16,7 +16,7 @@ from sounds import sound_player
 from images.characters.ettin_images import *
 
 class Ettin(pygame.sprite.Sprite):
-    def __init__(self,tile_position):
+    def __init__(self,tile_index):
         super().__init__()
         #Walk assets
         self.character_walk = character_walk
@@ -34,8 +34,8 @@ class Ettin(pygame.sprite.Sprite):
         self.character_pain_timer = 0
 
         #Position variables
-        self.tile_position = tile_position
-        self.position = level_painter.get_tile_position(tile_position)
+        self.tile_index = tile_index
+        self.position = level_painter.get_tile_position(tile_index)
         self.map_position = round(self.position[0]-player_position[0]+movement_manager.player_position_on_map[0],2), round(self.position[1]-player_position[1]+movement_manager.player_position_on_map[1],2)
         self.sprite_display_correction = 12
         self.sprite_position = self.position[0], self.position[1] + self.sprite_display_correction
@@ -129,7 +129,7 @@ class Ettin(pygame.sprite.Sprite):
       
         self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
         self.map_position = round(self.position[0]-player_position[0]+movement_manager.player_position_on_map[0],2), round(self.position[1]-player_position[1]+movement_manager.player_position_on_map[1],2)
-        self.tile_position = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
+        self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
         self.sprite_position = self.position[0], self.position[1] + self.sprite_display_correction
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         self.update_owned_sprites_position()

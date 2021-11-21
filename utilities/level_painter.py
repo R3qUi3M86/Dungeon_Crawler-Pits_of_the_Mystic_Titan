@@ -29,9 +29,9 @@ def create_all_level_tiles():
         for col_index,cell in enumerate(level_layout_row):
             type = cell
             level_position_index = row_index,col_index
-            level_tile_index = row_index,col_index
-            position = get_tile_position(level_tile_index)
-            vicinity_matrix = get_vicinity_matrix_for_tile(level_tile_index)
+            tile_index = row_index,col_index
+            position = get_tile_position(tile_index)
+            vicinity_matrix = get_vicinity_matrix_for_tile(tile_index)
             create_level_tile(type,level_position_index,position,TILE_SIZE,vicinity_matrix)
 
 def create_level_tile(type,level_position_index,position,size,vicinity_matrix):
@@ -45,9 +45,9 @@ def cell_is_starting_position(row_index,col_index,cell):
         return True
     return False
 
-def get_tile_position(level_tile_index):
-    index_distance_x = level_tile_index[1] - player_starting_tile_index[1]
-    index_distance_y = level_tile_index[0] - player_starting_tile_index[0]
+def get_tile_position(tile_index):
+    index_distance_x = tile_index[1] - player_starting_tile_index[1]
+    index_distance_y = tile_index[0] - player_starting_tile_index[0]
 
     distance_x = TILE_SIZE[0]*index_distance_x
     distance_y = TILE_SIZE[1]*index_distance_y
@@ -57,14 +57,14 @@ def get_tile_position(level_tile_index):
 
     return position_x,position_y
 
-def get_vicinity_matrix_for_tile(level_tile_index):
+def get_vicinity_matrix_for_tile(tile_index):
     vicinity_matrix = []
     for i in range(3):
         vicinity_matrix_row = []
         
         for j in range(3):
-            if 0 <= level_tile_index[0]+i-1 < len(level) and 0 <= level_tile_index[1]+j-1 < len(level[0]):
-                cell = level[level_tile_index[0]+i-1][level_tile_index[1]+j-1]
+            if 0 <= tile_index[0]+i-1 < len(level) and 0 <= tile_index[1]+j-1 < len(level[0]):
+                cell = level[tile_index[0]+i-1][tile_index[1]+j-1]
                 vicinity_matrix_row.append(cell)
             else:
                 cell = WALL
