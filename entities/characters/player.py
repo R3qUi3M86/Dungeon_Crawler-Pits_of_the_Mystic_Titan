@@ -88,6 +88,7 @@ class Hero(pygame.sprite.Sprite):
         self.is_dying = False
         self.is_overkilled = False
         self.is_in_pain = False
+        self.is_dead = False
 
         #Character properties
         self.health = 20
@@ -111,21 +112,25 @@ class Hero(pygame.sprite.Sprite):
             self.image = character_walk[int(self.character_walk_index[0])][int(self.character_walk_index[1])]
             self.walking_animation()
 
-        if self.is_attacking == True:
-            self.character_attack_animation()
-
-        if self.is_in_pain == True:
-            self.character_pain_animation()
-        
-        if self.is_dying == True:
-            self.character_death_animation()
-
-        if self.is_overkilled == True:
-            self.character_overkill_animation()
+        self.update_animation()
 
     def update_position(self,vector):
         self.map_position = round(self.map_position[0] + vector[0],2),round(self.map_position[1] + vector[1],2)
         self.tile_index = int(self.map_position[1] // TILE_SIZE[X]), int(self.map_position[0]// TILE_SIZE[Y])
+
+    def update_animation(self):
+        if not self.is_dead:
+            if self.is_attacking == True:
+                self.character_attack_animation()
+
+            if self.is_in_pain == True:
+                self.character_pain_animation()
+            
+            if self.is_dying == True:
+                self.character_death_animation()
+
+            if self.is_overkilled == True:
+                self.character_overkill_animation()
 
     #Animations
     def walking_animation(self):
@@ -162,14 +167,16 @@ class Hero(pygame.sprite.Sprite):
             self.character_death_index += 0.1
             if int(self.character_death_index) == 7:
                 self.character_death_index = 6
-                self.is_dying == False
+                self.is_dying = False
+                self.is_dead = True
             self.image = self.character_death[int(self.character_death_index)]
 
     def character_overkill_animation(self):
         self.character_overkill_index += 0.1
         if int(self.character_overkill_index) == 10:
             self.character_overkill_index = 9
-            self.is_overkilled == False
+            self.is_overkilled = False
+            self.is_dead = True
         self.image = self.character_overkill[int(self.character_overkill_index)]       
 
     def character_walk_forward_animation(self):
@@ -211,19 +218,18 @@ class Hero(pygame.sprite.Sprite):
             sound_player.player_pain_sound.play()
 
         else:
-            if self.is_living == True:
-                sound_player.player_pain_sound.stop()
-                sound_player.player_death_sound.play()
-                self.is_living = False
-                self.is_in_pain = False
-                self.is_dying = True
+            sound_player.player_pain_sound.stop()
+            sound_player.player_death_sound.play()
+            self.is_living = False
+            self.is_in_pain = False
+            self.is_dying = True
 
-            if self.is_overkilled == False and -(self.maxhealth//2) >= self.health:
+            if -(self.maxhealth//2) >= self.health:
                 sound_player.player_death_sound.stop()
                 random.choice(sound_player.player_overkill_sounds).play()
                 self.is_living = False
                 self.is_in_pain = False
-                self.is_dying = True
+                self.is_dying = False
                 self.is_overkilled = True
 
     #Misc

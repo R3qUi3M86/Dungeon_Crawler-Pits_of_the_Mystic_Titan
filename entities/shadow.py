@@ -18,13 +18,13 @@ class Shadow(pygame.sprite.Sprite):
             self.image = self.get_mask_image()
         else:
             self.image = self.get_normal_image()
-            
+
         self.rect = self.image.get_rect(center = (self.position))
-        self.mask = pygame.mask.from_surface(self.image)
+        self.mask = pygame.mask.from_surface(self.get_mask_image())
 
     #Update functions    
-    def update_position(self,vector):
-        self.position = self.position[0] - vector[0], self.position[1] - vector[1]
+    def update_position(self,position):
+        self.position = position
         self.rect = self.image.get_rect(center = (self.position))
 
     #Image getters

@@ -14,8 +14,8 @@ def attack_monster_with_melee_attack(damage = 0):
             enemy_has_been_hit = False
             
             for melee_sector in unique_player_object.HERO.entity_melee_sector_sprites:
-                if melee_sector.rect.colliderect(entity_sprite_group.sprite.rect):
-                    if melee_sector.sector == unique_player_object.HERO.facing_direction and pygame.sprite.collide_mask(melee_sector, entity_sprite_group.sprite) != None:
+                if melee_sector.rect.colliderect(entity_sprite_group.sprite.entity_collision_mask.rect):
+                    if melee_sector.sector == unique_player_object.HERO.facing_direction and pygame.sprite.collide_mask(melee_sector, entity_sprite_group.sprite.entity_collision_mask) != None:
                         enemy_has_been_hit = True
                         break
             
@@ -40,10 +40,10 @@ def attack_player_with_melee_attack(monster, damage = 0):
                 break
     
     if hit:
-        play_melee_attack_sound(monster.name, HIT)
+        play_melee_attack_sound(monster.NAME, HIT)
         unique_player_object.HERO.take_damage(damage)
     else:
-        play_melee_attack_sound(monster.name, MISS)
+        play_melee_attack_sound(monster.NAME, MISS)
 
 def play_melee_attack_sound(attacking_entity, hit):
     if hit:

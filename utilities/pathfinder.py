@@ -25,7 +25,6 @@ class Pathfinder:
         self.grid.cleanup()
 
     def update(self, monster_tile_index = None, pathfinding = False):
-        print(self.path)
         self.generate_points_path(self.path)
         if pathfinding:
             self.monster_tile_index = monster_tile_index
@@ -40,8 +39,6 @@ class Pathfinder:
             for level_tile in entity_manager.level_sprite_groups:
                 if level_tile.sprite.tile_index == (path_grid[1], path_grid[0]):
                     self.points.append((level_tile.sprite.position[0],level_tile.sprite.position[1]))
-        
-        print(self.points)
 
     def draw_path(self):
         if self.points:

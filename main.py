@@ -121,8 +121,8 @@ def collision_detection():
 def draw_sprites():
     for tile in entity_manager.level_sprite_groups:
         tile.draw(screen)
-    # for melee_sector_sprite_group in entity_manager.melee_sector_sprite_groups:
-    #     melee_sector_sprite_group.draw(screen)
+    for melee_sector_sprite_group in entity_manager.melee_sector_sprite_groups:
+        melee_sector_sprite_group.draw(screen)
     for entity_collision_sprite_group in entity_manager.entity_collision_sprite_groups:
         entity_collision_sprite_group.draw(screen)
     for shadow in entity_manager.shadow_sprite_groups:
@@ -137,7 +137,7 @@ def draw_pathfinding_path_for_monster(monster_index):
 
 initialize_player_object()
 level_painter.create_all_level_tiles()
-#entity_manager.generate_monsters()
+entity_manager.generate_monsters()
 
 #Main game loop
 while True:
@@ -152,7 +152,7 @@ while True:
     entity_manager.update_all_entities()
     unique_player_object.HERO.update_position(unique_player_object.HERO.speed_vector)
     entity_manager.update_all_non_player_entities_position_by_vector(unique_player_object.HERO.speed_vector)
-    #collision_detection()
+    collision_detection()
 
     #Events
     for event in pygame.event.get():
@@ -163,7 +163,6 @@ while True:
     #Drawing
     draw_sprites()
     draw_pathfinding_path_for_monster(0)
-    print(unique_player_object.HERO.speed_scalar)
     points = [(entity_manager.level_sprite_groups[0].sprite.position[0], entity_manager.level_sprite_groups[0].sprite.position[1]),(entity_manager.level_sprite_groups[50].sprite.position[0], entity_manager.level_sprite_groups[50].sprite.position[1])]
     pygame.draw.lines(screen,'#aa0000',False,points,5)
     debug_text(f"{unique_player_object.HERO.map_position}")

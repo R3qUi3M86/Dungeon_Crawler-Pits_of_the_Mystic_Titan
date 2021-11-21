@@ -19,7 +19,7 @@ def character_vs_level_movement_collision(character):
             correct_character_position_by_vector(character.sprite,level_collision_sprite_group.sprite)
             if character.sprite.is_monster:
                 if character.sprite.monster_ai.is_path_finding == False and character.sprite.monster_ai.is_following_path == False:
-                    character.sprite.monster_ai.is_avoiding_obstacle = False
+                    character.sprite.monster_ai.reset_obstacle_avoidance_flags()
                     character.sprite.monster_ai.is_path_finding = True
 
 def monster_vs_monster_collision(character):
@@ -28,9 +28,8 @@ def monster_vs_monster_collision(character):
             character_collider = character.sprite.collision_mask
             entity_collider = entity_sprite_group.sprite.collision_mask
             if character_collider.rect.colliderect(entity_collider):
-                mask_collision_coordinates = pygame.sprite.collide_mask(character_collider, entity_collider)
-                if mask_collision_coordinates != None:
-                    adjust_monster_movement_vector(mask_collision_coordinates, character.sprite, entity_sprite_group.sprite)
+                if pygame.sprite.collide_mask(character_collider, entity_collider) != None:
+                    adjust_monster_movement_vector(character.sprite, entity_sprite_group.sprite)
 
 def projectile_collision(projectile):
     #Projectile collision logic
@@ -55,31 +54,23 @@ def adjust_player_movement_vector(mask_collision_coordinates):
         unique_player_object.HERO.speed_scalar = unique_player_object.HERO.speed_scalar[0], round(unique_player_object.HERO.speed_scalar[1]/3,2)
         unique_player_object.HERO.speed_vector = unique_player_object.HERO.speed_vector[0], round(unique_player_object.HERO.speed_vector[1]/3,2)
 
-def adjust_monster_movement_vector(mask_collision_coordinates, monster, current_monster_movement_collision_sprite):
-    east_collision_coordinate_X = 0
-    west_collision_coordinate_X = 0
-    north_collision_coordinate_Y = 0
-    south_collision_coordinate_Y = 0
-
-    if current_monster_movement_collision_sprite.shadow_size == SIZE_MEDIUM:
-        east_collision_coordinate_X = 31
-        west_collision_coordinate_X = 30
-        north_collision_coordinate_Y = 12
-        south_collision_coordinate_Y = 18
-    elif current_monster_movement_collision_sprite.shadow_size == SIZE_SMALL or current_monster_movement_collision_sprite.shadow_size == SIZE_MEDIUM:
-        east_collision_coordinate_X = 23
-        west_collision_coordinate_X = 13
-        north_collision_coordinate_Y = 10
-        south_collision_coordinate_Y = 10
-
-    if mask_collision_coordinates[0] >= east_collision_coordinate_X and monster.speed_vector[0] >= 0:
+def adjust_monster_movement_vector(monster, current_monster_movement_collision_sprite):
+    if east_mask_collides(monster,current_monster_movement_collision_sprite):
         monster.monster_ai.avoid_obstacle(SECTOR_E)
-    elif mask_collision_coordinates[0] <= west_collision_coordinate_X and monster.speed_vector[0] <= 0:
+    elif west_mask_collides(monster,current_monster_movement_collision_sprite):
         monster.monster_ai.avoid_obstacle(SECTOR_W)
-    elif mask_collision_coordinates[1] <= north_collision_coordinate_Y and monster.speed_vector[1] <= 0:
+    elif north_mask_collides(monster,current_monster_movement_collision_sprite):
         monster.monster_ai.avoid_obstacle(SECTOR_N)
-    elif mask_collision_coordinates[1] > south_collision_coordinate_Y and monster.speed_vector[1] >= 0:
+    elif south_mask_collides(monster,current_monster_movement_collision_sprite):
         monster.monster_ai.avoid_obstacle(SECTOR_S)
+    elif north_east_mask_collides(monster,current_monster_movement_collision_sprite):
+        monster.monster_ai.avoid_obstacle(SECTOR_NE)
+    elif north_west_mask_collides(monster,current_monster_movement_collision_sprite):
+        monster.monster_ai.avoid_obstacle(SECTOR_NW)
+    elif south_east_mask_collides(monster,current_monster_movement_collision_sprite):
+        monster.monster_ai.avoid_obstacle(SECTOR_SE)
+    elif south_west_mask_collides(monster,current_monster_movement_collision_sprite):
+        monster.monster_ai.avoid_obstacle(SECTOR_SW)
 
 #Character bounce-back
 def correct_character_position_by_vector(current_entity_sprite,colliding_entity_sprite):
