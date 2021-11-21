@@ -5,58 +5,50 @@ from images.misc.shadow_images import *
 from images.misc.player_collision_mask_images import *
 
 class Shadow(pygame.sprite.Sprite):
-    def __init__(self, position, id, size, visible, sector=None):
+    def __init__(self, position, id, size, mask=False, sector=None):
         super().__init__()
 
-        self.visible = visible
+        self.mask = mask
         self.sector = sector
         self.shadow_size = size
         self.position = position
         self.id = id
 
-        self.image = self.get_self_image()
+        if mask:
+            self.image = self.get_mask_image()
+        else:
+            self.image = self.get_normal_image()
+            
         self.rect = self.image.get_rect(center = (self.position))
-        self.mask = self.get_self_mask()
+        self.mask = pygame.mask.from_surface(self.image)
 
     #Update functions    
-    def update(self):
-        self.rect = self.image.get_rect(center = (self.position))
-
     def update_position(self,vector):
         self.position = self.position[0] - vector[0], self.position[1] - vector[1]
         self.rect = self.image.get_rect(center = (self.position))
 
-    #Misc
-    def get_self_image(self):
+    #Image getters
+    def get_normal_image(self):
         if self.shadow_size == SIZE_SMALL:
-            if self.visible:
-                return shadow_small
-            else:
-                return invisible_shadow_small
-        
+            return shadow_small
         elif self.shadow_size == SIZE_MEDIUM:
-            if self.visible:
-                return shadow_medium
-            else:
-                return invisible_shadow_medium
+            return shadow_medium
     
-    def get_self_mask(self):
+    def get_mask_image(self):
         if self.sector == None:
             if self.shadow_size == SIZE_SMALL:
-                return pygame.mask.from_surface(shadow_small_mask)
+                return collision_small_mask
             elif self.shadow_size == SIZE_MEDIUM:
-                return pygame.mask.from_surface(shadow_medium_mask)
+                return collision_medium_mask
         
-        elif self.sector == SECTOR_NW:
-            self.image = collision_sector_nw
-            return pygame.mask.from_surface(collision_sector_nw)
-        elif self.sector == SECTOR_NE:
-            self.image = collision_sector_ne
-            return pygame.mask.from_surface(collision_sector_ne)
-        elif self.sector == SECTOR_SW:
-            self.image = collision_sector_sw
-            return pygame.mask.from_surface(collision_sector_sw)
-        elif self.sector == SECTOR_SE:
-            self.image = collision_sector_se
-            return pygame.mask.from_surface(collision_sector_se)
+        else:
+            if self.shadow_size == SIZE_SMALL:
+                if self.sector == SECTOR_NW:
+                    return collision_small_sector_nw
+                elif self.sector == SECTOR_NE:
+                    return collision_small_sector_ne
+                elif self.sector == SECTOR_SW:
+                    return collision_small_sector_sw
+                elif self.sector == SECTOR_SE:
+                    return collision_small_sector_se
 

@@ -2,7 +2,6 @@ import pygame
 import random
 from entities.level.level import *
 from images.level.cave_images import *
-from utilities import movement_manager
 from utilities import level_painter
 
 class Tile(pygame.sprite.Sprite):

@@ -1,16 +1,18 @@
-import pygame
 from settings import *
 
-PLAYER_SHADOW_ID = -1
+PLAYER_ID = -1
 
 X = 0
 Y = 1
 
 PLAYER = "player"
+MONSTER = "monster"
 ETTIN = "ettin"
 
+HIT = True
+MISS = False
+
 SIZE_SMALL = 'small'
-SIZE_MEDIUM_SMALL = 'medium_small'
 SIZE_MEDIUM = "medium"
 
 SECTOR_N = "North"

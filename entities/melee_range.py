@@ -8,9 +8,9 @@ class Melee(pygame.sprite.Sprite):
         super().__init__()
         self.position = position
         self.sector = sector
-        self.image = melee_mask_image
+        self.image = self.get_sector_image()
         self.rect = self.image.get_rect(center = (self.position))
-        self.mask = pygame.mask.from_surface(self.get_sector_image())
+        self.mask = pygame.mask.from_surface(self.image)
 
     #Update functions
     def update(self):

@@ -1,9 +1,8 @@
 import random
-import time
-from utilities.constants import *
 from utilities import util
 from utilities import pathfinder
-from entities.characters import unique_player_objects
+from utilities.constants import *
+from entities.characters import unique_player_object
 
 class Ai():
     def __init__(self,owner, pathfinding_matrix, tile_index):
@@ -18,6 +17,7 @@ class Ai():
         self.attack_decision_timer_limit = 3
         
         self.pathfinder = pathfinder.Pathfinder(pathfinding_matrix, tile_index)
+        self.pathfinding_collision_rect = pygame.Rect((self.monster.position[0] - 2, self.monster.position[1] -2),(4,4))
         self.is_path_finding = False
         self.is_following_path = False
         self.is_avoiding_obstacle = False
@@ -76,15 +76,6 @@ class Ai():
             else:
                 self.monster.facing_direction = util.get_facing_direction(self.monster.position,player_position)
         
-        elif self.is_path_finding == True:
-            self.pathfinder.update(self.monster.tile_index, True)
-            self.pathfinder.create_path()
-            self.is_following_path = True
-            self.is_path_finding = False
-
-        elif self.is_following_path == True:
-            pass
-        
         elif self.is_avoiding_obstacle == True and self.avoidance_direction_sector == None:
             self.change_to_parallel_direction()
         
@@ -123,6 +114,11 @@ class Ai():
                 self.monster.facing_direction = SECTOR_NW
             elif self.obstacle_sector == SECTOR_W and self.avoidance_direction_sector == SECTOR_S:
                 self.monster.facing_direction = SECTOR_SW
+    
+    def change_to_next_point_direction(self):
+        # if self.pathfinder.points and self.monster.pathfinding_collision_rect.collidepoint(self.pathfinder.points[0]):
+        #     del self.pathfinder.points[0]
+        self.monster.facing_direction = util.get_facing_direction(self.monster.map_position,self.pathfinder.points[0])
 
     def finish_avoiding_obstacle(self):
         self.is_avoiding_obstacle = False
@@ -131,18 +127,18 @@ class Ai():
         self.is_doing_diagonal_avoidance = False
         self.is_on_final_approach = False
 
-    def finish_path_finding(self):
+    def finish_pathfinding(self):
         self.pathfinder.update(pathfinding = False)
         self.is_path_finding = False
         self.is_following_path = False
 
     #Combat decisions
     def monster_can_melee_attack_player(self):
-        if unique_player_objects.HERO.is_living == True:
+        if unique_player_object.HERO.is_living == True:
             self.player_direction_sector = util.get_facing_direction(self.monster.position,player_position)
             for melee_sprite in self.monster.character_melee_sprites:
-                if melee_sprite.rect.colliderect(unique_player_objects.PLAYER_SHADOW_SPRITE):
-                    if pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE):
+                if melee_sprite.rect.colliderect(unique_player_object.HERO.entity_collision_mask):
+                    if pygame.sprite.collide_mask(melee_sprite, unique_player_object.HERO.entity_collision_mask):
                         return True
         return False
 

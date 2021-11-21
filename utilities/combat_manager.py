@@ -1,54 +1,52 @@
-from entities.characters import unique_player_objects
+from entities.characters import unique_player_object
 from utilities import entity_manager
 from sounds import sound_player
 from utilities.constants import *
 
-enemy_has_been_hit = False
-hit_something = False
+def attack_monster_with_melee_attack(damage = 0):
+    enemy_has_been_hit = False
+    hit_something = False
 
-def attack_monster_with_melee_attack():
-    global enemy_has_been_hit
-    global hit_something
-
-    hit_entity_list = []
-    for entity in entity_manager.melee_collision_sprite_groups:
-        if entity != unique_player_objects.PLAYER_SHADOW_SPRITE_GROUP:
-            for PLAYER_MELEE_SPRITE in unique_player_objects.PLAYER_MELEE_SPRITES:
-                if PLAYER_MELEE_SPRITE.sector == unique_player_objects.HERO.facing_direction and PLAYER_MELEE_SPRITE.rect.colliderect(entity.sprite.rect):
-                    if PLAYER_MELEE_SPRITE.sector == unique_player_objects.HERO.facing_direction and pygame.sprite.collide_mask(PLAYER_MELEE_SPRITE, entity.sprite) != None:
+    hit_monsters = []
+    
+    for entity_sprite_group in entity_manager.entity_sprite_groups:
+        if entity_sprite_group.sprite != unique_player_object.HERO:
+            enemy_has_been_hit = False
+            
+            for melee_sector in unique_player_object.HERO.entity_melee_sector_sprites:
+                if melee_sector.rect.colliderect(entity_sprite_group.sprite.rect):
+                    if melee_sector.sector == unique_player_object.HERO.facing_direction and pygame.sprite.collide_mask(melee_sector, entity_sprite_group.sprite) != None:
                         enemy_has_been_hit = True
                         break
             
-            if enemy_has_been_hit == True:
+            if enemy_has_been_hit:
                 hit_something = True
-                hit_entity_list.append(entity)
-            enemy_has_been_hit = False
+                hit_monsters.append(entity_sprite_group.sprite)
 
-    play_melee_attack_sound(PLAYER)
-    hit_something = False
-    for entity in hit_entity_list:
-        deal_damage_to_monster(entity, damage=4)
-
-def attack_player_with_melee_attack(current_attacking_monster):
-    global hit_something
-    for melee_sprite in current_attacking_monster.character_melee_sprites:
-        if melee_sprite.sector == current_attacking_monster.facing_direction and pygame.sprite.collide_mask(melee_sprite, unique_player_objects.PLAYER_SHADOW_SPRITE) != None:
-            hit_something = True
-            break
-    
-    play_melee_attack_sound(current_attacking_monster.name)
-    if hit_something == True:
-        unique_player_objects.HERO.take_damage(damage=0)
-    hit_something = False
-
-def deal_damage_to_monster(entity, damage):
-    id = entity.sprite.id
-    for monster in entity_manager.character_sprite_groups:
-        if id == monster.sprite.id:
-            monster.sprite.take_damage(damage)
-
-def play_melee_attack_sound(attacking_entity):
     if hit_something:
+        play_melee_attack_sound(PLAYER, HIT)
+        for monster in hit_monsters:
+            monster.take_damage(damage)
+    else:
+        play_melee_attack_sound(PLAYER, MISS)
+        
+def attack_player_with_melee_attack(monster, damage = 0):
+    hit = False
+
+    for melee_sector in monster.entity_melee_sector_sprites:
+        if melee_sector.rect.colliderect(unique_player_object.HERO.entity_collision_mask.rect):
+            if melee_sector.sector == monster.facing_direction and pygame.sprite.collide_mask(melee_sector, unique_player_object.HERO.entity_collision_mask) != None:
+                hit = True
+                break
+    
+    if hit:
+        play_melee_attack_sound(monster.name, HIT)
+        unique_player_object.HERO.take_damage(damage)
+    else:
+        play_melee_attack_sound(monster.name, MISS)
+
+def play_melee_attack_sound(attacking_entity, hit):
+    if hit:
         if attacking_entity == PLAYER:
             sound_player.hero_melee_hit_sound.play()
         elif attacking_entity == ETTIN:

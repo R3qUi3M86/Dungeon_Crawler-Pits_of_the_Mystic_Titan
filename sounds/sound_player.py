@@ -4,6 +4,7 @@ VOLUME = 0.1
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
+
 hero_melee_miss_sound = pygame.mixer.Sound('sounds/attack/PUNCHMIS.wav')
 hero_melee_hit_sound = pygame.mixer.Sound('sounds/attack/hit/ETHIT1.wav')
 monster_melee_miss_sound = pygame.mixer.Sound('sounds/attack/WTRSWIP.wav')
