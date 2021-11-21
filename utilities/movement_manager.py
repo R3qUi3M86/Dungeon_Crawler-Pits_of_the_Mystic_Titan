@@ -10,6 +10,7 @@ speed_vector = 0,0
 player_speed = 3
 player_position_on_map = 0,0
 player_tile_index = 0,0
+pathfinding_matrix = []
 
 def player_vs_monster_movement_collision():
     for monster_movement_collision_sprite_group in entity_manager.monster_movement_collision_sprite_groups:

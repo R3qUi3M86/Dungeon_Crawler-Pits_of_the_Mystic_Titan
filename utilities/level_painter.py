@@ -25,6 +25,7 @@ def set_player_position_on_map():
 def create_all_level_tiles():
     set_player_tile_index()
     set_player_position_on_map()
+
     for row_index,level_layout_row in enumerate(level):
         for col_index,cell in enumerate(level_layout_row):
             type = cell
@@ -33,6 +34,8 @@ def create_all_level_tiles():
             position = get_tile_position(tile_index)
             vicinity_matrix = get_vicinity_matrix_for_tile(tile_index)
             create_level_tile(type,level_position_index,position,TILE_SIZE,vicinity_matrix)
+    
+    generate_pathfinding_matrix()
 
 def create_level_tile(type,level_position_index,position,size,vicinity_matrix):
     new_tile_sprite = Tile(type,level_position_index,position,size,vicinity_matrix)
@@ -73,3 +76,19 @@ def get_vicinity_matrix_for_tile(tile_index):
         vicinity_matrix_row.clear()
 
     return vicinity_matrix
+
+def get_tile_sprite(tile_index):
+    for tile in entity_manager.level_sprite_groups:
+        if tile.sprite.tile_index == tile_index:
+            return tile.sprite
+
+def generate_pathfinding_matrix():
+    for row_index,level_layout_row in enumerate(level):
+        matrix_row = []
+        for col_index,_ in enumerate(level_layout_row):
+            tile_index = row_index,col_index
+            if get_tile_sprite(tile_index).passable == False:
+                matrix_row.append(0)
+            else:
+                matrix_row.append(1)
+        movement_manager.pathfinding_matrix.append(matrix_row)
