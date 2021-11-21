@@ -1,5 +1,26 @@
 from settings import *
 
+test_map = [
+"                                  ",
+"                                  ",
+"                                  ",
+"                                  ",
+"                                  ",
+"                                  ",
+"                                  ",
+"            EEE                   ",
+"            EEE                   ",
+"            EEE                   ",    
+"                                  ",
+"                                  ",
+"                                  ",
+"                                  ",
+"                                  ",
+"                                  ",
+"                                  ",
+"                                  "
+]
+
 level_01_map = [
 "XXEEEXXXXXXXXXXXXXXXXX",
 "XXEEEXXXXXXX XXXX  XXX",

@@ -8,7 +8,7 @@ pathfinding_matrix = []
 def player_vs_monster_movement_collision():
     for entity_sprite_group in entity_manager.entity_sprite_groups:
         if entity_sprite_group.sprite != unique_player_object.HERO and unique_player_object.HERO.entity_collision_mask.rect.colliderect(entity_sprite_group.sprite.entity_collision_mask.rect):
-            mask_collision_coordinates = pygame.sprite.collide_mask(unique_player_object.HERO.entity_collision_mask, entity_sprite_group.sprite.entity_collision_mask.sprite)
+            mask_collision_coordinates = pygame.sprite.collide_mask(unique_player_object.HERO.entity_collision_mask, entity_sprite_group.sprite.entity_collision_mask)
             if mask_collision_coordinates != None:
                 bump_monster_back(unique_player_object.HERO, entity_sprite_group.sprite)
                 adjust_player_movement_vector(mask_collision_coordinates)
@@ -25,10 +25,11 @@ def character_vs_level_movement_collision(character):
 def monster_vs_monster_collision(character):
     for entity_sprite_group in entity_manager.entity_sprite_groups:
         if character.sprite != unique_player_object.HERO and character != entity_sprite_group:
-            character_collider = character.sprite.collision_mask
-            entity_collider = entity_sprite_group.sprite.collision_mask
+            character_collider = character.sprite.entity_collision_mask
+            entity_collider = entity_sprite_group.sprite.entity_collision_mask
             if character_collider.rect.colliderect(entity_collider):
                 if pygame.sprite.collide_mask(character_collider, entity_collider) != None:
+                    bump_monster_back(character.sprite, entity_sprite_group.sprite)
                     adjust_monster_movement_vector(character.sprite, entity_sprite_group.sprite)
 
 def projectile_collision(projectile):

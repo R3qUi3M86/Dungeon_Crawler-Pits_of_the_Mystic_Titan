@@ -63,10 +63,10 @@ class Ai():
 
     #Obstacle avoidance logic
     def avoid_obstacle(self,sector):
-        self.is_roaming = False
         self.end_pathfinding()
         self.reset_obstacle_avoidance_flags()
-        self.direction_change_decision_timer_limit = 1
+        self.is_roaming = False
+        self.direction_change_decision_timer_limit = 6
         self.direction_change_decision_timer = 0
         self.is_avoiding_obstacle = True
         self.obstacle_sector = sector
@@ -89,12 +89,12 @@ class Ai():
 
     def change_to_parallel_direction(self):
             if self.obstacle_sector == SECTOR_N or self.obstacle_sector == SECTOR_S:
-                self.set_avoidance_direction_sector(self.monster.position, horizontal=True)
-            elif self.obstacle_sector == SECTOR_E or self.obstacle_sector == SECTOR_W:
                 self.set_avoidance_direction_sector(self.monster.position, vertical=True)
-            elif self.obstacle_sector == SECTOR_NW or self.obstacle_sector == SECTOR_SE:
-                self.set_avoidance_direction_sector(self.monster.position, diagonal_sw_ne=True)
+            elif self.obstacle_sector == SECTOR_E or self.obstacle_sector == SECTOR_W:
+                self.set_avoidance_direction_sector(self.monster.position, horizontal=True)
             elif self.obstacle_sector == SECTOR_NE or self.obstacle_sector == SECTOR_SW:
+                self.set_avoidance_direction_sector(self.monster.position, diagonal_sw_ne=True)
+            elif self.obstacle_sector == SECTOR_NW or self.obstacle_sector == SECTOR_SE:
                 self.set_avoidance_direction_sector(self.monster.position, diagonal_se_nw=True)
 
             self.monster.facing_direction = self.avoidance_direction_sector

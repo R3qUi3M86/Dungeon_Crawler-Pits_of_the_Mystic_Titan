@@ -8,7 +8,8 @@ from utilities import entity_manager
 from utilities import collision_manager
 
 TILE_SIZE = 48,48
-level = level_01_map
+#level = level_01_map
+level = test_map
 player_starting_tile_index = 0,0
 
 def set_player_tile_index():
@@ -69,12 +70,11 @@ def get_vicinity_matrix_for_tile(tile_index):
         for j in range(3):
             if 0 <= tile_index[0]+i-1 < len(level) and 0 <= tile_index[1]+j-1 < len(level[0]):
                 cell = level[tile_index[0]+i-1][tile_index[1]+j-1]
-                vicinity_matrix_row.append(cell)
             else:
                 cell = WALL
+            vicinity_matrix_row.append(cell)
         
         vicinity_matrix.append(deepcopy(vicinity_matrix_row))
-        vicinity_matrix_row.clear()
 
     return vicinity_matrix
 

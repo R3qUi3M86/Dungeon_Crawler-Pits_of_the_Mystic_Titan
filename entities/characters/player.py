@@ -215,6 +215,7 @@ class Hero(pygame.sprite.Sprite):
 
         if self.health > 0:
             self.is_in_pain = True
+            sound_player.player_pain_sound.stop()
             sound_player.player_pain_sound.play()
 
         else:

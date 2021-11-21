@@ -76,7 +76,7 @@ class Ettin(pygame.sprite.Sprite):
         self.shadow = shadow.Shadow(self.position, self.id, SIZE_MEDIUM)
         
         #Sprite lists
-        self.entity_collision_mask_sprites = [self.entity_collision_mask_nw,self.entity_collision_mask_ne,self.entity_collision_mask_sw,self.entity_collision_mask_se]
+        self.entity_collision_mask_sprites = [self.entity_collision_mask,self.entity_collision_mask_nw,self.entity_collision_mask_ne,self.entity_collision_mask_sw,self.entity_collision_mask_se]
         self.entity_melee_sector_sprites   = [self.entity_melee_e_sector,self.entity_melee_ne_sector,self.entity_melee_n_sector,self.entity_melee_nw_sector,self.entity_melee_w_sector,self.entity_melee_sw_sector,self.entity_melee_s_sector,self.entity_melee_se_sector]
         self.entity_auxilary_sprites       = [[self.shadow],self.entity_collision_mask_sprites,self.entity_melee_sector_sprites]
 
