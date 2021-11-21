@@ -96,6 +96,10 @@ def draw_sprites():
     for character in entity_manager.character_sprite_groups:
         character.draw(screen)
 
+def draw_pathfinding_path_for_monster(monster_index):
+    monster_sprite = entity_manager.get_monster_sprite(monster_index)
+    monster_sprite.monster_ai.pathfinder.draw_path()
+
 #Main game loop
 while True:
     screen.fill([25, 23, 22])
@@ -118,8 +122,9 @@ while True:
 
     #Drawing
     draw_sprites()
+    draw_pathfinding_path_for_monster(0)
     debug_text(f"{movement_manager.player_position_on_map}")
-    debug_text(f"{movement_manager.player_tile_index}",'Black',10,30)
+    debug_text(f"{movement_manager.player_tile_index}",x = 10, y = 30)
     
     cursor.cursor.draw(screen)
     cursor.cursor.update()

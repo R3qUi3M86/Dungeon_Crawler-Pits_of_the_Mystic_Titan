@@ -24,6 +24,9 @@ def character_vs_level_movement_collision(entity):
     for level_collision_sprite_group in entity_manager.level_collision_sprite_groups:
             if entity.sprite.shadow.rect.colliderect(level_collision_sprite_group.sprite.rect) and any_sector_mask_collides(entity.sprite,level_collision_sprite_group.sprite):
                 correct_character_position_by_vector(entity.sprite,level_collision_sprite_group.sprite)
+                if entity.sprite.is_monster:
+                    entity.sprite.monster_ai.is_avoiding_obstacle = False
+                    entity.sprite.monster_ai.is_path_finding = True
 
 def monster_vs_monster_collision(current_monster_movement_collision_sprite):
     for monster_movement_collision_sprite_group in entity_manager.monster_movement_collision_sprite_groups:
@@ -86,6 +89,12 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
     west_tile_index = colliding_tile_index[0],colliding_tile_index[1]-1
     south_tile_index = colliding_tile_index[0]+1,colliding_tile_index[1]
     north_tile_index = colliding_tile_index[0]-1,colliding_tile_index[1]
+    current_entity_speed_vector = None
+
+    if current_entity_sprite == unique_player_objects.HERO:
+        current_entity_speed_vector = speed_vector
+    else:
+        current_entity_speed_vector = current_entity_sprite.speed_vector
 
     correction_vector = 0,0
     while any_sector_mask_collides(current_entity_sprite,colliding_entity_sprite):
@@ -149,7 +158,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         elif character_moving_north_east(current_entity_sprite):
             if north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(south_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(west_tile_index) == None:
-                    correction_vector = -speed_vector[0], -speed_vector[1]
+                    correction_vector = -current_entity_speed_vector[0], -current_entity_speed_vector[1]
                 elif entity_manager.get_level_collision_sprite_by_index(south_tile_index) != None:
                     correction_vector = -1, 0
                 elif entity_manager.get_level_collision_sprite_by_index(west_tile_index) != None:
@@ -162,7 +171,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         elif character_moving_north_west(current_entity_sprite):
             if north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(south_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(east_tile_index) == None:
-                    correction_vector = -speed_vector[0], -speed_vector[1]
+                    correction_vector = -current_entity_speed_vector[0], -current_entity_speed_vector[1]
                 elif entity_manager.get_level_collision_sprite_by_index(south_tile_index) != None:
                     correction_vector = 1, 0
                 elif entity_manager.get_level_collision_sprite_by_index(east_tile_index) != None:
@@ -175,7 +184,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         elif character_moving_south_east(current_entity_sprite):
             if south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(west_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(north_tile_index) == None:
-                    correction_vector = -speed_vector[0], -speed_vector[1]
+                    correction_vector = -current_entity_speed_vector[0], -current_entity_speed_vector[1]
                 elif entity_manager.get_level_collision_sprite_by_index(west_tile_index) != None:
                     correction_vector = 0,-1
                 elif entity_manager.get_level_collision_sprite_by_index(north_tile_index) != None:
@@ -188,7 +197,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         elif character_moving_south_west(current_entity_sprite):
             if south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(east_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(north_tile_index) == None:
-                    correction_vector = -speed_vector[0], -speed_vector[1]
+                    correction_vector = -current_entity_speed_vector[0], -current_entity_speed_vector[1]
                 elif entity_manager.get_level_collision_sprite_by_index(east_tile_index) != None:
                     correction_vector = 0,-1
                 elif entity_manager.get_level_collision_sprite_by_index(north_tile_index) != None:

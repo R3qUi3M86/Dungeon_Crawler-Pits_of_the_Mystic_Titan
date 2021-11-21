@@ -36,7 +36,7 @@ def generate_monster(monster_type, tile_index):
 
 def update_non_player_group_single_entities_position(vector,entities):
     for entity in entities:
-        if unique_player_objects.HERO_SPRITE_GROUP.sprite.attack == True or unique_player_objects.HERO_SPRITE_GROUP.sprite.living == False:
+        if unique_player_objects.HERO_SPRITE_GROUP.sprite.is_attacking == True or unique_player_objects.HERO_SPRITE_GROUP.sprite.is_living == False:
             movement_manager.speed_vector = 0,0
         entity.sprite.update_position(vector)
 
@@ -154,7 +154,7 @@ def generate_monsters():
 
 def fix_all_dead_bodies_to_pixel_accuracy():
     for character in character_sprite_groups:
-        if character.sprite.living == False:
+        if character.sprite.is_living == False:
             character.sprite.position = math.floor(character.sprite.position[0]), math.floor(character.sprite.position[1])
 
 def fix_all_tiles_to_pixel_accuracy():

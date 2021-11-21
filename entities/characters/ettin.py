@@ -75,56 +75,59 @@ class Ettin(pygame.sprite.Sprite):
 
         #Character properties        
         self.name = ETTIN
-        self.attack = False
+        self.is_monster = True
+        self.is_attacking = False
         self.attack_interruption_chance = 50
         self.attack_can_be_interrupted = True
         self.facing_direction = SECTOR_S
         self.speed_vector = 0,0
-        self.monster_ai = monster_ai.Ai(self)
-        self.living = True
-        self.dying = False
-        self.in_pain = False
+        self.monster_ai = monster_ai.Ai(self, movement_manager.pathfinding_matrix, tile_index)
+        self.is_living = True
+        self.is_dying = False
+        self.is_in_pain = False
         self.health = 10
 
     #Update functions
     def update(self):
-        if self.living == True:
-            if self.monster_ai.monster_can_melee_attack_player() == False and self.attack == False:
+        if self.is_living == True:
+            if self.monster_ai.monster_can_melee_attack_player() == False and self.is_attacking == False:
                 self.monster_ai.increment_direction_change_decision_timer()
             else:
                 self.facing_direction = self.monster_ai.player_direction_sector
 
-            if self.attack == False and self.in_pain == False:
+            if self.is_attacking == False and self.is_in_pain == False:
                 self.set_facing_direction()
 
             if self.monster_ai.monster_can_melee_attack_player():
+                self.monster_ai.finish_avoiding_obstacle()
+                self.monster_ai.finish_path_finding()
                 self.monster_ai.increment_attack_decision_timer()
 
-            if self.attack == False and self.in_pain == False and unique_player_objects.HERO.living == True:
+            if self.is_attacking == False and self.is_in_pain == False and unique_player_objects.HERO.is_living == True:
                 self.set_speed_vector()
                 if self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
                     self.character_walk_forward_animation()
             
-            elif self.attack == True and self.in_pain == True:
+            elif self.is_attacking == True and self.is_in_pain == True:
                 self.speed_vector = 0,0
                 if self.attack_can_be_interrupted and self.attack_interupted():
                     self.interrupt_attack()
 
-            if self.in_pain == True and self.attack == False:
+            if self.is_in_pain == True and self.is_attacking == False:
                 self.speed_vector = 0,0
                 self.character_pain_animation()
 
-            elif self.attack == True:
+            elif self.is_attacking == True:
                 self.speed_vector = 0,0
                 self.character_attack_animation()
         
-        elif self.dying == True:
+        elif self.is_dying == True:
             self.interrupt_attack()
-            self.in_pain = False
+            self.is_in_pain = False
             self.speed_vector = 0,0
             self.character_death_animation()
 
-        if  unique_player_objects.HERO.living == False:
+        if  unique_player_objects.HERO.is_living == False:
             self.speed_vector = 0,0
       
         self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
@@ -177,7 +180,7 @@ class Ettin(pygame.sprite.Sprite):
         elif self.facing_direction == SECTOR_SE:
             self.image = character_pain_south_east
         if int(self.character_pain_timer) >= 1:
-            self.in_pain = False
+            self.is_in_pain = False
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
             self.character_pain_timer = 0
 
@@ -185,7 +188,7 @@ class Ettin(pygame.sprite.Sprite):
         self.character_death_index += 0.1
         if int(self.character_death_index) == 7:
             self.character_death_index = 6
-            self.dying == False
+            self.is_dying == False
         self.image = self.character_death[int(self.character_death_index)]
 
     def character_walk_forward_animation(self):
@@ -195,7 +198,7 @@ class Ettin(pygame.sprite.Sprite):
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_attack_animation(self):
-        if self.attack:
+        if self.is_attacking:
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
             self.rect = self.image.get_rect(midbottom = (self.sprite_position))
 
@@ -236,8 +239,6 @@ class Ettin(pygame.sprite.Sprite):
     #Walk speed vector setting
     def set_speed_vector(self):
         if self.monster_ai.monster_can_melee_attack_player():
-            if self.monster_ai.avoiding_obstacle == True:
-                self.monster_ai.finish_avoiding_obstacle()
             self.speed_vector = 0,0
         else:
             movement_manager.monster_vs_monster_collision(entity_manager.get_collision_sprite_by_id(self.id))
@@ -263,20 +264,20 @@ class Ettin(pygame.sprite.Sprite):
         self.health -= damage
         if self.health <= 0:
             sound_player.ettin_death_sound.play()
-            self.living = False
-            self.dying = True
+            self.is_living = False
+            self.is_dying = True
             self.speed_vector = 0,0
             entity_manager.kill_character_auxilary_entities(self.id)
             entity_manager.fix_all_dead_bodies_to_pixel_accuracy()
             entity_manager.fix_all_tiles_to_pixel_accuracy()
             entity_manager.fix_player_position_to_pixel_accuracy()
         else:
-            self.in_pain = True
+            self.is_in_pain = True
             if random.choice(range(4)) == 0:
                 sound_player.ettin_pain_sound.play()
 
     def interrupt_attack(self):
-        self.attack = False
+        self.is_attacking = False
         self.character_attack_index[1] = 0
 
     def attack_interupted(self):
