@@ -152,7 +152,7 @@ while True:
     entity_manager.update_all_entities()
     unique_player_object.HERO.update_position(unique_player_object.HERO.speed_vector)
     entity_manager.update_all_non_player_entities_position_by_vector(unique_player_object.HERO.speed_vector)
-    collision_detection()
+    #collision_detection()
 
     #Events
     for event in pygame.event.get():

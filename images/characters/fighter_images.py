@@ -99,3 +99,5 @@ character_attack = [[character_attack_east1,character_attack_east2],
 character_death = [character_death1,character_death2,character_death3,character_death4,character_death5,character_death6,character_death7]
 
 character_overkill = [character_overkill1,character_overkill2,character_overkill3,character_overkill4,character_overkill5,character_overkill6,character_overkill7,character_overkill8,character_overkill9,character_overkill10]
+
+character_pain = [character_pain_east,character_pain_north_east,character_pain_north,character_pain_north_west,character_pain_west,character_pain_south_east,character_pain_south,character_pain_south_east]

@@ -237,6 +237,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
             unique_player_object.HERO.update_position(correction_vector)
             entity_manager.update_all_non_player_entities_position_by_vector(correction_vector)
         elif correction_vector[0] != 0 or correction_vector[1] != 0:
+            current_entity_sprite.update_map_position_by_vector(correction_vector)
             current_entity_sprite.update_position((-correction_vector[0],-correction_vector[1]))
 
 def bump_monster_back(player_sprite, monster_sprite):
@@ -277,6 +278,7 @@ def bump_monster_back(player_sprite, monster_sprite):
         bounce_vector = -1,1
 
     monster_sprite.update_position((-bounce_vector[0],-bounce_vector[1]))
+    monster_sprite.update_map_position_by_vector(bounce_vector)
 
 #Conditions
 def character_moving_east(current_entity_sprite):

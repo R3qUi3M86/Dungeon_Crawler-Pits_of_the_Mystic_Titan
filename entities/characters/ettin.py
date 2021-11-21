@@ -45,7 +45,13 @@ class Ettin(pygame.sprite.Sprite):
         self.character_death = character_death
         self.character_death_index = 0
 
+        #Overkill assets
+        self.character_overkill = character_overkill
+        self.character_overkill_index = 0
+
         #Pain assets
+        self.character_pain = character_pain
+        self.character_pain_index = 0
         self.character_pain_timer = 0
 
         ###Owned sprites###
@@ -99,12 +105,12 @@ class Ettin(pygame.sprite.Sprite):
         self.facing_direction = SECTOR_S
         self.speed = 1.4,1
         self.speed_vector = 0,0
-        self.monster_ai = monster_ai.Ai(self, movement_manager.pathfinding_matrix, tile_index)
+        self.monster_ai = monster_ai.Ai(self, collision_manager.pathfinding_matrix, tile_index)
 
     #Update functions
     def update(self):
         self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
-        self.map_position = round(self.position[0]-player_position[0]+movement_manager.player_position_on_map[0],2), round(self.position[1]-player_position[1]+movement_manager.player_position_on_map[1],2)
+        self.map_position = round(self.position[0]-player_position[0]+unique_player_object.HERO.tile_index[0],2), round(self.position[1]-player_position[1]+unique_player_object.HERO.tile_index[1],2)
         self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
         self.sprite_position = self.position[0], self.position[1] + self.sprite_display_correction
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
@@ -112,6 +118,20 @@ class Ettin(pygame.sprite.Sprite):
         self.update_decisions()
         self.update_animation()
 
+    def update_position(self, vector):
+        self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
+        self.sprite_position = self.position[0], self.position[1] + self.sprite_display_correction
+        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+        self.update_owned_sprites_position()
+
+    def update_map_position_by_vector(self,vector):
+        self.map_position = self.map_position[0]+vector[0], self.map_position[1]+vector[1]
+        self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
+    
+    def update_decisions():
+        pass
+
+    def update_animation(self):
         if self.is_living == True:
             if self.monster_ai.monster_can_melee_attack_player() == False and self.is_attacking == False and self.monster_ai.is_following_path == False:
                 self.monster_ai.increment_direction_change_decision_timer()
@@ -139,7 +159,7 @@ class Ettin(pygame.sprite.Sprite):
                 self.monster_ai.finish_pathfinding()
                 self.monster_ai.increment_attack_decision_timer()
 
-            if self.is_attacking == False and self.is_in_pain == False and unique_player_objects.HERO.is_living == True:
+            if self.is_attacking == False and self.is_in_pain == False and unique_player_object.HERO.is_living == True:
                 self.set_speed_vector()
                 if self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
                     self.character_walk_forward_animation()
@@ -163,17 +183,8 @@ class Ettin(pygame.sprite.Sprite):
             self.speed_vector = 0,0
             self.character_death_animation()
 
-        if  unique_player_objects.HERO.is_living == False:
+        if  unique_player_object.HERO.is_living == False:
             self.speed_vector = 0,0
-      
-    def update_position(self, vector):
-        self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
-        self.sprite_position = self.position[0], self.position[1] + self.sprite_display_correction
-        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
-        self.update_owned_sprites_position()
-    
-    def update_animation(self):
-        pass
 
     def set_facing_direction(self):
         self.set_character_animation_direction_indices()
@@ -182,93 +193,57 @@ class Ettin(pygame.sprite.Sprite):
     def update_owned_sprites_position(self):
         self.pathfinding_collision_rect = pygame.Rect((self.position[0] - 2, self.position[1] -2),(4,4))
 
-        for auxilary_sprite in self.character_auxilary_sprites:
-            auxilary_sprite.position = self.position
-            auxilary_sprite.update()
-        
-        for melee_sprite  in self.character_melee_sprites:
-            melee_sprite.position = self.position
-            melee_sprite.update()
-
-        for character_collision_mask_sprite in self.character_collision_mask_sprites:
-            character_collision_mask_sprite.position = self.position
-            character_collision_mask_sprite.update()
+        for auxilary_sprites_row in self.entity_auxilary_sprites:
+            for auxilary_sprite in auxilary_sprites_row:
+                auxilary_sprite.position = self.position
+                auxilary_sprite.update()
 
     #Animations
     def character_pain_animation(self):
         self.character_pain_timer += 0.05
-        if self.facing_direction == SECTOR_E:
-            self.image = character_pain_east
-        elif self.facing_direction == SECTOR_NE:
-            self.image = character_pain_north_east
-        elif self.facing_direction == SECTOR_N:
-            self.image = character_pain_north
-        elif self.facing_direction == SECTOR_NW:
-            self.image = character_pain_north_west
-        elif self.facing_direction == SECTOR_W:
-            self.image = character_pain_west
-        elif self.facing_direction == SECTOR_SW:
-            self.image = character_pain_south_west
-        elif self.facing_direction == SECTOR_S:
-            self.image = character_pain_south
-        elif self.facing_direction == SECTOR_SE:
-            self.image = character_pain_south_east
         if int(self.character_pain_timer) >= 1:
             self.is_in_pain = False
-            self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
             self.character_pain_timer = 0
+        self.image = character_pain[self.character_pain_index]
 
     def character_death_animation(self):
-        self.character_death_index += 0.1
-        if int(self.character_death_index) == 7:
-            self.character_death_index = 6
-            self.is_dying == False
-        self.image = self.character_death[int(self.character_death_index)]
+        if self.is_overkilled == False:
+            self.character_death_index += 0.1
+            if int(self.character_death_index) == 7:
+                self.character_death_index = 6
+                self.is_dying == False
+            self.image = self.character_death[int(self.character_death_index)]
+
+    def character_overkill_animation(self):
+        self.character_overkill_index += 0.1
+        if int(self.character_overkill_index) == 10:
+            self.character_overkill_index = 9
+            self.is_overkilled == False
+        self.image = self.character_overkill[int(self.character_overkill_index)]       
 
     def character_walk_forward_animation(self):
-        self.character_walk_index[1] += 0.1
-        if int(self.character_walk_index[1]) == 4:
-            self.character_walk_index[1] = 0
-        self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
+        if self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
+            self.character_walk_index[1] += 0.1
+            if int(self.character_walk_index[1]) == 4:
+                self.character_walk_index[1] = 0
+            self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_attack_animation(self):
-        if self.is_attacking:
-            self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
-            self.rect = self.image.get_rect(midbottom = (self.sprite_position))
-
-            self.character_attack_index[1] += 0.1
-            if round(self.character_attack_index[1],2) == 2.00:
-                combat_manager.attack_player_with_melee_attack(self)
-            if int(self.character_attack_index[1]) == 3:
-                self.interrupt_attack()
-                self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
-                self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+        self.character_attack_index[1] += 0.1
+        if round(self.character_attack_index[1],2) == 2.00:
+            combat_manager.attack_player_with_melee_attack(self)
+        self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
+        
+        if int(self.character_attack_index[1]) == 3:
+            self.interrupt_attack()
+            self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def set_character_animation_direction_indices(self):
-        if self.facing_direction == SECTOR_E:
-            self.character_walk_index[0] = 0
-            self.character_attack_index[0] = 0
-        elif self.facing_direction == SECTOR_NE:
-            self.character_walk_index[0] = 1
-            self.character_attack_index[0] = 1
-        elif self.facing_direction == SECTOR_N:
-            self.character_walk_index[0] = 2
-            self.character_attack_index[0] = 2
-        elif self.facing_direction == SECTOR_NW:
-            self.character_walk_index[0] = 3
-            self.character_attack_index[0] = 3
-        elif self.facing_direction == SECTOR_W:
-            self.character_walk_index[0] = 4
-            self.character_attack_index[0] = 4
-        elif self.facing_direction == SECTOR_SW:
-            self.character_walk_index[0] = 5
-            self.character_attack_index[0] = 5
-        elif self.facing_direction == SECTOR_S:
-            self.character_walk_index[0] = 6
-            self.character_attack_index[0] = 6
-        elif self.facing_direction == SECTOR_SE:
-            self.character_walk_index[0] = 7
-            self.character_attack_index[0] = 7            
+        for sector in SECTORS:
+            if sector == self.facing_direction:
+                self.character_walk_index[0] = sector
+                self.character_attack_index[0] = sector
+                self.character_pain_index = sector           
 
     #Walk speed vector setting
     def set_speed_vector(self):
@@ -297,8 +272,8 @@ class Ettin(pygame.sprite.Sprite):
             self.is_living = False
             self.is_dying = True
             self.speed_vector = 0,0
-            entity_manager.kill_character_auxilary_entities(self.id)
-            entity_manager.fix_all_dead_bodies_to_pixel_accuracy()
+            entity_manager.kill_entity_colliders_and_melee_entities(self.id)
+            entity_manager.fix_all_dead_objects_to_pixel_accuracy()
             entity_manager.fix_all_tiles_to_pixel_accuracy()
             entity_manager.fix_player_position_to_pixel_accuracy()
         else:

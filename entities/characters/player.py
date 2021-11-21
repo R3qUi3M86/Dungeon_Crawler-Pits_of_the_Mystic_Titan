@@ -4,10 +4,7 @@ from settings import *
 from sounds import sound_player
 from entities import shadow
 from entities import melee_range
-from utilities import util
 from utilities import combat_manager
-from utilities import collision_manager
-from utilities import entity_manager
 from utilities.level_painter import TILE_SIZE
 from utilities.text_printer import *
 from utilities.constants import *
@@ -48,6 +45,8 @@ class Hero(pygame.sprite.Sprite):
         self.character_overkill_index = 0
 
         #Pain assets
+        self.character_pain = character_pain
+        self.character_pain_index = 0
         self.character_pain_timer = 0
         
         ###Owned sprites###
@@ -153,22 +152,7 @@ class Hero(pygame.sprite.Sprite):
             self.is_in_pain = False
         else:
             self.character_pain_timer += 0.05
-            if self.facing_direction == SECTOR_E:
-                self.image = character_pain_east
-            elif self.facing_direction == SECTOR_NE:
-                self.image = character_pain_north_east
-            elif self.facing_direction == SECTOR_N:
-                self.image = character_pain_north
-            elif self.facing_direction == SECTOR_NW:
-                self.image = character_pain_north_west
-            elif self.facing_direction == SECTOR_W:
-                self.image = character_pain_west
-            elif self.facing_direction == SECTOR_SW:
-                self.image = character_pain_south_west
-            elif self.facing_direction == SECTOR_S:
-                self.image = character_pain_south
-            elif self.facing_direction == SECTOR_SE:
-                self.image = character_pain_south_east
+            self.image = character_pain[self.character_pain_index]
             if int(self.character_pain_timer) >= 1:
                 self.is_in_pain = False
                 self.character_pain_timer = 0
@@ -203,40 +187,20 @@ class Hero(pygame.sprite.Sprite):
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_attack_animation(self):
-        if self.is_attacking:
-            self.character_attack_index[1] += 0.05
-            if round(self.character_attack_index[1],2) == 1.00:
-                combat_manager.attack_monster_with_melee_attack()
-            if int(self.character_attack_index[1]) == 2:
-                self.is_attacking = False
-                self.character_attack_index[1] = 0
-            self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
+        self.character_attack_index[1] += 0.05
+        if round(self.character_attack_index[1],2) == 1.00:
+            combat_manager.attack_monster_with_melee_attack()
+        if int(self.character_attack_index[1]) == 2:
+            self.is_attacking = False
+            self.character_attack_index[1] = 0
+        self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
 
     def set_character_animation_direction_indices(self):
-        if self.facing_direction == SECTOR_E:
-            self.character_walk_index[0] = 0
-            self.character_attack_index[0] = 0
-        elif self.facing_direction == SECTOR_NE:
-            self.character_walk_index[0] = 1
-            self.character_attack_index[0] = 1
-        elif self.facing_direction == SECTOR_N:
-            self.character_walk_index[0] = 2
-            self.character_attack_index[0] = 2
-        elif self.facing_direction == SECTOR_NW:
-            self.character_walk_index[0] = 3
-            self.character_attack_index[0] = 3
-        elif self.facing_direction == SECTOR_W:
-            self.character_walk_index[0] = 4
-            self.character_attack_index[0] = 4
-        elif self.facing_direction == SECTOR_SW:
-            self.character_walk_index[0] = 5
-            self.character_attack_index[0] = 5
-        elif self.facing_direction == SECTOR_S:
-            self.character_walk_index[0] = 6
-            self.character_attack_index[0] = 6
-        elif self.facing_direction == SECTOR_SE:
-            self.character_walk_index[0] = 7
-            self.character_attack_index[0] = 7 
+        for sector in SECTORS:
+            if sector == self.facing_direction:
+                self.character_walk_index[0] = sector
+                self.character_attack_index[0] = sector
+                self.character_pain_index = sector
 
     #Combat functions
     def take_damage(self, damage):
