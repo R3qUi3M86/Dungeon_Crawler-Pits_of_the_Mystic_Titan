@@ -22,6 +22,7 @@ class Pathfinder:
         start_grid = self.grid.node(self.monster_tile_index[1], self.monster_tile_index[0])
         end_grid = self.grid.node(unique_player_object.HERO.tile_index[1], unique_player_object.HERO.tile_index[0])
         self.path, _ = self.finder.find_path(start_grid, end_grid, self.grid)
+        print(self.grid.grid_str(self.path, start_grid, end_grid))
         self.grid.cleanup()
 
     def update(self, monster_tile_index = None, pathfinding = False):
@@ -38,10 +39,10 @@ class Pathfinder:
         for path_grid in path:
             for level_tile in entity_manager.level_sprite_groups:
                 if level_tile.sprite.tile_index == (path_grid[1], path_grid[0]):
-                    self.points.append((level_tile.sprite.position[0],level_tile.sprite.position[1]))
+                    self.points.append((level_tile.sprite.position[0]-unique_player_object.HERO.speed_vector[0],level_tile.sprite.position[1]-unique_player_object.HERO.speed_vector[1]))
 
     def draw_path(self):
-        if self.points:
+        if len(self.points) >= 2:
             pygame.draw.lines(screen,'#aa0000',False,self.points,5)
 
     def update_collision_rect_pos(self,position):

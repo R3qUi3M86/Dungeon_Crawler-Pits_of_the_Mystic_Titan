@@ -2,18 +2,17 @@ import pygame
 import random
 from settings import *
 from sounds import sound_player
-from entities import shadow
-from entities import melee_range
 from utilities import util
 from utilities import combat_manager
 from utilities import collision_manager
 from utilities import entity_manager
 from utilities import level_painter
 from utilities import monster_ai
-from utilities.text_printer import *
 from utilities.constants import *
 from images.characters.ettin_images import *
 from entities.characters import unique_player_object
+from entities.shadow import Shadow
+from entities.colliders.collider import Collider
 
 class Ettin(pygame.sprite.Sprite):
     def __init__(self,tile_index):
@@ -56,29 +55,30 @@ class Ettin(pygame.sprite.Sprite):
 
         ###Owned sprites###
         #Colliders
-        self.entity_collision_mask_nw = shadow.Shadow(self.position, self.id, SIZE_SMALL, True, SECTOR_NW)
-        self.entity_collision_mask_ne = shadow.Shadow(self.position, self.id, SIZE_SMALL, True, SECTOR_NE)
-        self.entity_collision_mask_sw = shadow.Shadow(self.position, self.id, SIZE_SMALL, True, SECTOR_SW)
-        self.entity_collision_mask_se = shadow.Shadow(self.position, self.id, SIZE_SMALL, True, SECTOR_SE)
-        self.entity_collision_mask    = shadow.Shadow(player_position, self.id, SIZE_SMALL, True)
+        self.entity_collider_nw = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NW)
+        self.entity_collider_ne = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NE)
+        self.entity_collider_sw = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SW)
+        self.entity_collider_se = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SE)
+        self.entity_collider_omni = Collider(player_position, self.id, ENTITY_OMNI)
+        self.pathfinding_collider = Collider(self.position, self.id, SQUARE)
 
         #Melee sectors
-        self.entity_melee_e_sector  = melee_range.Melee(self.position, SECTOR_E)
-        self.entity_melee_ne_sector = melee_range.Melee(self.position, SECTOR_NE)
-        self.entity_melee_n_sector  = melee_range.Melee(self.position, SECTOR_N)
-        self.entity_melee_nw_sector = melee_range.Melee(self.position, SECTOR_NW)
-        self.entity_melee_w_sector  = melee_range.Melee(self.position, SECTOR_W)
-        self.entity_melee_sw_sector = melee_range.Melee(self.position, SECTOR_SW)
-        self.entity_melee_s_sector  = melee_range.Melee(self.position, SECTOR_S)
-        self.entity_melee_se_sector = melee_range.Melee(self.position, SECTOR_SE)
+        self.melee_collider_e  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_E)
+        self.melee_collider_ne = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_NE)
+        self.melee_collider_n  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_N)
+        self.melee_collider_nw = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_NW)
+        self.melee_collider_w  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_W)
+        self.melee_collider_sw = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_SW)
+        self.melee_collider_s  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_S)
+        self.melee_collider_se = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_SE)
 
         #Shadow
-        self.shadow = shadow.Shadow(self.position, self.id, SIZE_MEDIUM)
+        self.shadow = Shadow(self.position, self.id, SIZE_MEDIUM)
         
         #Sprite lists
-        self.entity_collision_mask_sprites = [self.entity_collision_mask,self.entity_collision_mask_nw,self.entity_collision_mask_ne,self.entity_collision_mask_sw,self.entity_collision_mask_se]
-        self.entity_melee_sector_sprites   = [self.entity_melee_e_sector,self.entity_melee_ne_sector,self.entity_melee_n_sector,self.entity_melee_nw_sector,self.entity_melee_w_sector,self.entity_melee_sw_sector,self.entity_melee_s_sector,self.entity_melee_se_sector]
-        self.entity_auxilary_sprites       = [[self.shadow],self.entity_collision_mask_sprites,self.entity_melee_sector_sprites]
+        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se,self.pathfinding_collider]
+        self.entity_melee_sector_sprites = [self.melee_collider_e,self.melee_collider_ne,self.melee_collider_n,self.melee_collider_nw,self.melee_collider_w,self.melee_collider_sw,self.melee_collider_s,self.melee_collider_se]
+        self.entity_auxilary_sprites     = [[self.shadow],self.entity_melee_sector_sprites,self.entity_collider_sprites]
 
         ###Initial sprite definition###
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
@@ -99,6 +99,7 @@ class Ettin(pygame.sprite.Sprite):
         #Character properties
         self.health = 10
         self.maxhealth = 10
+        self.damage = 0
         self.attack_interruption_chance = 50
         self.attack_can_be_interrupted = True
         self.can_shoot = False
@@ -112,11 +113,10 @@ class Ettin(pygame.sprite.Sprite):
     #Update functions
     def update(self):
         self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
-        self.map_position = round(self.position[0]-player_position[0]+unique_player_object.HERO.tile_index[0],2), round(self.position[1]-player_position[1]+unique_player_object.HERO.tile_index[1],2)
+        self.map_position = round(self.position[0]+unique_player_object.HERO.map_position[0]-player_position[0],2), round(self.position[1]+unique_player_object.HERO.map_position[1]-player_position[1],2)
         self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
         self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
-        
         self.update_owned_sprites()
         
         if not self.is_dead:
@@ -128,6 +128,7 @@ class Ettin(pygame.sprite.Sprite):
     def update_position(self, vector):
         self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
         self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
+        self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         self.update_owned_sprites_position()
 
@@ -152,25 +153,21 @@ class Ettin(pygame.sprite.Sprite):
                         self.interrupt_attack()
             
             else:
-                if not self.monster_ai.is_following_path:
+                if not self.monster_ai.is_following_path and not self.monster_ai.is_path_finding:
                     self.monster_ai.increment_direction_change_decision_timer()
                     self.set_speed_vector()
                 
                 else:
                     if self.monster_ai.is_path_finding and not self.monster_ai.is_following_path:
-                        print("creating path")
+                        self.monster_ai.pathfinder.update(self.tile_index, True)
                         self.monster_ai.pathfinder.create_path()
-                        self.is_path_finding = False
-                        self.is_following_path = True
-                        self.monster_ai.pathfinder.update(self.monster.tile_index, True)
+                        self.monster_ai.is_path_finding = False
+                        self.monster_ai.is_following_path = True
+                        self.monster_ai.pathfinder.update(self.tile_index, True)
                 
                     elif self.monster_ai.is_following_path and len(self.monster_ai.pathfinder.path) != 0:
-                        print("following path")
-                        self.monster_ai.pathfinder.update(self.monster.tile_index, True)
+                        self.monster_ai.pathfinder.update(self.tile_index, True)
                         self.monster_ai.change_to_next_point_direction()
-
-                    elif self.monster_ai.is_following_path and len(self.monster_ai.pathfinder.path) == 0:
-                        self.monster_ai.end_pathfinding()
 
         elif self.is_dying and not self.is_dead:
             self.interrupt_attack()
@@ -209,7 +206,7 @@ class Ettin(pygame.sprite.Sprite):
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
     
     def update_owned_sprites_position(self):
-        self.monster_ai.pathfinding_collision_rect = pygame.Rect((self.position[0] - 2, self.position[1] -2),(4,4))
+        self.pathfinding_collision_rect = pygame.Rect((self.position[0] - 2, self.position[1] -2),(4,4))
 
         for auxilary_sprites_row in self.entity_auxilary_sprites:
             for auxilary_sprite in auxilary_sprites_row:
@@ -217,8 +214,6 @@ class Ettin(pygame.sprite.Sprite):
                 auxilary_sprite.update_position(self.position)
     
     def update_owned_sprites(self):
-        self.pathfinding_collision_rect = pygame.Rect((self.position[0] - 2, self.position[1] -2),(4,4))
-
         for auxilary_sprites_row in self.entity_auxilary_sprites:
             for auxilary_sprite in auxilary_sprites_row:
                 auxilary_sprite.position = self.position
@@ -263,7 +258,7 @@ class Ettin(pygame.sprite.Sprite):
         else:
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]    
             if round(self.character_attack_index[1],2) == 2.00:
-                combat_manager.attack_player_with_melee_attack(self)
+                combat_manager.attack_player_with_melee_attack(self, self.damage)
 
     def set_character_animation_direction_indices(self):
         for sector in SECTORS:

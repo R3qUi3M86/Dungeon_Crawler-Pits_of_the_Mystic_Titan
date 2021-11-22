@@ -15,6 +15,13 @@ MISS = False
 SIZE_SMALL = 'small'
 SIZE_MEDIUM = "medium"
 
+#Colliders
+MELEE_SECTOR = "melee sector"
+ENTITY_OMNI = "movement omni"
+ENTITY_SECTOR = "movement sector"
+SQUARE = "square"
+
+#Sector names
 SECTOR_E = 0
 SECTOR_NE = 1
 SECTOR_N = 2

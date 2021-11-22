@@ -7,30 +7,29 @@ pathfinding_matrix = []
 #Collision types
 def player_vs_monster_movement_collision():
     for entity_sprite_group in entity_manager.entity_sprite_groups:
-        if entity_sprite_group.sprite != unique_player_object.HERO and unique_player_object.HERO.entity_collision_mask.rect.colliderect(entity_sprite_group.sprite.entity_collision_mask.rect):
-            mask_collision_coordinates = pygame.sprite.collide_mask(unique_player_object.HERO.entity_collision_mask, entity_sprite_group.sprite.entity_collision_mask)
+        if entity_sprite_group.sprite != unique_player_object.HERO and unique_player_object.HERO.entity_collider_omni.rect.colliderect(entity_sprite_group.sprite.entity_collider_omni.rect):
+            mask_collision_coordinates = pygame.sprite.collide_mask(unique_player_object.HERO.entity_collider_omni, entity_sprite_group.sprite.entity_collider_omni)
             if mask_collision_coordinates != None:
                 bump_monster_back(unique_player_object.HERO, entity_sprite_group.sprite)
                 adjust_player_movement_vector(mask_collision_coordinates)
                 
 def character_vs_level_movement_collision(character):
     for level_collision_sprite_group in entity_manager.level_collision_sprite_groups:
-        if character.sprite.entity_collision_mask.rect.colliderect(level_collision_sprite_group.sprite.rect) and any_sector_mask_collides(character.sprite,level_collision_sprite_group.sprite):
+        if character.sprite.entity_collider_omni.rect.colliderect(level_collision_sprite_group.sprite.rect) and any_sector_mask_collides(character.sprite,level_collision_sprite_group.sprite):
             correct_character_position_by_vector(character.sprite,level_collision_sprite_group.sprite)
-            if character.sprite.is_monster:
-                if character.sprite.monster_ai.is_path_finding == False and character.sprite.monster_ai.is_following_path == False:
-                    character.sprite.monster_ai.reset_obstacle_avoidance_flags()
-                    character.sprite.monster_ai.is_path_finding = True
+            if character.sprite.is_monster and character.sprite.monster_ai.is_path_finding == False:
+                character.sprite.monster_ai.initialize_monster_path_finding()
 
 def monster_vs_monster_collision(character):
-    for entity_sprite_group in entity_manager.entity_sprite_groups:
-        if character.sprite != unique_player_object.HERO and character != entity_sprite_group:
-            character_collider = character.sprite.entity_collision_mask
-            entity_collider = entity_sprite_group.sprite.entity_collision_mask
-            if character_collider.rect.colliderect(entity_collider):
-                if pygame.sprite.collide_mask(character_collider, entity_collider) != None:
-                    bump_monster_back(character.sprite, entity_sprite_group.sprite)
-                    adjust_monster_movement_vector(character.sprite, entity_sprite_group.sprite)
+    if character.sprite != unique_player_object.HERO:
+        for entity_sprite_group in entity_manager.entity_sprite_groups:
+            if entity_sprite_group.sprite != unique_player_object.HERO and character != entity_sprite_group:
+                character_collider = character.sprite.entity_collider_omni
+                entity_collider = entity_sprite_group.sprite.entity_collider_omni
+                if character_collider.rect.colliderect(entity_collider):
+                    if pygame.sprite.collide_mask(character_collider, entity_collider) != None:
+                        bump_monster_back(character.sprite, entity_sprite_group.sprite)
+                        adjust_monster_movement_vector(character.sprite, entity_sprite_group.sprite)
 
 def projectile_collision(projectile):
     #Projectile collision logic
@@ -106,6 +105,10 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
                     correction_vector = -1,0
                 else:
                     correction_vector = 0,-1
+            elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = 1,1
+            elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = 1,-1
 
         elif character_moving_west(current_entity_sprite):
             if north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
@@ -118,6 +121,10 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
                     correction_vector = 1,0
                 else:
                     correction_vector = 0,-1
+            elif north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = -1,1
+            elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = -1,-1
 
         elif character_moving_north(current_entity_sprite):
             if north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
@@ -130,6 +137,10 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
                     correction_vector = 0,1
                 else:
                     correction_vector = -1,0
+            elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = 1,-1
+            elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = -1,-1
 
         elif character_moving_south(current_entity_sprite):
             if south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
@@ -142,6 +153,10 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
                     correction_vector = 0,-1
                 else:
                     correction_vector = -1,0
+            elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = 1,1
+            elif north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = -1,1
 
         elif character_moving_north_east(current_entity_sprite):
             if north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
@@ -155,6 +170,8 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
                 correction_vector = 0, 1
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 correction_vector = -1, 0
+            elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = 1,-1
 
         elif character_moving_north_west(current_entity_sprite):
             if north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
@@ -168,6 +185,8 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
                 correction_vector = 0, 1
             elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 correction_vector = 1, 0
+            elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = -1,-1
 
         elif character_moving_south_east(current_entity_sprite):
             if south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
@@ -181,6 +200,8 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
                 correction_vector = -1, 0
             elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 correction_vector = 0, -1
+            elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = 1,1
 
         elif character_moving_south_west(current_entity_sprite):
             if south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
@@ -194,6 +215,8 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
                 correction_vector = 1, 0
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 correction_vector = 0, -1
+            elif north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
+                correction_vector = -1,1
 
         elif character_not_moving(current_entity_sprite):
             if north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
@@ -235,7 +258,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
 def bump_monster_back(player_sprite, monster_sprite):
     bounce_vector = 0,0
 
-    if all_sector_mask_collide(player_sprite, monster_sprite.entity_collision_mask):
+    if all_sector_mask_collide(player_sprite, monster_sprite.entity_collider_omni):
         if character_moving_east(player_sprite):
             bounce_vector = -1,0
         elif character_moving_west(player_sprite):
@@ -252,21 +275,21 @@ def bump_monster_back(player_sprite, monster_sprite):
             bounce_vector = -1,-0.58
         elif character_moving_south_west(player_sprite):
             bounce_vector = 1,-0.58
-    elif east_mask_collides(player_sprite, monster_sprite.entity_collision_mask):
+    elif east_mask_collides(player_sprite, monster_sprite.entity_collider_omni):
         bounce_vector = 1,0
-    elif west_mask_collides(player_sprite, monster_sprite.entity_collision_mask):
+    elif west_mask_collides(player_sprite, monster_sprite.entity_collider_omni):
         bounce_vector = -1,0
-    elif north_mask_collides(player_sprite, monster_sprite.entity_collision_mask):
+    elif north_mask_collides(player_sprite, monster_sprite.entity_collider_omni):
         bounce_vector = 0,-1
-    elif south_mask_collides(player_sprite, monster_sprite.entity_collision_mask):
+    elif south_mask_collides(player_sprite, monster_sprite.entity_collider_omni):
         bounce_vector = 0,1
-    elif north_east_mask_collides(player_sprite, monster_sprite.entity_collision_mask):
+    elif north_east_mask_collides(player_sprite, monster_sprite.entity_collider_omni):
         bounce_vector = 1,-1
-    elif north_west_mask_collides(player_sprite, monster_sprite.entity_collision_mask):
+    elif north_west_mask_collides(player_sprite, monster_sprite.entity_collider_omni):
         bounce_vector = -1,-1
-    elif south_east_mask_collides(player_sprite, monster_sprite.entity_collision_mask):
+    elif south_east_mask_collides(player_sprite, monster_sprite.entity_collider_omni):
         bounce_vector = 1,1
-    elif south_west_mask_collides(player_sprite, monster_sprite.entity_collision_mask):
+    elif south_west_mask_collides(player_sprite, monster_sprite.entity_collider_omni):
         bounce_vector = -1,1
 
     monster_sprite.update_position((-bounce_vector[0],-bounce_vector[1]))
@@ -319,51 +342,51 @@ def character_not_moving(current_entity_sprite):
     return False
 
 def east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_ne, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_se, colliding_entity_sprite) != None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) != None:
         return True
     return False
 
 def west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_nw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_sw, colliding_entity_sprite) != None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) != None:
         return True
     return False
 
 def north_mask_collides(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_ne, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_nw, colliding_entity_sprite) != None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite) != None:
         return True
     return False
 
 def south_mask_collides(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_se, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_sw, colliding_entity_sprite) != None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) != None:
         return True
     return False
 
 def north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_ne, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_nw, colliding_entity_sprite) == None  and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_se, colliding_entity_sprite) == None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite) == None  and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) == None:
         return True
     return False
 
 def north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_nw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_ne, colliding_entity_sprite) == None  and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_sw, colliding_entity_sprite) == None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite) == None  and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) == None:
         return True
     return False
 
 def south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_se, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_ne, colliding_entity_sprite) == None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_sw, colliding_entity_sprite) == None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite) == None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) == None:
         return True
     return False
 
 def south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_sw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_nw, colliding_entity_sprite) == None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_se, colliding_entity_sprite) == None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite) == None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) == None:
         return True
     return False
 
 def any_sector_mask_collides(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_nw, colliding_entity_sprite) != None or pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_ne, colliding_entity_sprite) != None or pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_sw, colliding_entity_sprite) != None or pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_se, colliding_entity_sprite) != None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite) != None or pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite) != None or pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) != None or pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) != None:
         return True
     return False
 
 def all_sector_mask_collide(current_entity_sprite,colliding_entity_sprite):
-    if pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_nw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_ne, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_sw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collision_mask_se, colliding_entity_sprite) != None:
+    if pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) != None and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) != None:
         return True
     return False

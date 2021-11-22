@@ -64,8 +64,8 @@ def update_non_player_group_entities_position(vector,entities):
 #Monster generation
 def generate_monsters():
     generate_monster(ETTIN,(3,4))
-    generate_monster(ETTIN, (5,3))
-    generate_monster(ETTIN, (6,3))
+    # generate_monster(ETTIN, (5,3))
+    # generate_monster(ETTIN, (6,3))
     # generate_monster(ETTIN, (5,9))
     # generate_monster(ETTIN, (7,8))
     # generate_monster(ETTIN, (6,7))
@@ -87,7 +87,7 @@ def append_sprite_groups_lists(object_entity):
 
     entity_sprite_groups.append(pygame.sprite.GroupSingle(object_entity))
     shadow_sprite_groups.append(pygame.sprite.GroupSingle(object_entity.shadow))
-    entity_collision_sprite_groups.append(pygame.sprite.Group(object_entity.entity_collision_mask_sprites))
+    entity_collision_sprite_groups.append(pygame.sprite.Group(object_entity.entity_collider_sprites))
     
     if object_entity.TYPE == MONSTER:
         melee_sector_sprite_groups.append(pygame.sprite.Group(object_entity.entity_melee_sector_sprites))

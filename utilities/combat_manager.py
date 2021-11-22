@@ -14,8 +14,8 @@ def attack_monster_with_melee_attack(damage = 0):
             enemy_has_been_hit = False
             
             for melee_sector in unique_player_object.HERO.entity_melee_sector_sprites:
-                if melee_sector.rect.colliderect(entity_sprite_group.sprite.entity_collision_mask.rect):
-                    if melee_sector.sector == unique_player_object.HERO.facing_direction and pygame.sprite.collide_mask(melee_sector, entity_sprite_group.sprite.entity_collision_mask) != None:
+                if melee_sector.rect.colliderect(entity_sprite_group.sprite.entity_collider_omni.rect):
+                    if melee_sector.sector == unique_player_object.HERO.facing_direction and pygame.sprite.collide_mask(melee_sector, entity_sprite_group.sprite.entity_collider_omni) != None:
                         enemy_has_been_hit = True
                         break
             
@@ -34,8 +34,8 @@ def attack_player_with_melee_attack(monster, damage = 0):
     hit = False
 
     for melee_sector in monster.entity_melee_sector_sprites:
-        if melee_sector.rect.colliderect(unique_player_object.HERO.entity_collision_mask.rect):
-            if melee_sector.sector == monster.facing_direction and pygame.sprite.collide_mask(melee_sector, unique_player_object.HERO.entity_collision_mask) != None:
+        if melee_sector.rect.colliderect(unique_player_object.HERO.entity_collider_omni.rect):
+            if melee_sector.sector == monster.facing_direction and pygame.sprite.collide_mask(melee_sector, unique_player_object.HERO.entity_collider_omni) != None:
                 hit = True
                 break
     

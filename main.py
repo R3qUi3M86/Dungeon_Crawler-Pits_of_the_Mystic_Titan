@@ -12,7 +12,6 @@ from entities import cursor
 
 pygame.init()
 clock = pygame.time.Clock()
-
 set_volume_for_all_sounds(VOLUME)
 
 def initialize_player_object():
@@ -20,7 +19,7 @@ def initialize_player_object():
     entity_manager.entity_sprite_groups.append(pygame.sprite.GroupSingle(unique_player_object.HERO))
     entity_manager.shadow_sprite_groups.append(pygame.sprite.GroupSingle(unique_player_object.HERO.shadow))
     entity_manager.melee_sector_sprite_groups.append(pygame.sprite.Group(unique_player_object.HERO.entity_melee_sector_sprites))
-    entity_manager.entity_collision_sprite_groups.append(pygame.sprite.Group(unique_player_object.HERO.entity_collision_mask_sprites))    
+    entity_manager.entity_collision_sprite_groups.append(pygame.sprite.Group(unique_player_object.HERO.entity_collider_sprites))    
 
 def get_player_wsad_input():
     keys = pygame.key.get_pressed()
@@ -167,6 +166,9 @@ while True:
     pygame.draw.lines(screen,'#aa0000',False,points,5)
     debug_text(f"{unique_player_object.HERO.map_position}")
     debug_text(f"{unique_player_object.HERO.tile_index}",x = 10, y = 30)
+    debug_text(f"mon index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 50)
+    debug_text(f"mon map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 70)
+    debug_text(f"mon pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 90)
     
     cursor.cursor.draw(screen)
     cursor.cursor.update()

@@ -2,13 +2,13 @@ import pygame
 import random
 from settings import *
 from sounds import sound_player
-from entities import shadow
-from entities import melee_range
 from utilities import combat_manager
 from utilities.level_painter import TILE_SIZE
 from utilities.text_printer import *
 from utilities.constants import *
 from images.characters.fighter_images import *
+from entities.shadow import Shadow
+from entities.colliders.collider import Collider
 
 class Hero(pygame.sprite.Sprite):
     def __init__(self,position):
@@ -51,30 +51,30 @@ class Hero(pygame.sprite.Sprite):
         
         ###Owned sprites###
         #Colliders
-        self.entity_collision_mask_nw = shadow.Shadow(player_position, PLAYER_ID, SIZE_SMALL, True, SECTOR_NW)
-        self.entity_collision_mask_ne = shadow.Shadow(player_position, PLAYER_ID, SIZE_SMALL, True, SECTOR_NE)
-        self.entity_collision_mask_sw = shadow.Shadow(player_position, PLAYER_ID, SIZE_SMALL, True, SECTOR_SW)
-        self.entity_collision_mask_se = shadow.Shadow(player_position, PLAYER_ID, SIZE_SMALL, True, SECTOR_SE)
-        self.entity_collision_mask    = shadow.Shadow(player_position, PLAYER_ID, SIZE_SMALL, True)
+        self.entity_collider_nw = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NW)
+        self.entity_collider_ne = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NE)
+        self.entity_collider_sw = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SW)
+        self.entity_collider_se = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SE)
+        self.entity_collider_omni = Collider(player_position, self.id, ENTITY_OMNI)
+        self.pathfinding_collider = Collider(self.position, self.id, SQUARE)
 
         #Melee sectors
-        self.entity_melee_e_sector  = melee_range.Melee(player_position, SECTOR_E)
-        self.entity_melee_ne_sector = melee_range.Melee(player_position, SECTOR_NE)
-        self.entity_melee_n_sector  = melee_range.Melee(player_position, SECTOR_N)
-        self.entity_melee_nw_sector = melee_range.Melee(player_position, SECTOR_NW)
-        self.entity_melee_w_sector  = melee_range.Melee(player_position, SECTOR_W)
-        self.entity_melee_sw_sector = melee_range.Melee(player_position, SECTOR_SW)
-        self.entity_melee_s_sector  = melee_range.Melee(player_position, SECTOR_S)
-        self.entity_melee_se_sector = melee_range.Melee(player_position, SECTOR_SE)
+        self.melee_collider_e  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_E)
+        self.melee_collider_ne = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_NE)
+        self.melee_collider_n  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_N)
+        self.melee_collider_nw = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_NW)
+        self.melee_collider_w  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_W)
+        self.melee_collider_sw = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_SW)
+        self.melee_collider_s  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_S)
+        self.melee_collider_se = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_SE)
 
         #Shadow
-        self.shadow = shadow.Shadow(player_position, PLAYER_ID, SIZE_SMALL)
+        self.shadow = Shadow(player_position, PLAYER_ID, SIZE_SMALL)
 
         #Sprite lists
-        self.entity_collision_mask_sprites = [self.entity_collision_mask_nw,self.entity_collision_mask_ne,self.entity_collision_mask_sw,self.entity_collision_mask_se]
-        self.entity_melee_sector_sprites   = [self.entity_melee_e_sector,self.entity_melee_ne_sector,self.entity_melee_n_sector,self.entity_melee_nw_sector,self.entity_melee_w_sector,self.entity_melee_sw_sector,self.entity_melee_s_sector,self.entity_melee_se_sector]
-        self.entity_auxilary_sprites       = [[self.shadow],self.entity_collision_mask_sprites,self.entity_melee_sector_sprites]
-
+        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se]
+        self.entity_melee_sector_sprites = [self.melee_collider_e,self.melee_collider_ne,self.melee_collider_n,self.melee_collider_nw,self.melee_collider_w,self.melee_collider_sw,self.melee_collider_s,self.melee_collider_se]
+        self.entity_auxilary_sprites     = [[self.shadow],self.entity_melee_sector_sprites,self.entity_collider_sprites]
 
         ###Initial sprite definition###
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
@@ -93,6 +93,7 @@ class Hero(pygame.sprite.Sprite):
         #Character properties
         self.health = 20
         self.maxhealth = 20
+        self.damage = 0
         self.attack_can_be_interrupted = False
         self.can_shoot = False
         self.projectile_type = None
@@ -196,7 +197,7 @@ class Hero(pygame.sprite.Sprite):
     def character_attack_animation(self):
         self.character_attack_index[1] += 0.05
         if round(self.character_attack_index[1],2) == 1.00:
-            combat_manager.attack_monster_with_melee_attack()
+            combat_manager.attack_monster_with_melee_attack(self.damage)
         if int(self.character_attack_index[1]) == 2:
             self.is_attacking = False
             self.character_attack_index[1] = 0

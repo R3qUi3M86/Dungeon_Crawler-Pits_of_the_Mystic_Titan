@@ -8,8 +8,8 @@ from utilities import entity_manager
 from utilities import collision_manager
 
 TILE_SIZE = 48,48
-#level = level_01_map
-level = test_map
+level = level_01_map
+#level = test_map
 player_starting_tile_index = 0,0
 
 def set_player_tile_index():
