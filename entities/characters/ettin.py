@@ -160,14 +160,14 @@ class Ettin(pygame.sprite.Sprite):
                 
                 else:
                     if self.monster_ai.is_path_finding and not self.monster_ai.is_following_path:
-                        self.monster_ai.pathfinder.update(self.tile_index, True)
+                        self.monster_ai.pathfinder.monster_tile_index = self.tile_index
                         self.monster_ai.pathfinder.create_path()
+                        self.monster_ai.next_tile_pos_x = level_painter.get_tile_sprite_by_index((self.monster_ai.pathfinder.path[0][1],self.monster_ai.pathfinder.path[0][0])).map_position[0]
+                        self.monster_ai.next_tile_pos_y = level_painter.get_tile_sprite_by_index((self.monster_ai.pathfinder.path[0][1],self.monster_ai.pathfinder.path[0][0])).map_position[1]
                         self.monster_ai.is_path_finding = False
                         self.monster_ai.is_following_path = True
-                        self.monster_ai.pathfinder.update(self.tile_index, True)
                 
                     elif self.monster_ai.is_following_path and len(self.monster_ai.pathfinder.path) != 0:
-                        self.monster_ai.pathfinder.update(self.tile_index, True)
                         self.monster_ai.change_to_next_point_direction()
 
         elif self.is_dying and not self.is_dead:
