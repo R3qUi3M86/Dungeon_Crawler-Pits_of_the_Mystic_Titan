@@ -93,6 +93,7 @@ class Ettin(pygame.sprite.Sprite):
         self.is_overkilled = False
         self.is_in_pain = False
         self.is_dead = False
+        self.is_corpse = False
         self.has_los = False
         
         #Character properties
@@ -111,23 +112,25 @@ class Ettin(pygame.sprite.Sprite):
 
     #Update functions
     def update(self):
-        self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
-        self.map_position = round(self.position[0]+unique_player_object.HERO.map_position[0]-player_position[0],2), round(self.position[1]+unique_player_object.HERO.map_position[1]-player_position[1],2)
-        self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
-        self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
-        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
-        self.update_owned_sprites()
-        
         if not self.is_dead:
+            self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
+            self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
+            self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+            self.update_owned_sprites()
+        
             if self.is_living:
                 self.update_decisions()
-            self.update_animation()
-        else:
+
+        elif not self.is_corpse:
+            self.is_corpse = True
             entity_manager.kill_entity_colliders_and_melee_entities(self.id)
+        
+        self.update_animation()
 
     def update_position(self, vector):
         self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
         self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
+        self.map_position = round(self.position[0]+unique_player_object.HERO.map_position[0]-player_position[0],2), round(self.position[1]+unique_player_object.HERO.map_position[1]-player_position[1],2)
         self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         self.update_owned_sprites_position()
@@ -186,25 +189,22 @@ class Ettin(pygame.sprite.Sprite):
             self.monster_ai.end_pathfinding()
 
     def update_animation(self):
-        self.set_facing_direction_indices()
-        self.image = character_walk[int(self.character_walk_index[0])][int(self.character_walk_index[1])]
-        self.character_walk_forward_animation()
+        self.set_character_animation_direction_indices()
+        
+        if self.is_living:
+            self.character_walk_forward_animation()
 
-        if self.is_in_pain == True:
+        if self.is_in_pain:
             self.character_pain_animation()
         
-        if self.is_attacking == True:
+        if self.is_attacking:
             self.character_attack_animation()
         
-        if self.is_dying == True:
+        if self.is_dying:
             self.character_death_animation()
 
-        if self.is_overkilled == True:
+        if self.is_overkilled :
             self.character_overkill_animation()
-
-    def set_facing_direction_indices(self):
-        self.set_character_animation_direction_indices()
-        self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
     
     def update_owned_sprites_position(self):
         self.pathfinding_collision_rect = pygame.Rect((self.position[0] - 2, self.position[1] -2),(4,4))
@@ -249,7 +249,7 @@ class Ettin(pygame.sprite.Sprite):
             self.character_walk_index[1] += 0.1
             if int(self.character_walk_index[1]) == 4:
                 self.character_walk_index[1] = 0
-            self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
+        self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_attack_animation(self):
         self.character_attack_index[1] += 0.1

@@ -7,6 +7,8 @@ Y = 1
 
 PLAYER = "player"
 MONSTER = "monster"
+PROJECTILE = "projectile"
+ITEM = "item"
 ETTIN = "ettin"
 
 HIT = True

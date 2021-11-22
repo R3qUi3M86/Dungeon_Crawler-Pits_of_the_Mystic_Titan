@@ -108,15 +108,6 @@ def order_sprites():
             if entity_manager.entity_sprite_groups[j].sprite.sprite_position[Y] > entity_manager.entity_sprite_groups[j+1].sprite.sprite_position[Y]:
                     entity_manager.entity_sprite_groups[j], entity_manager.entity_sprite_groups[j+1] = entity_manager.entity_sprite_groups[j+1], entity_manager.entity_sprite_groups[j]
 
-def collision_detection():
-    collision_manager.player_vs_monster_movement_collision()
-
-    for entity_sprite_group in entity_manager.entity_sprite_groups:
-        collision_manager.character_vs_level_movement_collision(entity_sprite_group)
-        collision_manager.monster_vs_monster_collision(entity_sprite_group)
-        collision_manager.projectile_collision(entity_sprite_group)
-        collision_manager.item_collision(entity_sprite_group)
-
 def draw_sprites():
     for tile in entity_manager.level_sprite_groups:
         tile.draw(screen)
@@ -146,7 +137,7 @@ while True:
     entity_manager.update_all_entities()
     unique_player_object.HERO.update_position(unique_player_object.HERO.speed_vector)
     entity_manager.update_all_non_player_entities_position_by_vector(unique_player_object.HERO.speed_vector)
-    collision_detection()
+    collision_manager.detect_all_collisions()
 
     #Events
     for event in pygame.event.get():

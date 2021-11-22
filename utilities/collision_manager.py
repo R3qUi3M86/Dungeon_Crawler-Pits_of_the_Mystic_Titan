@@ -4,6 +4,25 @@ from utilities import entity_manager
 
 pathfinding_matrix = []
 
+#Master function
+def detect_all_collisions():
+    player_vs_monster_movement_collision()
+
+    for entity_collision_sprite_group in entity_manager.entity_collision_sprite_groups:
+        owner_entity_sprite = entity_manager.get_entity_sprite_by_id(entity_collision_sprite_group.sprites()[0].id)
+        
+        if owner_entity_sprite is MONSTER or owner_entity_sprite is unique_player_object.HERO:
+            character_vs_level_movement_collision(owner_entity_sprite)
+        
+        if owner_entity_sprite is MONSTER:
+            monster_vs_monster_collision(owner_entity_sprite)
+
+        elif owner_entity_sprite is PROJECTILE:    
+            projectile_collision(owner_entity_sprite)
+
+        elif owner_entity_sprite is ITEM:
+            item_collision(owner_entity_sprite)
+
 #Collision types
 def player_vs_monster_movement_collision():
     for entity_collision_sprite_group in entity_manager.entity_collision_sprite_groups:
@@ -14,29 +33,28 @@ def player_vs_monster_movement_collision():
                 bump_monster_back(unique_player_object.HERO, entity_sprite)
                 adjust_player_movement_vector(mask_collision_coordinates)
                 
-def character_vs_level_movement_collision(character):
+def character_vs_level_movement_collision(character_sprite):
     for level_collision_sprite_group in entity_manager.level_collision_sprite_groups:
-        if character.sprite.entity_collider_omni.rect.colliderect(level_collision_sprite_group.sprite.rect) and any_sector_mask_collides(character.sprite,level_collision_sprite_group.sprite):
-            correct_character_position_by_vector(character.sprite,level_collision_sprite_group.sprite)
-            if character.sprite.is_monster and character.sprite.monster_ai.is_path_finding == False and character.sprite.monster_ai.path_finding_is_ready:
-                character.sprite.monster_ai.initialize_monster_path_finding()
+        if character_sprite.entity_collider_omni.rect.colliderect(level_collision_sprite_group.sprite.rect) and any_sector_mask_collides(character_sprite,level_collision_sprite_group.sprite):
+            correct_character_position_by_vector(character_sprite,level_collision_sprite_group.sprite)
+            if character_sprite.is_monster and character_sprite.monster_ai.is_path_finding == False and character_sprite.monster_ai.path_finding_is_ready:
+                character_sprite.monster_ai.initialize_monster_path_finding()
 
-def monster_vs_monster_collision(character):
-    if character.sprite != unique_player_object.HERO:
-        for entity_sprite_group in entity_manager.entity_sprite_groups:
-            if entity_sprite_group.sprite != unique_player_object.HERO and character != entity_sprite_group:
-                character_collider = character.sprite.entity_collider_omni
-                entity_collider = entity_sprite_group.sprite.entity_collider_omni
-                if character_collider.rect.colliderect(entity_collider):
-                    if pygame.sprite.collide_mask(character_collider, entity_collider) != None:
-                        bump_monster_back(character.sprite, entity_sprite_group.sprite)
-                        adjust_monster_movement_vector(character.sprite, entity_sprite_group.sprite)
+def monster_vs_monster_collision(character_sprite):
+    for entity_sprite_group in entity_manager.entity_sprite_groups:
+        if entity_sprite_group.sprite != unique_player_object.HERO and character_sprite != entity_sprite_group.sprite:
+            character_collider = character_sprite.entity_collider_omni
+            entity_collider = entity_sprite_group.sprite.entity_collider_omni
+            if character_collider.rect.colliderect(entity_collider):
+                if pygame.sprite.collide_mask(character_collider, entity_collider) != None:
+                    bump_monster_back(character_sprite, entity_sprite_group.sprite)
+                    adjust_monster_movement_vector(character_sprite, entity_sprite_group.sprite)
 
-def projectile_collision(projectile):
+def projectile_collision(projectile_sprite):
     #Projectile collision logic
     pass
 
-def item_collision(item):
+def item_collision(item_sprite):
     #Item collision logic
     pass
 
