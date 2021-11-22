@@ -63,4 +63,6 @@ class Collider(pygame.sprite.Sprite):
         elif self.type == SQUARE:
             if self.size == SIZE_SMALL:
                 return small_square_collider
+            elif self.size == SIZE_MEDIUM:
+                return medium_square_collider
 

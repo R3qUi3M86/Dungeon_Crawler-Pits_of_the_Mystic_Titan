@@ -86,3 +86,8 @@ def generate_entity_id():
     else:
         entity_manager.entities_id.append(len(entity_manager.entities_id))
         return entity_manager.entities_id[len(entity_manager.entities_id)-1]
+
+def draw_pathfinding_path_for_monster(monster_index):
+    monster_sprite = entity_manager.get_entity_sprite_by_id(monster_index)
+    if monster_sprite != None:
+        monster_sprite.monster_ai.pathfinder.draw_path()

@@ -20,10 +20,14 @@ class Ai():
         self.monster_path_follow_dir_change_timer = 3
         self.monster_path_follow_dir_change_timer_limit = 3
 
+        self.pathfinding_prepare_timer = 0
+        self.pathfinding_prepare_timer_limit = 20
+
         self.pathfinder = pathfinder.Pathfinder(pathfinding_matrix, tile_index)
         self.is_roaming = True
         self.is_path_finding = False
         self.is_following_path = False
+        self.path_finding_is_ready = True
         self.is_avoiding_obstacle = False
         self.obstacle_sector = None
         self.avoidance_direction_sector = None
@@ -44,9 +48,9 @@ class Ai():
         self.direction_change_decision_timer_limit += random.choice(range(12))
 
     def increment_path_follow_dir_change_timer(self):
-        if self.pathfinder.path:
-            next_tile_pos_x = level_painter.get_tile_sprite_by_index(self.pathfinder.path[0]).map_position[1]
-            next_tile_pos_y = level_painter.get_tile_sprite_by_index(self.pathfinder.path[0]).map_position[0]
+        if len(self.pathfinder.path) > 0:
+            next_tile_pos_y = level_painter.get_tile_sprite_by_index((self.pathfinder.path[0][1],self.pathfinder.path[0][0])).map_position[1]
+            next_tile_pos_x = level_painter.get_tile_sprite_by_index((self.pathfinder.path[0][1],self.pathfinder.path[0][0])).map_position[0]
             if int(self.monster_path_follow_dir_change_timer) == self.monster_path_follow_dir_change_timer_limit:
                 self.monster_path_follow_dir_change_timer = 0
                 self.monster.facing_direction = util.get_facing_direction(self.monster.map_position,(next_tile_pos_x,next_tile_pos_y))
@@ -55,6 +59,13 @@ class Ai():
                 self.monster_path_follow_dir_change_timer = round(self.monster_path_follow_dir_change_timer+0.1,1)
         else:
             self.end_pathfinding()
+
+    def increment_pathfinding_prepare_timer(self):
+        if not self.path_finding_is_ready:
+            self.pathfinding_prepare_timer += 0.1
+        if int(self.pathfinding_prepare_timer) == self.pathfinding_prepare_timer_limit:
+            self.path_finding_is_ready = True
+            self.pathfinding_prepare_timer = 0
 
     def direction_change(self):
         if self.is_roaming:
@@ -158,12 +169,14 @@ class Ai():
                 self.monster.facing_direction = SECTOR_SW
     
     def initialize_monster_path_finding(self):
+        print(f"id: {self.monster.id} initializes pf")
         self.reset_obstacle_avoidance_flags()
         self.is_path_finding = True
+        self.path_finding_is_ready = False
         self.monster_path_follow_dir_change_timer = self.monster_path_follow_dir_change_timer_limit
 
     def change_to_next_point_direction(self):
-        if self.pathfinder.points and self.monster.pathfinding_collider.rect.collidepoint(self.pathfinder.points[0]):
+        if self.pathfinder.path and self.monster.medium_square_collider.rect.collidepoint(self.pathfinder.points[0]):
             self.pathfinder.path.remove(self.pathfinder.path[0])
             self.pathfinder.generate_points_path(self.pathfinder.path)
         self.increment_path_follow_dir_change_timer()

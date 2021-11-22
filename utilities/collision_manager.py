@@ -6,18 +6,19 @@ pathfinding_matrix = []
 
 #Collision types
 def player_vs_monster_movement_collision():
-    for entity_sprite_group in entity_manager.entity_sprite_groups:
-        if entity_sprite_group.sprite != unique_player_object.HERO and unique_player_object.HERO.entity_collider_omni.rect.colliderect(entity_sprite_group.sprite.entity_collider_omni.rect):
-            mask_collision_coordinates = pygame.sprite.collide_mask(unique_player_object.HERO.entity_collider_omni, entity_sprite_group.sprite.entity_collider_omni)
+    for entity_collision_sprite_group in entity_manager.entity_collision_sprite_groups:
+        entity_sprite = entity_manager.get_entity_sprite_by_id(entity_collision_sprite_group.sprites()[0].id)
+        if entity_sprite != unique_player_object.HERO and unique_player_object.HERO.entity_collider_omni.rect.colliderect(entity_sprite.entity_collider_omni.rect):
+            mask_collision_coordinates = pygame.sprite.collide_mask(unique_player_object.HERO.entity_collider_omni, entity_sprite.entity_collider_omni)
             if mask_collision_coordinates != None:
-                bump_monster_back(unique_player_object.HERO, entity_sprite_group.sprite)
+                bump_monster_back(unique_player_object.HERO, entity_sprite)
                 adjust_player_movement_vector(mask_collision_coordinates)
                 
 def character_vs_level_movement_collision(character):
     for level_collision_sprite_group in entity_manager.level_collision_sprite_groups:
         if character.sprite.entity_collider_omni.rect.colliderect(level_collision_sprite_group.sprite.rect) and any_sector_mask_collides(character.sprite,level_collision_sprite_group.sprite):
             correct_character_position_by_vector(character.sprite,level_collision_sprite_group.sprite)
-            if character.sprite.is_monster and character.sprite.monster_ai.is_path_finding == False:
+            if character.sprite.is_monster and character.sprite.monster_ai.is_path_finding == False and character.sprite.monster_ai.path_finding_is_ready:
                 character.sprite.monster_ai.initialize_monster_path_finding()
 
 def monster_vs_monster_collision(character):
@@ -86,167 +87,167 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
 
     while any_sector_mask_collides(current_entity_sprite,colliding_entity_sprite):
         if east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-            correction_vector = -1,0
+            correction_vector = -3,0
         elif west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-            correction_vector = 1,0
+            correction_vector = 3,0
         elif north_mask_collides(current_entity_sprite,colliding_entity_sprite):
-            correction_vector = 0,1
+            correction_vector = 0,3
         elif south_mask_collides(current_entity_sprite,colliding_entity_sprite):
-            correction_vector = 0,-1
+            correction_vector = 0,-3
 
         if character_moving_east(current_entity_sprite):
             if north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(south_tile_index) != None:
-                    correction_vector = -1,0
+                    correction_vector = -3,0
                 else:
-                    correction_vector = 0,1
+                    correction_vector = 0,3
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(north_tile_index) != None:
-                    correction_vector = -1,0
+                    correction_vector = -3,0
                 else:
-                    correction_vector = 0,-1
+                    correction_vector = 0,-3
             elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 1,1
+                correction_vector = 3,3
             elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 1,-1
+                correction_vector = 3,-3
 
         elif character_moving_west(current_entity_sprite):
             if north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(south_tile_index) != None:
-                    correction_vector = 1,0
+                    correction_vector = 3,0
                 else:
-                    correction_vector = 0,1
+                    correction_vector = 0,3
             elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(north_tile_index) != None:
-                    correction_vector = 1,0
+                    correction_vector = 3,0
                 else:
-                    correction_vector = 0,-1
+                    correction_vector = 0,-3
             elif north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = -1,1
+                correction_vector = -3,3
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = -1,-1
+                correction_vector = -3,-3
 
         elif character_moving_north(current_entity_sprite):
             if north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(east_tile_index) != None:
-                    correction_vector = 0,1
+                    correction_vector = 0,3
                 else:
-                    correction_vector = 1,0
+                    correction_vector = 3,0
             elif north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(west_tile_index) != None:
-                    correction_vector = 0,1
+                    correction_vector = 0,3
                 else:
-                    correction_vector = -1,0
+                    correction_vector = -3,0
             elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 1,-1
+                correction_vector = 3,-3
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = -1,-1
+                correction_vector = -3,-3
 
         elif character_moving_south(current_entity_sprite):
             if south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(east_tile_index) != None:
-                    correction_vector = 0,-1
+                    correction_vector = 0,-3
                 else:
-                    correction_vector = 1,0
+                    correction_vector = 3,0
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(west_tile_index) != None:
-                    correction_vector = 0,-1
+                    correction_vector = 0,-3
                 else:
-                    correction_vector = -1,0
+                    correction_vector = -3,0
             elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 1,1
+                correction_vector = 3,3
             elif north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = -1,1
+                correction_vector = -3,3
 
         elif character_moving_north_east(current_entity_sprite):
             if north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(south_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(west_tile_index) == None:
-                    correction_vector = -speed_vector[0], -speed_vector[1]
+                    correction_vector = -3*speed_vector[0], -3*speed_vector[1]
                 elif entity_manager.get_level_collision_sprite_by_index(south_tile_index) != None:
-                    correction_vector = -1, 0
+                    correction_vector = -3, 0
                 elif entity_manager.get_level_collision_sprite_by_index(west_tile_index) != None:
-                    correction_vector = 0, 1
+                    correction_vector = 0, 3
             elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 0, 1
+                correction_vector = 0, 3
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = -1, 0
+                correction_vector = -3, 0
             elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 1,-1
+                correction_vector = 3,-3
 
         elif character_moving_north_west(current_entity_sprite):
             if north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(south_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(east_tile_index) == None:
-                    correction_vector = -speed_vector[0], -speed_vector[1]
+                    correction_vector = -3*speed_vector[0], -3*speed_vector[1]
                 elif entity_manager.get_level_collision_sprite_by_index(south_tile_index) != None:
-                    correction_vector = 1, 0
+                    correction_vector = 3, 0
                 elif entity_manager.get_level_collision_sprite_by_index(east_tile_index) != None:
-                    correction_vector = 0, 1
+                    correction_vector = 0, 3
             elif north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 0, 1
+                correction_vector = 0, 3
             elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 1, 0
+                correction_vector = 3, 0
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = -1,-1
+                correction_vector = -3,-3
 
         elif character_moving_south_east(current_entity_sprite):
             if south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(west_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(north_tile_index) == None:
-                    correction_vector = -speed_vector[0], -speed_vector[1]
+                    correction_vector = -3*speed_vector[0], -3*speed_vector[1]
                 elif entity_manager.get_level_collision_sprite_by_index(west_tile_index) != None:
-                    correction_vector = 0,-1
+                    correction_vector = 0,-3
                 elif entity_manager.get_level_collision_sprite_by_index(north_tile_index) != None:
-                    correction_vector = -1,0
+                    correction_vector = -3,0
             elif north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = -1, 0
+                correction_vector = -3, 0
             elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 0, -1
+                correction_vector = 0, -3
             elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 1,1
+                correction_vector = 3,3
 
         elif character_moving_south_west(current_entity_sprite):
             if south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(east_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(north_tile_index) == None:
-                    correction_vector = -speed_vector[0], -speed_vector[1]
+                    correction_vector = -3*speed_vector[0], -3*speed_vector[1]
                 elif entity_manager.get_level_collision_sprite_by_index(east_tile_index) != None:
-                    correction_vector = 0,-1
+                    correction_vector = 0,-3
                 elif entity_manager.get_level_collision_sprite_by_index(north_tile_index) != None:
-                    correction_vector = 1,0
+                    correction_vector = 3,0
             elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 1, 0
+                correction_vector = 3, 0
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = 0, -1
+                correction_vector = 0, -3
             elif north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
-                correction_vector = -1,1
+                correction_vector = -3,3
 
         elif character_not_moving(current_entity_sprite):
             if north_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(south_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(west_tile_index) == None:
-                    correction_vector = 1, 1
+                    correction_vector = 3, 3
                 elif entity_manager.get_level_collision_sprite_by_index(south_tile_index) != None:
-                    correction_vector = -1, 0
+                    correction_vector = -3, 0
                 elif entity_manager.get_level_collision_sprite_by_index(west_tile_index) != None:
-                    correction_vector = 0, 1
+                    correction_vector = 0, 3
             elif north_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(south_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(east_tile_index) == None:
-                    correction_vector = -1, 1
+                    correction_vector = -3, 3
                 elif entity_manager.get_level_collision_sprite_by_index(south_tile_index) != None:
-                    correction_vector = 1, 0
+                    correction_vector = 3, 0
                 elif entity_manager.get_level_collision_sprite_by_index(east_tile_index) != None:
-                    correction_vector = 0, 1
+                    correction_vector = 0, 3
             elif south_east_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(west_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(north_tile_index) == None:
-                    correction_vector = -1, -1
+                    correction_vector = -3, -3
                 elif entity_manager.get_level_collision_sprite_by_index(west_tile_index) != None:
-                    correction_vector = 0,-1
+                    correction_vector = 0,-3
                 elif entity_manager.get_level_collision_sprite_by_index(north_tile_index) != None:
-                    correction_vector = -1,0
+                    correction_vector = -3,0
             elif south_west_mask_collides(current_entity_sprite,colliding_entity_sprite):
                 if entity_manager.get_level_collision_sprite_by_index(east_tile_index) == None and entity_manager.get_level_collision_sprite_by_index(north_tile_index) == None:
-                    correction_vector = 1, -1
+                    correction_vector = 3, -3
                 elif entity_manager.get_level_collision_sprite_by_index(east_tile_index) != None:
-                    correction_vector = 0,-1
+                    correction_vector = 0,-3
                 elif entity_manager.get_level_collision_sprite_by_index(north_tile_index) != None:
-                    correction_vector = 1,0
+                    correction_vector = 3,0
 
         if current_entity_sprite == unique_player_object.HERO and (correction_vector[0] != 0 or correction_vector[1] != 0):
             unique_player_object.HERO.update_position(correction_vector)

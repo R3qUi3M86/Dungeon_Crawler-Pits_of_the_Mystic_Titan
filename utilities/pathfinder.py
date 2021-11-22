@@ -16,13 +16,12 @@ class Pathfinder:
         self.finder = AStarFinder(diagonal_movement = DiagonalMovement.always)
         self.path = []
         self.points = []
-        self.pathfinding_collision_rect = pygame.Rect((self.position[0] - 2, self.position[1] -2),(4,4))
     
     def create_path(self):
         start_grid = self.grid.node(self.monster_tile_index[1], self.monster_tile_index[0])
         end_grid = self.grid.node(unique_player_object.HERO.tile_index[1], unique_player_object.HERO.tile_index[0])
         self.path, _ = self.finder.find_path(start_grid, end_grid, self.grid)
-        print(self.grid.grid_str(self.path, start_grid, end_grid))
+        #print(self.grid.grid_str(self.path, start_grid, end_grid))
         self.grid.cleanup()
 
     def update(self, monster_tile_index = None, pathfinding = False):
@@ -44,6 +43,3 @@ class Pathfinder:
     def draw_path(self):
         if len(self.points) >= 2:
             pygame.draw.lines(screen,'#aa0000',False,self.points,5)
-
-    def update_collision_rect_pos(self,position):
-        self.pathfinding_collision_rect = pygame.Rect((self.position[0] - 2, self.position[1] -2),(4,4))

@@ -55,12 +55,12 @@ class Ettin(pygame.sprite.Sprite):
 
         ###Owned sprites###
         #Colliders
-        self.entity_collider_nw = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NW)
-        self.entity_collider_ne = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NE)
-        self.entity_collider_sw = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SW)
-        self.entity_collider_se = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SE)
-        self.entity_collider_omni = Collider(player_position, self.id, ENTITY_OMNI)
-        self.pathfinding_collider = Collider(self.position, self.id, SQUARE)
+        self.entity_collider_nw    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NW)
+        self.entity_collider_ne    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NE)
+        self.entity_collider_sw    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SW)
+        self.entity_collider_se    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SE)
+        self.entity_collider_omni  = Collider(player_position, self.id, ENTITY_OMNI)
+        self.medium_square_collider = Collider(self.position, self.id, SQUARE, size=SIZE_MEDIUM)
 
         #Melee sectors
         self.melee_collider_e  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_E)
@@ -76,7 +76,7 @@ class Ettin(pygame.sprite.Sprite):
         self.shadow = Shadow(self.position, self.id, SIZE_MEDIUM)
         
         #Sprite lists
-        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se,self.pathfinding_collider]
+        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se,self.medium_square_collider]
         self.entity_melee_sector_sprites = [self.melee_collider_e,self.melee_collider_ne,self.melee_collider_n,self.melee_collider_nw,self.melee_collider_w,self.melee_collider_sw,self.melee_collider_s,self.melee_collider_se]
         self.entity_auxilary_sprites     = [[self.shadow],self.entity_melee_sector_sprites,self.entity_collider_sprites]
 
@@ -93,7 +93,6 @@ class Ettin(pygame.sprite.Sprite):
         self.is_overkilled = False
         self.is_in_pain = False
         self.is_dead = False
-        self.is_corpse = False
         self.has_los = False
         
         #Character properties
@@ -120,10 +119,11 @@ class Ettin(pygame.sprite.Sprite):
         self.update_owned_sprites()
         
         if not self.is_dead:
-            self.update_decisions()
+            if self.is_living:
+                self.update_decisions()
             self.update_animation()
-        elif not self.is_corpse: 
-            entity_manager.kill_entity_colliders_and_melee_entities(id)
+        else:
+            entity_manager.kill_entity_colliders_and_melee_entities(self.id)
 
     def update_position(self, vector):
         self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
@@ -155,6 +155,7 @@ class Ettin(pygame.sprite.Sprite):
             else:
                 if not self.monster_ai.is_following_path and not self.monster_ai.is_path_finding:
                     self.monster_ai.increment_direction_change_decision_timer()
+                    self.monster_ai.increment_pathfinding_prepare_timer()
                     self.set_speed_vector()
                 
                 else:
@@ -189,11 +190,11 @@ class Ettin(pygame.sprite.Sprite):
         self.image = character_walk[int(self.character_walk_index[0])][int(self.character_walk_index[1])]
         self.character_walk_forward_animation()
 
-        if self.is_attacking == True:
-            self.character_attack_animation()
-
         if self.is_in_pain == True:
             self.character_pain_animation()
+        
+        if self.is_attacking == True:
+            self.character_attack_animation()
         
         if self.is_dying == True:
             self.character_death_animation()
@@ -233,6 +234,7 @@ class Ettin(pygame.sprite.Sprite):
             self.character_death_index = 6
             self.is_dying = False
             self.is_dead = True
+            self.is_corpse = True
         self.image = self.character_death[int(self.character_death_index)]
 
     def character_overkill_animation(self):
@@ -241,6 +243,7 @@ class Ettin(pygame.sprite.Sprite):
             self.character_overkill_index = 9
             self.is_overkilled = False
             self.is_dead = True
+            self.is_corpse = True
         self.image = self.character_overkill[int(self.character_overkill_index)]       
 
     def character_walk_forward_animation(self):
@@ -289,7 +292,6 @@ class Ettin(pygame.sprite.Sprite):
     #Combat functions
     def take_damage(self, damage):
         self.health -= damage
-        print("damage")
         
         if self.health > 0:
             self.is_in_pain = True

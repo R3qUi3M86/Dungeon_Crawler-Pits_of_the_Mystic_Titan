@@ -64,10 +64,10 @@ def update_non_player_group_entities_position(vector,entities):
 #Monster generation
 def generate_monsters():
     generate_monster(ETTIN,(3,4))
-    # generate_monster(ETTIN, (5,3))
-    # generate_monster(ETTIN, (6,3))
-    # generate_monster(ETTIN, (5,9))
-    # generate_monster(ETTIN, (7,8))
+    generate_monster(ETTIN, (4,2))
+    generate_monster(ETTIN, (4,1))
+    generate_monster(ETTIN, (7,3))
+    generate_monster(ETTIN, (7,8))
     # generate_monster(ETTIN, (6,7))
 
 def generate_monster(monster_type, tile_index):

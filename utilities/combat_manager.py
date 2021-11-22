@@ -1,6 +1,7 @@
+from sounds import sound_player
 from entities.characters import unique_player_object
 from utilities import entity_manager
-from sounds import sound_player
+from utilities import collision_manager
 from utilities.constants import *
 
 def attack_monster_with_melee_attack(damage = 0):
@@ -34,8 +35,8 @@ def attack_player_with_melee_attack(monster, damage = 0):
     hit = False
 
     for melee_sector in monster.entity_melee_sector_sprites:
-        if melee_sector.rect.colliderect(unique_player_object.HERO.entity_collider_omni.rect):
-            if melee_sector.sector == monster.facing_direction and pygame.sprite.collide_mask(melee_sector, unique_player_object.HERO.entity_collider_omni) != None:
+        if melee_sector.rect.colliderect(unique_player_object.HERO.entity_collider_omni.rect) and pygame.sprite.collide_mask(melee_sector,unique_player_object.HERO.entity_collider_omni):
+            if melee_sector.sector == monster.facing_direction:
                 hit = True
                 break
     

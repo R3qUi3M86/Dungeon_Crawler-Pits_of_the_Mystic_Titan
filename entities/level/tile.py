@@ -3,6 +3,7 @@ import random
 from entities.level.level import *
 from images.level.cave_images import *
 from utilities import level_painter
+from images.misc.colliders import *
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self,type,tile_index,pos,size,vicinity_matrix):
@@ -43,7 +44,7 @@ class Tile(pygame.sprite.Sprite):
         if self.passable == True:
             return pygame.mask.from_surface(empty_tile_image)
         else:
-            return pygame.mask.from_surface(self.image)
+            return pygame.mask.from_surface(level_tile_collider)
 
     def get_passable(self):
         if self.type in IMPASSABLE_TILES:
