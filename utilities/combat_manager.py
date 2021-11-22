@@ -4,14 +4,16 @@ from utilities import entity_manager
 from utilities import collision_manager
 from utilities.constants import *
 
-def attack_monster_with_melee_attack(damage = 0):
+def attack_monster_with_melee_attack(damage):
     enemy_has_been_hit = False
     hit_something = False
 
     hit_monsters = []
     
     for entity_sprite_group in entity_manager.entity_sprite_groups:
-        if entity_sprite_group.sprite != unique_player_object.HERO:
+        entity_sprite = entity_sprite_group.sprite
+        
+        if entity_sprite != unique_player_object.HERO and not entity_sprite.is_dead and not entity_sprite.is_overkilled:
             enemy_has_been_hit = False
             
             for melee_sector in unique_player_object.HERO.entity_melee_sector_sprites:
@@ -31,7 +33,7 @@ def attack_monster_with_melee_attack(damage = 0):
     else:
         play_melee_attack_sound(PLAYER, MISS)
         
-def attack_player_with_melee_attack(monster, damage = 0):
+def attack_player_with_melee_attack(monster, damage):
     hit = False
 
     for melee_sector in monster.entity_melee_sector_sprites:

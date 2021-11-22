@@ -234,7 +234,6 @@ class Ettin(pygame.sprite.Sprite):
             self.character_death_index = 6
             self.is_dying = False
             self.is_dead = True
-            self.is_corpse = True
         self.image = self.character_death[int(self.character_death_index)]
 
     def character_overkill_animation(self):
@@ -243,7 +242,6 @@ class Ettin(pygame.sprite.Sprite):
             self.character_overkill_index = 9
             self.is_overkilled = False
             self.is_dead = True
-            self.is_corpse = True
         self.image = self.character_overkill[int(self.character_overkill_index)]       
 
     def character_walk_forward_animation(self):
