@@ -7,6 +7,7 @@ from utilities import util
 from utilities.level_painter import TILE_SIZE
 from utilities.text_printer import *
 from utilities.constants import *
+from utilities import entity_manager
 from images.characters.fighter_images import *
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
@@ -23,6 +24,7 @@ class Hero(pygame.sprite.Sprite):
         self.tile_index = 0,0
         self.prevous_tile_index = self.tile_index
         self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+        self.vicinity_collision_tiles = []
         self.position = position
         self.map_position = 0,0
         self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
@@ -125,6 +127,7 @@ class Hero(pygame.sprite.Sprite):
         if self.tile_index != self.prevous_tile_index:
             self.prevous_tile_index = self.tile_index
             self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+            self.update_vicinity_collision_tiles()
 
     def update_animation(self):
         if not self.is_dead:
@@ -139,6 +142,17 @@ class Hero(pygame.sprite.Sprite):
 
             if self.is_overkilled == True:
                 self.character_overkill_animation()
+
+    def update_vicinity_collision_tiles(self):
+        vicinity_collision_tiles = []
+        for row in self.vicinity_index_matrix:
+            for tile_index in row:
+                collision_tile = entity_manager.get_level_collision_sprite_by_index(tile_index)
+                
+                if collision_tile != None:
+                    vicinity_collision_tiles.append(collision_tile)
+        
+        self.vicinity_collision_tiles = vicinity_collision_tiles
 
     #Animations
     def walking_animation(self):

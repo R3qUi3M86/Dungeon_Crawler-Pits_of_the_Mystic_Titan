@@ -24,6 +24,7 @@ class Ettin(pygame.sprite.Sprite):
         ###Position variables###
         self.tile_index = tile_index
         self.prevous_tile_index = tile_index
+        self.vicinity_collision_tiles = []
         self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(tile_index)
         self.position = level_painter.get_tile_position(tile_index)
         self.map_position = round(self.position[0]-player_position[0]+entity_manager.hero.tile_index[0],2), round(self.position[1]-player_position[1]+entity_manager.hero.tile_index[1],2)
@@ -87,7 +88,6 @@ class Ettin(pygame.sprite.Sprite):
 
         ###General variables###
         #Status flags
-        self.is_monster = True
         self.is_attacking = False
         self.is_living = True
         self.is_dying = False
@@ -137,6 +137,7 @@ class Ettin(pygame.sprite.Sprite):
         if self.tile_index != self.prevous_tile_index:
             self.prevous_tile_index = self.tile_index
             self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+            self.update_vicinity_collision_tiles()
         
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         self.update_owned_sprites_position()
@@ -221,6 +222,19 @@ class Ettin(pygame.sprite.Sprite):
             for auxilary_sprite in auxilary_sprites_row:
                 auxilary_sprite.position = self.position
                 auxilary_sprite.update()
+
+    def update_vicinity_collision_tiles(self):
+        vicinity_collision_tiles = []
+        for row in self.vicinity_index_matrix:
+            for tile_index in row:
+                collision_tile = entity_manager.get_level_collision_sprite_by_index(tile_index)
+                
+                if collision_tile != None:
+                    vicinity_collision_tiles.append(collision_tile)
+        
+        self.vicinity_collision_tiles = vicinity_collision_tiles
+
+
 
     #Animations
     def character_pain_animation(self):
@@ -310,7 +324,7 @@ class Ettin(pygame.sprite.Sprite):
             
             if -(self.maxhealth//2) >= self.health:
                 sound_player.ettin_death_sound.stop()
-                random.choice(sound_player.player_overkill_sounds).play()
+                sound_player.ettin_overkill_sound.play()
                 self.is_living = False
                 self.is_in_pain = False
                 self.is_dying = False

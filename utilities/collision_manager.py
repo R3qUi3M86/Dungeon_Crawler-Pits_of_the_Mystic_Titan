@@ -15,6 +15,7 @@ def detect_all_collisions():
             entity_vs_level_collision(owner_entity_sprite)
 
         elif owner_entity_sprite.TYPE is MONSTER:
+            pass
             monster_vs_monster_collision(owner_entity_sprite)
             entity_vs_level_collision(owner_entity_sprite)
         
@@ -39,14 +40,23 @@ def player_vs_monster_movement_collision():
                 #slow_down_player()
                 
 def entity_vs_level_collision(character_sprite):
-    for level_collision_sprite_group in entity_manager.level_collision_sprite_groups:
-        if entity_in_vicinity(character_sprite, level_collision_sprite_group.sprite) and character_sprite.entity_collider_omni.rect.colliderect(level_collision_sprite_group.sprite.rect):
-            collision_matrix = get_collision_matrix(character_sprite,level_collision_sprite_group.sprite)
+    for level_collision_sprite in character_sprite.vicinity_collision_tiles:
+        
+        if character_sprite.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
             
-            if any_sector_collider_collides(collision_matrix):
-                correct_character_position_by_vector(character_sprite,level_collision_sprite_group.sprite, collision_matrix)
+            if character_sprite.TYPE == PLAYER:
+                collision_matrix = get_collision_matrix(character_sprite,level_collision_sprite)
                 
-                if character_sprite.is_monster and character_sprite.monster_ai.is_path_finding == False and character_sprite.monster_ai.path_finding_is_ready:
+                if any_sector_collider_collides(collision_matrix):
+                    correct_character_position_by_vector(character_sprite,level_collision_sprite, collision_matrix)
+                    
+            if character_sprite.TYPE == MONSTER:
+                collision_matrix = get_collision_matrix(character_sprite,level_collision_sprite)
+                
+                if any_sector_collider_collides(collision_matrix):
+                    correct_character_position_by_vector(character_sprite,level_collision_sprite, collision_matrix)
+        
+                if character_sprite.monster_ai.is_path_finding == False and character_sprite.monster_ai.path_finding_is_ready:
                     character_sprite.monster_ai.initialize_monster_path_finding()
 
 def monster_vs_monster_collision(character_sprite):

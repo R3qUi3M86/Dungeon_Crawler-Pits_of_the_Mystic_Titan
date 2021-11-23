@@ -146,9 +146,9 @@ while True:
     # util.draw_pathfinding_path_for_monster(1)
     # util.draw_pathfinding_path_for_monster(2)
     # util.draw_pathfinding_path_for_monster(3)
-    debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 50)
-    debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 65)
-    debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).vicinity_index_matrix}",x = 10, y = 80)
+    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 50)
+    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 65)
+    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).vicinity_index_matrix}",x = 10, y = 80)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
     cursor.cursor.draw(screen)
     

@@ -16,11 +16,13 @@ player_overkill_sound1 = pygame.mixer.Sound('sounds/player/FGTXDTH1.wav')
 player_overkill_sound2 = pygame.mixer.Sound('sounds/player/FGTXDTH2.wav')
 player_overkill_sound3 = pygame.mixer.Sound('sounds/player/FGTXDTH3.wav')
 
-ettin_pain_sound = pygame.mixer.Sound('sounds/attack/monster_pain/CENT1.wav')
-ettin_death_sound = pygame.mixer.Sound('sounds/attack/monster_pain/CNTDTH1.wav')
+ettin_growl_sound = pygame.mixer.Sound('sounds/ettin/GROWL.wav')
+ettin_pain_sound = pygame.mixer.Sound('sounds/ettin/PAIN.wav')
+ettin_death_sound = pygame.mixer.Sound('sounds/ettin/DEATH.wav')
+ettin_overkill_sound = pygame.mixer.Sound('sounds/ettin/OVERKILL.wav')
 
 player_overkill_sounds = [player_overkill_sound1, player_overkill_sound2, player_overkill_sound3]
-all_sounds = [hero_melee_miss_sound,hero_melee_hit_sound,monster_melee_miss_sound,monster_melee_hit_sound,player_pain_sound,player_death_sound,player_overkill_sound1,player_overkill_sound2,player_overkill_sound3,ettin_pain_sound,ettin_death_sound]
+all_sounds = [hero_melee_miss_sound,hero_melee_hit_sound,monster_melee_miss_sound,monster_melee_hit_sound,player_pain_sound,player_death_sound,player_overkill_sound1,player_overkill_sound2,player_overkill_sound3,ettin_growl_sound,ettin_pain_sound,ettin_death_sound,ettin_overkill_sound]
 
 def set_volume_for_all_sounds(volume):
     for sound in all_sounds:
