@@ -80,6 +80,12 @@ def generate_monsters():
     generate_monster(ETTIN, (7,3))
     generate_monster(ETTIN, (7,8))
     generate_monster(ETTIN, (6,7))
+    generate_monster(ETTIN,(11,22))
+    generate_monster(ETTIN, (11,23))
+    generate_monster(ETTIN, (11,24))
+    generate_monster(ETTIN, (10,22))
+    generate_monster(ETTIN, (10,23))
+    generate_monster(ETTIN, (10,24))
     # pass
 
 def generate_monster(monster_type, tile_index):

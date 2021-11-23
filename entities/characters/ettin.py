@@ -193,27 +193,26 @@ class Ettin(pygame.sprite.Sprite):
             self.monster_ai.reset_obstacle_avoidance_flags()
             self.monster_ai.end_pathfinding()
 
-    def update_animation(self):
-        self.set_character_animation_direction_indices()
-        
+    def update_animation(self): 
         if self.is_living:
+            self.set_character_animation_direction_indices()
             self.character_walk_forward_animation()
 
         if self.is_in_pain:
+            self.set_character_animation_direction_indices()
             self.character_pain_animation()
         
         if self.is_attacking:
+            self.set_character_animation_direction_indices()
             self.character_attack_animation()
         
         if self.is_dying:
             self.character_death_animation()
 
-        if self.is_overkilled :
+        if self.is_overkilled:
             self.character_overkill_animation()
     
     def update_owned_sprites_position(self):
-        self.pathfinding_collision_rect = pygame.Rect((self.position[0] - 2, self.position[1] -2),(4,4))
-
         for auxilary_sprites_row in self.entity_auxilary_sprites:
             for auxilary_sprite in auxilary_sprites_row:
                 auxilary_sprite.position = self.position
