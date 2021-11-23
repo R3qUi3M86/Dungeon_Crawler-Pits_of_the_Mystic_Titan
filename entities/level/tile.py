@@ -20,6 +20,7 @@ class Tile(pygame.sprite.Sprite):
         
         self.image_surface_unscaled = self.get_tile_image()
         self.image = pygame.transform.scale(self.image_surface_unscaled, size)
+        self.cluster_x_y = self.get_cluster_x_y()
         self.mask = self.get_tile_mask()
         self.rect = self.image.get_rect(center = (self.position))
 
@@ -62,7 +63,9 @@ class Tile(pygame.sprite.Sprite):
     def get_tile_mask(self):
         if self.passable == True:
             return pygame.mask.from_surface(empty_tile_image)
-        else:
+        elif self.image_surface_unscaled in blue_water_border_convex_images[0] or self.image_surface_unscaled in blue_water_border_convex_images[1]:
+            return pygame.mask.from_surface(blue_water_border_convex_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]])
+        else:         
             return pygame.mask.from_surface(level_tile_collider)
 
     def deep_water(self):
@@ -79,7 +82,7 @@ class Tile(pygame.sprite.Sprite):
         return False
 
     def water_top_left_convex(self):
-        if self.vicinity_matrix[0][0] == FLOOR and self.vicinity_matrix[1][0] == FLOOR and self.vicinity_matrix[0][1] == FLOOR:
+        if self.vicinity_matrix[1][0] == FLOOR and self.vicinity_matrix[0][1] == FLOOR:
             if self.vicinity_matrix[1][2] == WATER and self.vicinity_matrix[2][1] == WATER:
                 return True
 
@@ -97,6 +100,14 @@ class Tile(pygame.sprite.Sprite):
         if self.vicinity_matrix[1][0] == FLOOR and self.vicinity_matrix[2][1] == FLOOR:
             if self.vicinity_matrix[0][1] == WATER and self.vicinity_matrix[1][2] == WATER:
                 return True
+
+    def get_cluster_x_y(self):
+        if self.image_surface_unscaled in blue_water_border_convex_images[0] or self.image_surface_unscaled in blue_water_border_convex_images[1]:
+            for i in range(2):
+                for j in range(2):
+                    if blue_water_border_convex_images[i][j] == self.image_surface_unscaled:
+                        return i,j
+
 
     def get_passable(self):
         if self.type in IMPASSABLE_TILES:

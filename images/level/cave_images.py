@@ -97,8 +97,14 @@ blue_water_border_top_left_convex = pygame.image.load("images/level/cave/blue_wa
 blue_water_border_top_right_convex = pygame.image.load("images/level/cave/blue_water/coastal/convex/blue_water_border_top_right_convex.png").convert_alpha()
 blue_water_border_bottom_left_convex = pygame.image.load("images/level/cave/blue_water/coastal/convex/blue_water_border_bottom_left_convex.png").convert_alpha()
 blue_water_border_bottom_right_convex = pygame.image.load("images/level/cave/blue_water/coastal/convex/blue_water_border_bottom_right_convex.png").convert_alpha()
+blue_water_border_top_left_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_top_left_convex_collider.png").convert_alpha()
+blue_water_border_top_right_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_top_right_convex_collider.png").convert_alpha()
+blue_water_border_bottom_left_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_bottom_left_convex_collider.png").convert_alpha()
+blue_water_border_bottom_right_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_bottom_right_convex_collider.png").convert_alpha()
 blue_water_border_convex_images = [[blue_water_border_top_left_convex,blue_water_border_top_right_convex],
                                    [blue_water_border_bottom_left_convex,blue_water_border_bottom_right_convex]]
+blue_water_border_convex_colliders = [[blue_water_border_top_left_convex_collider,blue_water_border_top_right_convex_collider],
+                                      [blue_water_border_bottom_left_convex_collider,blue_water_border_bottom_right_convex_collider]]
 
 #Concave
 blue_water_border_top_left_concave = pygame.image.load("images/level/cave/blue_water/coastal/concave/blue_water_border_top_left_concave.png").convert_alpha()
