@@ -130,6 +130,7 @@ while True:
     entity_manager.update_hero_position()
     entity_manager.update_all_non_player_entities_position_by_vector(entity_manager.hero.speed_vector)
     collision_manager.detect_all_collisions()
+    cursor.cursor.update()
 
     #Events
     for event in pygame.event.get():
@@ -149,9 +150,7 @@ while True:
     debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 65)
     debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).vicinity_index_matrix}",x = 10, y = 80)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
-    
     cursor.cursor.draw(screen)
-    cursor.cursor.update()
     
     #Other
     pygame.display.update()

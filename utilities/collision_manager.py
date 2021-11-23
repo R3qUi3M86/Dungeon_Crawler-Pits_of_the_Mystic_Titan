@@ -53,7 +53,6 @@ def monster_vs_monster_collision(character_sprite):
     for entity_sprite_group in entity_manager.entity_sprite_groups:
         colliding_entity_sprite = entity_sprite_group.sprite
 
-
         if colliding_entity_sprite != entity_manager.hero and character_sprite != colliding_entity_sprite and entity_in_vicinity(character_sprite, colliding_entity_sprite):
             character_collider = character_sprite.entity_collider_omni
             entity_collider = colliding_entity_sprite.entity_collider_omni.rect
@@ -311,7 +310,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         current_collision_matrix = get_collision_matrix(current_entity_sprite,colliding_entity_sprite)
 
     if current_entity_sprite == entity_manager.hero:
-        adjust_player_speed_scalar(speed_correction_vector)
+        adjust_player_speed_scalar(speed_correction_vector,15)
         
 def bump_monster_back(player_sprite, monster_sprite, collision_matrix):
     bounce_vector = 0,0
