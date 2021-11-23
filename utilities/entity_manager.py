@@ -55,7 +55,8 @@ def update_all_entities():
 
 def update_all_non_player_entities_position_by_vector(vector):
     update_non_player_group_single_entities_position(vector,entity_sprite_groups)
-    update_non_player_group_single_entities_position(vector,level_sprite_groups)
+    if round(hero.speed_scalar[0],2) != 0.0 or round(hero.speed_scalar[1],2) != 0.0:
+        update_non_player_group_single_entities_position(vector,level_sprite_groups)
     update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
 
 def update_hero_position():
@@ -130,7 +131,7 @@ def fix_all_dead_objects_to_pixel_accuracy():
 
 def fix_all_tiles_to_pixel_accuracy():
     for level_sprite_group in level_sprite_groups:
-        level_sprite_group.sprite.position = math.floor(level_sprite_group.sprite.position[0]), math.floor(level_sprite_group.sprite.position[1])
+        level_sprite_group.sprite.position = math.ceil(level_sprite_group.sprite.position[0]), math.ceil(level_sprite_group.sprite.position[1])
 
 def fix_player_position_to_pixel_accuracy():
     hero.position = math.floor(hero.position[0]), math.floor(hero.position[1])
