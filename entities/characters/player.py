@@ -99,6 +99,10 @@ class Hero(pygame.sprite.Sprite):
         self.health = 20
         self.maxhealth = 20
         self.damage = 4
+        self.x_range = 58
+        self.y_range = 32
+        self.x_size = 20
+        self.y_size = 11
         self.attack_can_be_interrupted = False
         self.can_shoot = False
         self.projectile_type = None

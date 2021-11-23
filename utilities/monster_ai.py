@@ -8,8 +8,6 @@ from utilities.constants import *
 class Ai():
     def __init__(self,owner, pathfinding_matrix, tile_index):
         self.monster = owner
-        self.moving_direction = SECTOR_S
-        self.player_direction_sector = SECTOR_S
 
         self.direction_change_decision_timer = 0.0
         self.direction_change_decision_timer_limit = 6

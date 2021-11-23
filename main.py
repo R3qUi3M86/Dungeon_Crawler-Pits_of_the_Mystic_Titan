@@ -104,10 +104,10 @@ def draw_sprites():
 
     # for tile in entity_manager.level_sprite_groups:
     #     tile.draw(screen)
-    for melee_sector_sprite_group in entity_manager.melee_sector_sprite_groups:
-        melee_sector_sprite_group.draw(screen)
-    for entity_collision_sprite_group in entity_manager.entity_collision_sprite_groups:
-        entity_collision_sprite_group.draw(screen)
+    # for melee_sector_sprite_group in entity_manager.melee_sector_sprite_groups:
+    #     melee_sector_sprite_group.draw(screen)
+    # for entity_collision_sprite_group in entity_manager.entity_collision_sprite_groups:
+    #     entity_collision_sprite_group.draw(screen)
     for shadow in entity_manager.shadow_sprite_groups:
         shadow.draw(screen)
     for entity in entity_manager.entity_sprite_groups:
@@ -147,7 +147,7 @@ while True:
     # util.draw_pathfinding_path_for_monster(1)
     # util.draw_pathfinding_path_for_monster(2)
     # util.draw_pathfinding_path_for_monster(3)
-    debug_text(f"108 tile_index: {entity_manager.level_sprite_groups[108].sprite.tile_index}",x = 10, y = 45)
+    debug_text(f"109 tile_index: {entity_manager.level_sprite_groups[109].sprite.tile_index}",x = 10, y = 45)
     debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 60)
     debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 75)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)

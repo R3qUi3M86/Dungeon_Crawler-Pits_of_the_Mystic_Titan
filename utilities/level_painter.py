@@ -19,10 +19,11 @@ def set_player_tile_index():
         for col_index,cell in enumerate(level_layout_row):
             if cell_is_starting_position(row_index,col_index,cell):
                 player_starting_tile_index = row_index,col_index
+                print(f"hero starting tile: {player_starting_tile_index}")
                 entity_manager.hero.tile_index = player_starting_tile_index
 
 def set_player_position_on_map():
-    entity_manager.hero.map_position = TILE_SIZE[0]//2+(48*entity_manager.hero.tile_index[0])+screen_width//2,TILE_SIZE[1]//2+(48*entity_manager.hero.tile_index[1]+screen_height//2)
+    entity_manager.hero.map_position = TILE_SIZE[0]//2+(48*entity_manager.hero.tile_index[1])+screen_width//2,TILE_SIZE[1]//2+(48*entity_manager.hero.tile_index[0]+screen_height//2)
     level
 
 def create_all_level_tiles():
@@ -34,11 +35,10 @@ def create_all_level_tiles():
     for row_index,level_layout_row in enumerate(level):
         for col_index,cell in enumerate(level_layout_row):
             type = cell
-            level_position_index = row_index,col_index
             tile_index = row_index,col_index
             position = get_tile_position(tile_index)
             vicinity_matrix = get_vicinity_matrix_for_tile_index(tile_index)
-            create_level_tile(type,level_position_index,position,TILE_SIZE,vicinity_matrix)
+            create_level_tile(type,tile_index,position,TILE_SIZE,vicinity_matrix)
     
     generate_pathfinding_matrix()
 
@@ -58,8 +58,8 @@ def cell_is_starting_position(row_index,col_index,cell):
     return False
 
 def get_tile_position(tile_index):
-    index_distance_x = tile_index[1] - player_starting_tile_index[1]
     index_distance_y = tile_index[0] - player_starting_tile_index[0]
+    index_distance_x = tile_index[1] - player_starting_tile_index[1]
 
     distance_x = TILE_SIZE[0]*index_distance_x
     distance_y = TILE_SIZE[1]*index_distance_y

@@ -102,6 +102,10 @@ class Ettin(pygame.sprite.Sprite):
         self.health = 10
         self.maxhealth = 10
         self.damage = 0
+        self.x_range = 58
+        self.y_range = 32
+        self.x_size = 20
+        self.y_size = 11
         self.attack_interruption_chance = 50
         self.attack_can_be_interrupted = True
         self.can_shoot = False

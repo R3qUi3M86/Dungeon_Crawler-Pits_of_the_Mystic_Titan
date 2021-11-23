@@ -66,14 +66,15 @@ def monster_vs_monster_collision(character_sprite):
         if colliding_entity_sprite != entity_manager.hero and character_sprite != colliding_entity_sprite:
             
             if not entity_sprite_group.sprite.is_corpse:
-                character_collider = character_sprite.entity_collider_omni
-                entity_collider = colliding_entity_sprite.entity_collider_omni.rect
-                
-                if character_collider.rect.colliderect(entity_collider):
-                    collision_matrix = get_collision_matrix(character_sprite,colliding_entity_sprite)
+                if entity_in_vicinity(character_sprite,colliding_entity_sprite):
+                    character_collider = character_sprite.entity_collider_omni
+                    entity_collider = colliding_entity_sprite.entity_collider_omni.rect
+                    
+                    if character_collider.rect.colliderect(entity_collider):
+                        collision_matrix = get_collision_matrix(character_sprite,colliding_entity_sprite)
 
-                    if any_sector_collider_collides(collision_matrix):
-                        adjust_monster_movement_vector(character_sprite, collision_matrix)
+                        if any_sector_collider_collides(collision_matrix):
+                            adjust_monster_movement_vector(character_sprite, collision_matrix)
 
 def projectile_collision(projectile_sprite):
     #Projectile collision logic

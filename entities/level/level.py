@@ -22,10 +22,10 @@ test_map = [
 ]
 
 level_01_map = [
-"XXEEEXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-"XXEEEXXXXXXX     XXXX           XXX",
-"XXEEEXXXXX        XX           XXXX",
-"XX   XXXXXXXX     XX           XX X",
+"XXXEEEXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XXXEEEXXXXXX     XXXX           XXX",
+"XXXEEEXXXXX       XX           XXXX",
+"XX    XXXXXXX     XX           XX X",
 "X        XXXX                  XX X",
 "X   *    XXXX         XXXX   ``   X",
 "XXO           O       XXXX   ``XXXX",
