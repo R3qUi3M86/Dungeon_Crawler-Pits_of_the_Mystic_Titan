@@ -1,7 +1,5 @@
 from sounds import sound_player
-from entities.characters import unique_player_object
 from utilities import entity_manager
-from utilities import collision_manager
 from utilities.constants import *
 
 def attack_monster_with_melee_attack(damage):
@@ -13,12 +11,12 @@ def attack_monster_with_melee_attack(damage):
     for entity_sprite_group in entity_manager.entity_sprite_groups:
         entity_sprite = entity_sprite_group.sprite
         
-        if entity_sprite != unique_player_object.HERO and not entity_sprite.is_dead and not entity_sprite.is_overkilled:
+        if entity_sprite != entity_manager.hero and not entity_sprite.is_dead and not entity_sprite.is_overkilled:
             enemy_has_been_hit = False
             
-            for melee_sector in unique_player_object.HERO.entity_melee_sector_sprites:
+            for melee_sector in entity_manager.hero.entity_melee_sector_sprites:
                 if melee_sector.rect.colliderect(entity_sprite_group.sprite.entity_collider_omni.rect):
-                    if melee_sector.sector == unique_player_object.HERO.facing_direction and pygame.sprite.collide_mask(melee_sector, entity_sprite_group.sprite.entity_collider_omni) != None:
+                    if melee_sector.sector == entity_manager.hero.facing_direction and pygame.sprite.collide_mask(melee_sector, entity_sprite_group.sprite.entity_collider_omni) != None:
                         enemy_has_been_hit = True
                         break
             
@@ -37,14 +35,14 @@ def attack_player_with_melee_attack(monster, damage):
     hit = False
 
     for melee_sector in monster.entity_melee_sector_sprites:
-        if melee_sector.rect.colliderect(unique_player_object.HERO.entity_collider_omni.rect) and pygame.sprite.collide_mask(melee_sector,unique_player_object.HERO.entity_collider_omni):
+        if melee_sector.rect.colliderect(entity_manager.hero.entity_collider_omni.rect) and pygame.sprite.collide_mask(melee_sector,entity_manager.hero.entity_collider_omni):
             if melee_sector.sector == monster.facing_direction:
                 hit = True
                 break
     
     if hit:
         play_melee_attack_sound(monster.NAME, HIT)
-        unique_player_object.HERO.take_damage(damage)
+        entity_manager.hero.take_damage(damage)
     else:
         play_melee_attack_sound(monster.NAME, MISS)
 

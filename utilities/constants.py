@@ -9,6 +9,7 @@ PLAYER = "player"
 MONSTER = "monster"
 PROJECTILE = "projectile"
 ITEM = "item"
+TILE = "tile"
 ETTIN = "ettin"
 
 HIT = True

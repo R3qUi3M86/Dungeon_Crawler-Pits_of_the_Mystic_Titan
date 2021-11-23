@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from copy import deepcopy
 from utilities.constants import *
 from utilities import entity_manager
 from settings import *
@@ -87,7 +88,17 @@ def generate_entity_id():
         entity_manager.entities_id.append(len(entity_manager.entities_id))
         return entity_manager.entities_id[len(entity_manager.entities_id)-1]
 
-def draw_pathfinding_path_for_monster(monster_index):
-    monster_sprite = entity_manager.get_entity_sprite_by_id(monster_index)
-    if monster_sprite != None:
-        monster_sprite.monster_ai.pathfinder.draw_path()
+def get_vicinity_matrix_indices_for_index(index_x_y):
+    vicinity_matrix = []
+    for i in range(3):
+        vicinity_matrix_row = []
+        for j in range(3):
+            vicinity_matrix_row.append((index_x_y[0]+i-1,index_x_y[1]+j-1))
+        
+        vicinity_matrix.append(deepcopy(vicinity_matrix_row))
+
+    return vicinity_matrix
+# def draw_pathfinding_path_for_monster(monster_index):
+#     monster_sprite = entity_manager.get_entity_sprite_by_id(monster_index)
+#     if monster_sprite != None:
+#         monster_sprite.monster_ai.pathfinder.draw_path()

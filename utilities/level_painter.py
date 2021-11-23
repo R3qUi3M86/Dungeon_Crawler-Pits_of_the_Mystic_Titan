@@ -3,7 +3,6 @@ from copy import deepcopy
 from settings import *
 from entities.level.level import *
 from entities.level.tile import Tile
-from entities.characters import unique_player_object
 from utilities import entity_manager
 from utilities import collision_manager
 
@@ -19,10 +18,10 @@ def set_player_tile_index():
         for col_index,cell in enumerate(level_layout_row):
             if cell_is_starting_position(row_index,col_index,cell):
                 player_starting_tile_index = row_index,col_index
-                unique_player_object.HERO.tile_index = player_starting_tile_index
+                entity_manager.hero.tile_index = player_starting_tile_index
 
 def set_player_position_on_map():
-    unique_player_object.HERO.map_position = TILE_SIZE[0]//2+(48*unique_player_object.HERO.tile_index[0]),TILE_SIZE[1]//2+(48*unique_player_object.HERO.tile_index[1])
+    entity_manager.hero.map_position = TILE_SIZE[0]//2+(48*entity_manager.hero.tile_index[0]),TILE_SIZE[1]//2+(48*entity_manager.hero.tile_index[1])
 
 def create_all_level_tiles():
     set_player_tile_index()
@@ -34,7 +33,7 @@ def create_all_level_tiles():
             level_position_index = row_index,col_index
             tile_index = row_index,col_index
             position = get_tile_position(tile_index)
-            vicinity_matrix = get_vicinity_matrix_for_tile(tile_index)
+            vicinity_matrix = get_vicinity_matrix_for_tile_index(tile_index)
             create_level_tile(type,level_position_index,position,TILE_SIZE,vicinity_matrix)
     
     generate_pathfinding_matrix()
@@ -62,14 +61,19 @@ def get_tile_position(tile_index):
 
     return position_x,position_y
 
-def get_vicinity_matrix_for_tile(tile_index):
+def get_tile_sprite_by_index(tile_index):
+    for tile in entity_manager.level_sprite_groups:
+        if tile.sprite.tile_index == tile_index:
+            return tile.sprite
+
+def get_vicinity_matrix_for_tile_index(index_x_y):
     vicinity_matrix = []
     for i in range(3):
         vicinity_matrix_row = []
         
         for j in range(3):
-            if 0 <= tile_index[0]+i-1 < len(level) and 0 <= tile_index[1]+j-1 < len(level[0]):
-                cell = level[tile_index[0]+i-1][tile_index[1]+j-1]
+            if 0 <= index_x_y[0]+i-1 < len(level) and 0 <= index_x_y[1]+j-1 < len(level[0]):
+                cell = level[index_x_y[0]+i-1][index_x_y[1]+j-1]
             else:
                 cell = WALL
             vicinity_matrix_row.append(cell)
@@ -77,11 +81,6 @@ def get_vicinity_matrix_for_tile(tile_index):
         vicinity_matrix.append(deepcopy(vicinity_matrix_row))
 
     return vicinity_matrix
-
-def get_tile_sprite_by_index(tile_index):
-    for tile in entity_manager.level_sprite_groups:
-        if tile.sprite.tile_index == tile_index:
-            return tile.sprite
 
 def generate_pathfinding_matrix():
     for row_index,level_layout_row in enumerate(level):

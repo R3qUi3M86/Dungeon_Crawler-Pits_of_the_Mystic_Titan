@@ -10,7 +10,6 @@ from utilities import level_painter
 from utilities import monster_ai
 from utilities.constants import *
 from images.characters.ettin_images import *
-from entities.characters import unique_player_object
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
 
@@ -24,8 +23,10 @@ class Ettin(pygame.sprite.Sprite):
 
         ###Position variables###
         self.tile_index = tile_index
+        self.prevous_tile_index = tile_index
+        self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(tile_index)
         self.position = level_painter.get_tile_position(tile_index)
-        self.map_position = round(self.position[0]-player_position[0]+unique_player_object.HERO.tile_index[0],2), round(self.position[1]-player_position[1]+unique_player_object.HERO.tile_index[1],2)
+        self.map_position = round(self.position[0]-player_position[0]+entity_manager.hero.tile_index[0],2), round(self.position[1]-player_position[1]+entity_manager.hero.tile_index[1],2)
         self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
         
         ###Object ID###
@@ -117,7 +118,7 @@ class Ettin(pygame.sprite.Sprite):
             self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
             self.rect = self.image.get_rect(midbottom = (self.sprite_position))
             self.update_owned_sprites()
-        
+    
             if self.is_living:
                 self.update_decisions()
 
@@ -130,17 +131,18 @@ class Ettin(pygame.sprite.Sprite):
     def update_position(self, vector):
         self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
         self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
-        self.map_position = round(self.position[0]+unique_player_object.HERO.map_position[0]-player_position[0],2), round(self.position[1]+unique_player_object.HERO.map_position[1]-player_position[1],2)
+        self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
         self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
+        
+        if self.tile_index != self.prevous_tile_index:
+            self.prevous_tile_index = self.tile_index
+            self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+        
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
         self.update_owned_sprites_position()
-
-    def update_map_position_by_vector(self,vector):
-        self.map_position = self.map_position[0]+vector[0], self.map_position[1]+vector[1]
-        self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
     
     def update_decisions(self):
-        if  unique_player_object.HERO.is_living == False:
+        if  entity_manager.hero.is_living == False:
             self.speed_vector = 0,0
 
         if self.is_living == True:

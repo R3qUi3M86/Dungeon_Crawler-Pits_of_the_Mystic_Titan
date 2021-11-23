@@ -3,6 +3,7 @@ import random
 from settings import *
 from sounds import sound_player
 from utilities import combat_manager
+from utilities import util
 from utilities.level_painter import TILE_SIZE
 from utilities.text_printer import *
 from utilities.constants import *
@@ -20,6 +21,8 @@ class Hero(pygame.sprite.Sprite):
 
         ###Position variables###
         self.tile_index = 0,0
+        self.prevous_tile_index = self.tile_index
+        self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.position = position
         self.map_position = 0,0
         self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
@@ -118,6 +121,10 @@ class Hero(pygame.sprite.Sprite):
     def update_position(self,vector):
         self.map_position = round(self.map_position[0] + vector[0],2),round(self.map_position[1] + vector[1],2)
         self.tile_index = int(self.map_position[1] // TILE_SIZE[X]), int(self.map_position[0]// TILE_SIZE[Y])
+        
+        if self.tile_index != self.prevous_tile_index:
+            self.prevous_tile_index = self.tile_index
+            self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
 
     def update_animation(self):
         if not self.is_dead:

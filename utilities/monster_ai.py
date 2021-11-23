@@ -1,9 +1,9 @@
 import random
 from utilities import util
 from utilities import pathfinder
-from utilities.constants import *
 from utilities import level_painter
-from entities.characters import unique_player_object
+from utilities import entity_manager
+from utilities.constants import *
 
 class Ai():
     def __init__(self,owner, pathfinding_matrix, tile_index):
@@ -202,11 +202,11 @@ class Ai():
 
     #Combat decisions
     def monster_can_melee_attack_player(self):
-        if unique_player_object.HERO.is_living == True:
+        if entity_manager.hero.is_living == True:
             self.player_direction_sector = util.get_facing_direction(self.monster.position,player_position)
             for melee_sprite in self.monster.entity_melee_sector_sprites:
-                if melee_sprite.rect.colliderect(unique_player_object.HERO.entity_collider_omni):
-                    if pygame.sprite.collide_mask(melee_sprite, unique_player_object.HERO.entity_collider_omni):
+                if melee_sprite.rect.colliderect(entity_manager.hero.entity_collider_omni):
+                    if pygame.sprite.collide_mask(melee_sprite, entity_manager.hero.entity_collider_omni):
                         return True
         return False
 

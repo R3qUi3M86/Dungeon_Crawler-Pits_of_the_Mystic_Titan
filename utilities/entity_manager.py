@@ -1,12 +1,13 @@
 import pygame
 import math
 from utilities.constants import *
-from entities.characters import unique_player_object
 from entities.characters.ettin import Ettin
+from entities.characters.player import Hero
 
 entities_id = []
 
 #Standard entities
+hero = Hero(player_position)
 entity_sprite_groups = []
 shadow_sprite_groups = []
 level_sprite_groups = []
@@ -16,6 +17,13 @@ projectile_sprite_groups = []
 level_collision_sprite_groups = [] #For collision search optimization
 melee_sector_sprite_groups = []
 entity_collision_sprite_groups = []
+
+#Hero entity initialization
+def initialize_player_object():
+    entity_sprite_groups.append(pygame.sprite.GroupSingle(hero))
+    shadow_sprite_groups.append(pygame.sprite.GroupSingle(hero.shadow))
+    melee_sector_sprite_groups.append(pygame.sprite.Group(hero.entity_melee_sector_sprites))
+    entity_collision_sprite_groups.append(pygame.sprite.Group(hero.entity_collider_sprites))  
 
 #Get sprites
 def get_level_collision_sprite_by_index(index):
@@ -50,9 +58,12 @@ def update_all_non_player_entities_position_by_vector(vector):
     update_non_player_group_single_entities_position(vector,level_sprite_groups)
     update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
 
+def update_hero_position():
+    hero.update_position(hero.speed_vector)
+
 def update_non_player_group_single_entities_position(vector,entities):
     for entity in entities:
-        if entity.sprite != unique_player_object.HERO:
+        if entity.sprite != hero:
             entity.sprite.update_position(vector)
 
 def update_non_player_group_entities_position(vector,entities):
@@ -64,11 +75,12 @@ def update_non_player_group_entities_position(vector,entities):
 #Monster generation
 def generate_monsters():
     generate_monster(ETTIN,(3,4))
-    generate_monster(ETTIN, (4,2))
+    generate_monster(ETTIN, (5,6))
     generate_monster(ETTIN, (4,1))
     generate_monster(ETTIN, (7,3))
     generate_monster(ETTIN, (7,8))
-    # generate_monster(ETTIN, (6,7))
+    generate_monster(ETTIN, (6,7))
+    # pass
 
 def generate_monster(monster_type, tile_index):
     if monster_type == ETTIN:
@@ -115,5 +127,5 @@ def fix_all_tiles_to_pixel_accuracy():
         level_sprite_group.sprite.position = math.floor(level_sprite_group.sprite.position[0]), math.floor(level_sprite_group.sprite.position[1])
 
 def fix_player_position_to_pixel_accuracy():
-    unique_player_object.HERO.position = math.floor(unique_player_object.HERO.position[0]), math.floor(unique_player_object.HERO.position[1])
-    unique_player_object.HERO.map_position = math.floor(unique_player_object.HERO.map_position[0]), math.floor(unique_player_object.HERO.map_position[1])
+    hero.position = math.floor(hero.position[0]), math.floor(hero.position[1])
+    hero.map_position = math.floor(hero.map_position[0]), math.floor(hero.map_position[1])

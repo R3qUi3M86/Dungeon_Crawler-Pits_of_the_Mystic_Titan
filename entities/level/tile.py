@@ -2,13 +2,15 @@ import pygame
 import random
 from entities.level.level import *
 from images.level.cave_images import *
-from utilities import level_painter
 from images.misc.colliders import *
+from utilities.constants import *
+from utilities import level_painter
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self,type,tile_index,pos,size,vicinity_matrix):
         super().__init__()
         self.type = type
+        self.TYPE = TILE
         self.tile_index = tile_index
         self.position = pos
         self.map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
