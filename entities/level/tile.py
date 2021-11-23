@@ -30,7 +30,10 @@ class Tile(pygame.sprite.Sprite):
     def get_tile_image(self):
         if self.type == FLOOR:
             if self.vicinity_matrix[0][1] != ENTRANCE:
-                return random.choice(floor_tile_images)
+                if random.choice(range(20)) > 1:
+                    return random.choice(floor_tile_images)
+                else:
+                    return random.choice(debree_tile_images)
             else:
                 if self.vicinity_matrix[0][0] != ENTRANCE:
                     return floor_tile_entrance_images[0]
@@ -38,7 +41,21 @@ class Tile(pygame.sprite.Sprite):
                     return floor_tile_entrance_images[2]
                 else:
                     return floor_tile_entrance_images[1]
-        
+        elif self.type == WATER:
+            if self.deep_water():
+                return random.choice(blue_water_images)
+            elif self.left_water_border():
+                return blue_water_border_left
+            elif self.water_top_left_convex():
+                return blue_water_border_top_left_convex
+            elif self.water_top_right_convex():
+                return blue_water_border_top_right_convex
+            elif self.water_bottom_left_convex():
+                return blue_water_border_bottom_left_convex
+            elif self.water_bottom_right_convex():
+                return blue_water_border_bottom_right_convex
+            else:
+                return blank
         else:
             return blank
 
@@ -47,6 +64,39 @@ class Tile(pygame.sprite.Sprite):
             return pygame.mask.from_surface(empty_tile_image)
         else:
             return pygame.mask.from_surface(level_tile_collider)
+
+    def deep_water(self):
+        for row in self.vicinity_matrix:
+            for cell in row:
+                if cell != WATER:
+                    return False
+        return True
+
+    def left_water_border(self):
+        if self.vicinity_matrix[0][0] == FLOOR and self.vicinity_matrix[1][0] == FLOOR and self.vicinity_matrix[2][0] == FLOOR:
+            if self.vicinity_matrix[0][1] == WATER and self.vicinity_matrix[0][2] == WATER and self.vicinity_matrix[1][2] == WATER and self.vicinity_matrix[2][1] == WATER and self.vicinity_matrix[2][2] == WATER:
+                return True
+        return False
+
+    def water_top_left_convex(self):
+        if self.vicinity_matrix[0][0] == FLOOR and self.vicinity_matrix[1][0] == FLOOR and self.vicinity_matrix[0][1] == FLOOR:
+            if self.vicinity_matrix[1][2] == WATER and self.vicinity_matrix[2][1] == WATER:
+                return True
+
+    def water_top_right_convex(self):
+        if self.vicinity_matrix[0][1] == FLOOR and self.vicinity_matrix[1][2] == FLOOR:
+            if self.vicinity_matrix[1][0] == WATER and self.vicinity_matrix[2][1] == WATER:
+                return True
+    
+    def water_bottom_right_convex(self):
+        if self.vicinity_matrix[1][2] == FLOOR and self.vicinity_matrix[2][1] == FLOOR:
+            if self.vicinity_matrix[0][1] == WATER and self.vicinity_matrix[1][0] == WATER:
+                return True
+
+    def water_bottom_left_convex(self):
+        if self.vicinity_matrix[1][0] == FLOOR and self.vicinity_matrix[2][1] == FLOOR:
+            if self.vicinity_matrix[0][1] == WATER and self.vicinity_matrix[1][2] == WATER:
+                return True
 
     def get_passable(self):
         if self.type in IMPASSABLE_TILES:

@@ -73,6 +73,7 @@ blue_water_01 = pygame.image.load("images/level/cave/blue_water/blue_water_01.pn
 blue_water_02 = pygame.image.load("images/level/cave/blue_water/blue_water_02.png").convert_alpha()
 blue_water_03 = pygame.image.load("images/level/cave/blue_water/blue_water_03.png").convert_alpha()
 blue_water_04 = pygame.image.load("images/level/cave/blue_water/blue_water_04.png").convert_alpha()
+blue_water_images = [blue_water_01,blue_water_02,blue_water_03,blue_water_04]
 
 ###Coastal###
 #Straight
