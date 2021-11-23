@@ -8,6 +8,7 @@ from utilities import collision_manager
 
 TILE_SIZE = 48,48
 level = level_01_map
+level_surface = pygame.Surface((((len(level[0])*TILE_SIZE[0])+screen_width,(len(level)*TILE_SIZE[1])+screen_height)))
 #level = test_map
 player_starting_tile_index = 0,0
 
@@ -21,9 +22,12 @@ def set_player_tile_index():
                 entity_manager.hero.tile_index = player_starting_tile_index
 
 def set_player_position_on_map():
-    entity_manager.hero.map_position = TILE_SIZE[0]//2+(48*entity_manager.hero.tile_index[0]),TILE_SIZE[1]//2+(48*entity_manager.hero.tile_index[1])
+    entity_manager.hero.map_position = TILE_SIZE[0]//2+(48*entity_manager.hero.tile_index[0])+screen_width//2,TILE_SIZE[1]//2+(48*entity_manager.hero.tile_index[1]+screen_height//2)
+    level
 
 def create_all_level_tiles():
+    global level_surface
+
     set_player_tile_index()
     set_player_position_on_map()
 
@@ -37,6 +41,10 @@ def create_all_level_tiles():
             create_level_tile(type,level_position_index,position,TILE_SIZE,vicinity_matrix)
     
     generate_pathfinding_matrix()
+
+    level_surface.fill([25, 23, 22])
+    for tile in entity_manager.level_sprite_groups:
+        level_surface.blit(tile.sprite.image,(tile.sprite.map_position))
 
 def create_level_tile(type,level_position_index,position,size,vicinity_matrix):
     new_tile_sprite = Tile(type,level_position_index,position,size,vicinity_matrix)
@@ -92,3 +100,6 @@ def generate_pathfinding_matrix():
             else:
                 matrix_row.append(1)
         collision_manager.pathfinding_matrix.append(matrix_row)
+
+def get_level_surface_x_y():
+    return player_position[0]-entity_manager.hero.map_position[0]-TILE_SIZE[0]/2,player_position[1]-entity_manager.hero.map_position[1]-TILE_SIZE[1]/2

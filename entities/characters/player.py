@@ -122,7 +122,7 @@ class Hero(pygame.sprite.Sprite):
 
     def update_position(self,vector):
         self.map_position = round(self.map_position[0] + vector[0],2),round(self.map_position[1] + vector[1],2)
-        self.tile_index = int(self.map_position[1] // TILE_SIZE[X]), int(self.map_position[0]// TILE_SIZE[Y])
+        self.tile_index = int((self.map_position[1]-screen_height//2) // TILE_SIZE[X]), int((self.map_position[0]-screen_width//2)// TILE_SIZE[Y])
         
         if self.tile_index != self.prevous_tile_index:
             self.prevous_tile_index = self.tile_index

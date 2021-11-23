@@ -13,7 +13,7 @@ class Tile(pygame.sprite.Sprite):
         self.TYPE = TILE
         self.tile_index = tile_index
         self.position = pos
-        self.map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
+        self.map_position = int(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2+screen_width//2), int(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2 + screen_height//2)
         self.size = size
         self.vicinity_matrix = vicinity_matrix
         self.passable = self.get_passable()

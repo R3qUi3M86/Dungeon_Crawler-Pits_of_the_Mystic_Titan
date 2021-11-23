@@ -127,7 +127,7 @@ def kill_entity_colliders_and_melee_entities(id):
 def fix_all_dead_objects_to_pixel_accuracy():
     for entity_sprite_group in entity_sprite_groups:
         if entity_sprite_group.sprite.is_living == False:
-            entity_sprite_group.sprite.position = math.floor(entity_sprite_group.sprite.position[0]), math.floor(entity_sprite_group.sprite.position[1])
+            entity_sprite_group.sprite.position = math.ceil(entity_sprite_group.sprite.position[0]), math.ceil(entity_sprite_group.sprite.position[1])
 
 def fix_all_tiles_to_pixel_accuracy():
     for level_sprite_group in level_sprite_groups:

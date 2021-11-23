@@ -71,7 +71,7 @@ def get_player_wsad_input():
         entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X], -30.0
 
     entity_manager.hero.speed_scalar = round(entity_manager.hero.speed_scalar[0],2),round(entity_manager.hero.speed_scalar[1],2)
-    entity_manager.hero.speed_vector = round(((entity_manager.hero.speed_scalar[X]/30)*entity_manager.hero.speed),2), round(((entity_manager.hero.speed_scalar[Y]/30)*entity_manager.hero.speed*0.55),2)
+    entity_manager.hero.speed_vector = round((entity_manager.hero.speed_scalar[X]/30)*entity_manager.hero.speed,2), round((entity_manager.hero.speed_scalar[Y]/30)*entity_manager.hero.speed*0.55,2)
 
 def get_player_mouse_input():
     mouse_pos = pygame.mouse.get_pos()
@@ -101,8 +101,9 @@ def order_sprites():
                     entity_manager.entity_sprite_groups[j], entity_manager.entity_sprite_groups[j+1] = entity_manager.entity_sprite_groups[j+1], entity_manager.entity_sprite_groups[j]
 
 def draw_sprites():
-    for tile in entity_manager.level_sprite_groups:
-        tile.draw(screen)
+
+    # for tile in entity_manager.level_sprite_groups:
+    #     tile.draw(screen)
     for melee_sector_sprite_group in entity_manager.melee_sector_sprite_groups:
         melee_sector_sprite_group.draw(screen)
     for entity_collision_sprite_group in entity_manager.entity_collision_sprite_groups:
@@ -118,7 +119,6 @@ entity_manager.generate_monsters()
 
 #Main game loop
 while True:
-    screen.fill([25, 23, 22])
     order_sprites()
 
     #Inputs
@@ -139,6 +139,7 @@ while True:
             exit()
 
     #Drawing
+    screen.blit(level_painter.level_surface,(level_painter.get_level_surface_x_y()))
     draw_sprites()
     debug_text(f"{entity_manager.hero.map_position}")
     debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
@@ -146,9 +147,9 @@ while True:
     # util.draw_pathfinding_path_for_monster(1)
     # util.draw_pathfinding_path_for_monster(2)
     # util.draw_pathfinding_path_for_monster(3)
-    debug_text(f"mon 0 map_pos: {entity_manager.level_sprite_groups[0].sprite.position}",x = 10, y = 50)
-    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 65)
-    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).vicinity_index_matrix}",x = 10, y = 80)
+    debug_text(f"108 tile_index: {entity_manager.level_sprite_groups[108].sprite.tile_index}",x = 10, y = 45)
+    debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 60)
+    debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 75)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
     cursor.cursor.draw(screen)
     

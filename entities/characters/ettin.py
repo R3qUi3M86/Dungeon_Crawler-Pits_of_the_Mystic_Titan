@@ -133,7 +133,7 @@ class Ettin(pygame.sprite.Sprite):
         self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
         self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
         self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
-        self.tile_index = int(self.map_position[1])//level_painter.TILE_SIZE[1] , int(self.map_position[0])//level_painter.TILE_SIZE[0]
+        self.tile_index = int(self.map_position[1]-level_painter.screen_height//2)//level_painter.TILE_SIZE[1] , int(self.map_position[0]-level_painter.screen_width//2)//level_painter.TILE_SIZE[0]
         
         if self.tile_index != self.prevous_tile_index:
             self.prevous_tile_index = self.tile_index
@@ -285,22 +285,23 @@ class Ettin(pygame.sprite.Sprite):
 
     #Walk speed vector setting
     def set_speed_vector(self):
-        if self.facing_direction == SECTOR_E:
-            self.speed_vector = 1.4,0
-        elif self.facing_direction == SECTOR_NE:
-            self.speed_vector = 0.99,-0.58
-        elif self.facing_direction == SECTOR_N:
-            self.speed_vector = 0,-0.77
-        elif self.facing_direction == SECTOR_NW:
-            self.speed_vector = -0.99,-0.58
-        elif self.facing_direction == SECTOR_W:
-            self.speed_vector = -1.4,0
-        elif self.facing_direction == SECTOR_SW:
-            self.speed_vector = -0.99,0.58
-        elif self.facing_direction == SECTOR_S:
-            self.speed_vector = 0,0.77
-        elif self.facing_direction == SECTOR_SE:
-            self.speed_vector = 0.99,0.58
+        if self.is_living:
+            if self.facing_direction == SECTOR_E:
+                self.speed_vector = 1.4,0
+            elif self.facing_direction == SECTOR_NE:
+                self.speed_vector = 0.99,-0.58
+            elif self.facing_direction == SECTOR_N:
+                self.speed_vector = 0,-0.77
+            elif self.facing_direction == SECTOR_NW:
+                self.speed_vector = -0.99,-0.58
+            elif self.facing_direction == SECTOR_W:
+                self.speed_vector = -1.4,0
+            elif self.facing_direction == SECTOR_SW:
+                self.speed_vector = -0.99,0.58
+            elif self.facing_direction == SECTOR_S:
+                self.speed_vector = 0,0.77
+            elif self.facing_direction == SECTOR_SE:
+                self.speed_vector = 0.99,0.58
             
     #Combat functions
     def take_damage(self, damage):
