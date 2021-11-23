@@ -204,9 +204,10 @@ class Ai():
     def monster_can_melee_attack_player(self):
         if entity_manager.hero.is_living == True:
             self.player_direction_sector = util.get_facing_direction(self.monster.position,player_position)
-            for melee_sprite in self.monster.entity_melee_sector_sprites:
-                if melee_sprite.rect.colliderect(entity_manager.hero.small_square) and pygame.sprite.collide_mask(melee_sprite, entity_manager.hero.small_square):
-                    return True
+            if self.monster.entity_melee_sector_sprites[0].rect.colliderect(entity_manager.hero.small_square):
+                for melee_sprite in self.monster.entity_melee_sector_sprites:
+                    if pygame.sprite.collide_mask(melee_sprite, entity_manager.hero.small_square):
+                        return True
         return False
 
     #Combat decisions timer

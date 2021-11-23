@@ -23,7 +23,8 @@ class Ettin(pygame.sprite.Sprite):
 
         ###Position variables###
         self.tile_index = tile_index
-        self.prevous_tile_index = tile_index
+        self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
+        self.prevous_tile_index = 0,0
         self.vicinity_collision_tiles = []
         self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(tile_index)
         self.position = level_painter.get_tile_position(tile_index)
@@ -137,6 +138,7 @@ class Ettin(pygame.sprite.Sprite):
         if self.tile_index != self.prevous_tile_index:
             self.prevous_tile_index = self.tile_index
             self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+            self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
             self.update_vicinity_collision_tiles()
         
         self.rect = self.image.get_rect(midbottom = (self.sprite_position))
@@ -233,8 +235,6 @@ class Ettin(pygame.sprite.Sprite):
                     vicinity_collision_tiles.append(collision_tile)
         
         self.vicinity_collision_tiles = vicinity_collision_tiles
-
-
 
     #Animations
     def character_pain_animation(self):
