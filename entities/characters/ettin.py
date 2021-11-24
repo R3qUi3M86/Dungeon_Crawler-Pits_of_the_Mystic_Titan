@@ -133,7 +133,7 @@ class Ettin(pygame.sprite.Sprite):
             if self.is_living:
                 self.update_decisions()
 
-        elif not self.is_corpse or self.is_overkilled:
+        elif not self.is_corpse:
             self.is_corpse = True
             entity_manager.kill_entity_colliders(self.id)
             entity_manager.fix_all_dead_objects_to_pixel_accuracy()

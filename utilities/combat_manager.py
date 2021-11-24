@@ -10,7 +10,7 @@ def attack_monster_with_melee_attack(damage):
         entity = entity_sprite_group.sprite
         hero = entity_manager.hero
         
-        if entity != hero and hero.facing_direction == util.get_facing_direction(hero.map_position, entity.map_position) and util.elipses_intersect(hero.map_position,entity.map_position,hero.melee_range,entity.size):
+        if entity != hero and not (entity.is_dead or entity.is_overkilled) and hero.facing_direction == util.get_facing_direction(hero.map_position, entity.map_position) and util.elipses_intersect(hero.map_position,entity.map_position,hero.melee_range,entity.size):
             hit_monsters.append(entity)
 
     if hit_monsters:
