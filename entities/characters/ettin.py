@@ -4,11 +4,11 @@ from settings import *
 from sounds import sound_player
 from utilities import util
 from utilities import combat_manager
-from utilities import collision_manager
 from utilities import entity_manager
 from utilities import level_painter
 from utilities import monster_ai
 from utilities.constants import *
+from utilities.level_painter import TILE_SIZE
 from images.characters.ettin_images import *
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
@@ -74,7 +74,7 @@ class Ettin(pygame.sprite.Sprite):
         ###Initial sprite definition###
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
         self.rect = self.image.get_rect(midbottom = (self.image_position))
-        self.monster_ai = monster_ai.Ai(self, collision_manager.pathfinding_matrix, tile_index)
+        self.monster_ai = monster_ai.Ai(self, level_painter.pathfinding_matrix, tile_index)
 
         #####General variables#####
         ###Status flags###
@@ -127,15 +127,14 @@ class Ettin(pygame.sprite.Sprite):
             if self.tile_index != self.prevous_tile_index:
                 self.prevous_tile_index = self.tile_index
                 self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+                self.direct_proximity_collision_tiles = entity_manager.get_proximity_objects_list(self.direct_proximity_index_matrix)
                 self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
-                self.direct_proximity_collision_tiles = entity_manager.get_proximity_collision_tiles_list(self.direct_proximity_index_matrix)
-
+            
             if self.is_living:
                 self.update_decisions()
 
         elif not self.is_corpse:
             self.is_corpse = True
-            entity_manager.kill_entity_colliders(self.id)
             entity_manager.fix_all_dead_objects_to_pixel_accuracy()
             entity_manager.fix_player_position_to_pixel_accuracy()
         
@@ -151,9 +150,11 @@ class Ettin(pygame.sprite.Sprite):
     def update_decisions(self):
         if self.is_living == True:
             
-            if  entity_manager.hero.is_living == False:
+            if  entity_manager.hero.is_living == False or self.outside_of_update_range():
                 self.speed_vector = 0,0
                 self.monster_ai.increment_direction_change_decision_timer()
+                self.monster_ai.reset_obstacle_avoidance_flags()
+                self.monster_ai.end_pathfinding()
 
             elif self.monster_ai.monster_can_melee_attack_player():
                 self.initialize_attack_sequence()
@@ -330,4 +331,14 @@ class Ettin(pygame.sprite.Sprite):
         if random.choice(range(1,101)) <= self.attack_interruption_chance:
             return True
         self.attack_can_be_interrupted = False
+        return False
+    
+    #Conditions
+    def outside_of_update_range(self):
+        hero_tile_index = entity_manager.hero.tile_index
+        tile_row_offset = screen_height//2//TILE_SIZE[Y]+far_colliders_matrix_offset_y//2
+        tile_col_offset = screen_width//2//TILE_SIZE[X]+far_colliders_matrix_offset_x//2
+
+        if abs(self.tile_index[0]-hero_tile_index[0]) > tile_row_offset or abs(self.tile_index[1]-hero_tile_index[1]) > tile_col_offset:
+            return True
         return False

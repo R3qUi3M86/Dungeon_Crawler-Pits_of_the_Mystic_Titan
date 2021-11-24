@@ -33,35 +33,40 @@ def get_level_collision_sprite_by_index(index):
     else:
         return level_collision_sprites_matrix[0][0]
 
+def get_entity_sprite_by_index(index):
+    for entity in entity_sprite_groups:
+        if entity.sprite.tile_index == index:
+            return entity
+
 def get_entity_sprite_by_id(entity_id):
     for entity in entity_sprite_groups:
         if entity.sprite.id == entity_id:
             return entity.sprite
 
-def get_proximity_collision_tiles_list(matrix):
-    direct_proximity_collision_tiles = []
+def get_proximity_objects_list(matrix):
+    proximity_objects = []
+    
     for row in matrix:
         for tile_index in row:
             
             if len(level_layout) > tile_index[0] >= 0 and len(level_layout[0]) > tile_index[1] >= 0:
-                collision_tile = get_level_collision_sprite_by_index(tile_index)
+                object = get_level_collision_sprite_by_index(tile_index)
+                if object != None:
+                    proximity_objects.append(object)
             
-                if collision_tile != None:
-                    direct_proximity_collision_tiles.append(collision_tile)
-    
-    return direct_proximity_collision_tiles
+    return proximity_objects
 
 #Updates
 def update_all_entities():
-    global entity_sprite_groups
-    global level_sprite_groups
-    global projectile_sprite_groups
+    # global entity_sprite_groups
+    # global level_sprite_groups
+    # global projectile_sprite_groups
 
     for entity_sprite_group in entity_sprite_groups:
         entity_sprite_group.sprite.update()
     
-    for level_sprite_group in level_sprite_groups:
-        level_sprite_group.sprite.update()
+    # for level_sprite_group in level_sprite_groups:
+    #     level_sprite_group.sprite.update()
 
     for projectile_sprite_group in projectile_sprite_groups:
         sprites = projectile_sprite_group.sprites()
@@ -74,7 +79,6 @@ def update_all_non_player_entities_position_by_vector(vector):
         update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
         update_far_proximity_level_colliders_position()
     
-
 def update_hero_position():
     hero.update_position(hero.speed_vector)
 

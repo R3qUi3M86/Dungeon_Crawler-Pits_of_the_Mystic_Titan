@@ -8,6 +8,7 @@ from utilities import collision_manager
 
 TILE_SIZE = 48,48
 level_layout = level_01_map
+pathfinding_matrix = []
 level_surface = pygame.Surface((((len(level_layout[0])*TILE_SIZE[0])+screen_width,(len(level_layout)*TILE_SIZE[1])+screen_height)))
 #level_layout = test_map
 player_starting_tile_index = 0,0
@@ -100,6 +101,8 @@ def get_proximity_matrix_for_tile_index(index_x_y):
     return vicinity_matrix
 
 def generate_pathfinding_matrix():
+    global pathfinding_matrix
+    
     for row_index,level_layout_row in enumerate(level_layout):
         matrix_row = []
         for col_index,_ in enumerate(level_layout_row):
@@ -108,7 +111,7 @@ def generate_pathfinding_matrix():
                 matrix_row.append(0)
             else:
                 matrix_row.append(1)
-        collision_manager.pathfinding_matrix.append(matrix_row)
+        pathfinding_matrix.append(matrix_row)
 
 def get_level_surface_x_y():
     return player_position[0]-entity_manager.hero.map_position[0]-TILE_SIZE[0]/2,player_position[1]-entity_manager.hero.map_position[1]-TILE_SIZE[1]/2

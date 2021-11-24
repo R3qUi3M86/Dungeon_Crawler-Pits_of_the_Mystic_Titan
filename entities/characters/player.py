@@ -84,6 +84,7 @@ class Hero(pygame.sprite.Sprite):
         self.is_overkilled = False
         self.is_in_pain = False
         self.is_dead = False
+        self.is_corpse = False
 
         ###Character properties###
         #General
@@ -122,11 +123,11 @@ class Hero(pygame.sprite.Sprite):
         
         if self.tile_index != self.prevous_tile_index:
             self.prevous_tile_index = self.tile_index
-            self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-            self.direct_proximity_collision_tiles = entity_manager.get_proximity_collision_tiles_list(self.direct_proximity_index_matrix)
 
             self.far_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index,(screen_height//TILE_SIZE[Y]+far_colliders_matrix_offset_y,screen_width//TILE_SIZE[X]+far_colliders_matrix_offset_x))
-            self.far_proximity_collision_tiles = entity_manager.get_proximity_collision_tiles_list(self.far_proximity_index_matrix)
+            self.far_proximity_collision_tiles = entity_manager.get_proximity_objects_list(self.far_proximity_index_matrix)
+            self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+            self.direct_proximity_collision_tiles = entity_manager.get_proximity_objects_list(self.direct_proximity_index_matrix)
 
     def update_animation(self):
         if not self.is_dead:
@@ -248,7 +249,7 @@ class Hero(pygame.sprite.Sprite):
                 self.is_dying = False
                 self.is_overkilled = True
 
-    #Misc
+    #Conditions
     def facing_southwards(self):
         if self.facing_direction == SECTOR_S or self.facing_direction == SECTOR_SE or self.facing_direction == SECTOR_SW or self.facing_direction == SECTOR_E or self.facing_direction == SECTOR_W:
             return True

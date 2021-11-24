@@ -108,8 +108,6 @@ def elipses_intersect(entity1_map_pos,entity2_map_pos,entity1_a_b,entity2_a_b):
         return False
     
     else:
-        print(f"entity1 ab:{entity1_a_b}")
-        print(f"entity1 ab:{entity2_a_b}")
         angle = get_total_angle(entity1_map_pos,entity2_map_pos)
         entity1_x_abs_reach = abs(entity1_a_b[0]*math.cos(math.radians(angle)))
         entity1_y_abs_reach = abs(entity1_a_b[1]*math.sin(math.radians(angle)))
@@ -121,12 +119,9 @@ def elipses_intersect(entity1_map_pos,entity2_map_pos,entity1_a_b,entity2_a_b):
         distance = math.sqrt((x_abs_distance*x_abs_distance)+(y_abs_distance*y_abs_distance))
         reach = math.sqrt((total_x_reach*total_x_reach)+(total_y_reach*total_y_reach))
 
-        print(f"entity1_y_abs_reach: {entity1_y_abs_reach},entity2_y_abs_reach: {entity2_y_abs_reach}")
-        print(f"angle: {angle}, total_x_reach: {total_x_reach}, total_y_reach: {total_y_reach}, x_abs_distance: {x_abs_distance}, y_abs_distance: {y_abs_distance}")
-        print(f"distance: {distance}, reach: {reach}")
-
         if distance<reach:
             return True
+    
     return False
 
 # def draw_pathfinding_path_for_monster(monster_index):

@@ -126,7 +126,7 @@ class Ai():
             self.direction_change_decision_timer_limit = 6
 
     def set_avoidance_direction_sector(self, monster_position,horizontal = False, vertical = False, diagonal_sw_ne = False, diagonal_se_nw = False):
-        player_direction_angle = self.get_player_direction_angle(monster_position)
+        player_direction_angle = util.get_total_angle(monster_position,player_position)
         if horizontal:
             if 180 > int(player_direction_angle) >= 0:
                 self.avoidance_direction_sector = SECTOR_N
@@ -223,10 +223,7 @@ class Ai():
             self.monster.is_attacking = True
             self.monster.attack_can_be_interrupted = True
             self.attack_decision_timer = 0.0
-    
-    #Misc
-    def get_player_direction_angle(self,monster_position):
-        return util.get_total_angle(monster_position,player_position)
+
 
 
 

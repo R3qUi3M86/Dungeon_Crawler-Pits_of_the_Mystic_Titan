@@ -7,10 +7,15 @@ Y = 1
 
 PLAYER = "player"
 MONSTER = "monster"
+ENTITY = "entity"
 PROJECTILE = "projectile"
+COLLISION_TILE = "collison_tile"
 ITEM = "item"
 TILE = "tile"
 ETTIN = "ettin"
+
+DIRECT = "direct"
+FAR = "far"
 
 HIT = True
 MISS = False

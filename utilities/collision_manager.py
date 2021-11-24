@@ -2,79 +2,66 @@ from utilities.constants import *
 from utilities import entity_manager
 from utilities import util
 
-pathfinding_matrix = []
-
 #Master function
 def detect_all_collisions():
 
-    for entity_collision_sprite_group in entity_manager.entity_collision_sprite_groups:
-        owner_entity_sprite = entity_manager.get_entity_sprite_by_id(entity_collision_sprite_group.sprites()[0].id)
+    for entity_sprite_group in entity_manager.entity_sprite_groups:
+        entity = entity_sprite_group.sprite
         
-        if owner_entity_sprite is entity_manager.hero:
+        if entity is entity_manager.hero:
             player_vs_monster_movement_collision()
-            entity_vs_level_collision(owner_entity_sprite)
+            entity_vs_level_collision(entity)
 
-        elif owner_entity_sprite.TYPE is MONSTER:
-            pass
-            monster_vs_monster_collision(owner_entity_sprite)
-            entity_vs_level_collision(owner_entity_sprite)
+        elif entity.TYPE is MONSTER:
+            monster_vs_monster_collision(entity)
+            entity_vs_level_collision(entity)
         
-        elif owner_entity_sprite.TYPE is PROJECTILE:    
-            projectile_collision(owner_entity_sprite)
-            entity_vs_level_collision(owner_entity_sprite)
+        elif entity.TYPE is PROJECTILE:    
+            projectile_collision(entity)
+            entity_vs_level_collision(entity)
 
-        elif owner_entity_sprite.TYPE is ITEM:
-            item_collision(owner_entity_sprite)
-            entity_vs_level_collision(owner_entity_sprite)
+        elif entity.TYPE is ITEM:
+            item_collision(entity)
+            entity_vs_level_collision(entity)
 
 #Collision types
 def player_vs_monster_movement_collision():
-    for entity_collision_sprite_group in entity_manager.entity_collision_sprite_groups:
-        colliding_entity_sprite = entity_manager.get_entity_sprite_by_id(entity_collision_sprite_group.sprites()[0].id)
+    for entity_sprite_group in entity_manager.entity_sprite_groups:
+        entity = entity_sprite_group.sprite
+        hero = entity_manager.hero
 
-        if colliding_entity_sprite != entity_manager.hero and entity_manager.hero.entity_collider_omni.rect.colliderect(colliding_entity_sprite.entity_collider_omni.rect):
-            collision_matrix = get_collision_matrix(entity_manager.hero,colliding_entity_sprite)
+        if entity is not hero and not entity.is_corpse and not entity.is_overkilled and hero.entity_collider_omni.rect.colliderect(entity.entity_collider_omni.rect):
+            collision_matrix = get_collision_matrix(entity_manager.hero,entity)
                        
             if any_sector_collider_collides(collision_matrix):
-                bump_monster_back(entity_manager.hero, colliding_entity_sprite, collision_matrix)
+                bump_monster_back(entity_manager.hero, entity, collision_matrix)
                 #slow_down_player()
                 
-def entity_vs_level_collision(character_sprite):
-    for level_collision_sprite in character_sprite.direct_proximity_collision_tiles:
+def entity_vs_level_collision(character):
+    for level_collision_sprite in character.direct_proximity_collision_tiles:
         
-        if character_sprite.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
-            
-            if character_sprite.TYPE == PLAYER:
-                collision_matrix = get_collision_matrix(character_sprite,level_collision_sprite)
-                
-                if any_sector_collider_collides(collision_matrix):
-                    correct_character_position_by_vector(character_sprite,level_collision_sprite, collision_matrix)
-                    
-            if character_sprite.TYPE == MONSTER:
-                collision_matrix = get_collision_matrix(character_sprite,level_collision_sprite)
-                
-                if any_sector_collider_collides(collision_matrix):
-                    correct_character_position_by_vector(character_sprite,level_collision_sprite, collision_matrix)
-        
-                if character_sprite.monster_ai.is_path_finding == False and character_sprite.monster_ai.path_finding_is_ready:
-                    character_sprite.monster_ai.initialize_monster_path_finding()
+        if character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
+            collision_matrix = get_collision_matrix(character,level_collision_sprite)
+                        
+            if any_sector_collider_collides(collision_matrix):
+                correct_character_position_by_vector(character,level_collision_sprite, collision_matrix)
 
-def monster_vs_monster_collision(character_sprite):
+                if character.TYPE == MONSTER and character.monster_ai.is_path_finding == False and character.monster_ai.path_finding_is_ready:
+                    character.monster_ai.initialize_monster_path_finding()
+
+def monster_vs_monster_collision(monster):
     for entity_sprite_group in entity_manager.entity_sprite_groups:
-        colliding_entity_sprite = entity_sprite_group.sprite
+        entity = entity_sprite_group.sprite
         
-        if colliding_entity_sprite != entity_manager.hero and character_sprite != colliding_entity_sprite:
+        if entity != monster and entity != entity_manager.hero and not entity.is_corpse and not entity.is_overkilled:
+            monster_collider = monster.entity_collider_omni
+            entity_collider = entity.entity_collider_omni.rect
             
-            if not entity_sprite_group.sprite.is_corpse:
-                if entity_in_vicinity(character_sprite,colliding_entity_sprite):
-                    character_collider = character_sprite.entity_collider_omni
-                    entity_collider = colliding_entity_sprite.entity_collider_omni.rect
-                    
-                    if character_collider.rect.colliderect(entity_collider):
-                        collision_matrix = get_collision_matrix(character_sprite,colliding_entity_sprite)
+            if monster_collider.rect.colliderect(entity_collider):
+                collision_matrix = get_collision_matrix(monster,entity)
 
-                        if any_sector_collider_collides(collision_matrix):
-                            adjust_monster_movement_vector(character_sprite, collision_matrix)
+                if any_sector_collider_collides(collision_matrix):
+                    adjust_monster_movement_vector(monster, collision_matrix)
 
 def projectile_collision(projectile_sprite):
     #Projectile collision logic
@@ -527,11 +514,4 @@ def any_sector_collider_collides(collision_matrix):
 def all_sector_colliders_collide(collision_matrix):
     if collision_matrix[0][0] and collision_matrix[0][1] and collision_matrix[1][0] and collision_matrix[1][1]:
         return True
-    return False
-
-def entity_in_vicinity(current_entity_sprite, other_entity_sprite):
-    for vicinity_index_matrix_row in current_entity_sprite.direct_proximity_index_matrix:
-        if other_entity_sprite.tile_index in vicinity_index_matrix_row:
-            return True
-    
     return False
