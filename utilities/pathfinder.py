@@ -11,7 +11,6 @@ class Pathfinder:
         self.position = 0,0
         self.monster_tile_index = monster_tile_index
         self.matrix = matrix
-        print(matrix)
         self.grid = Grid(matrix = self.matrix)
         self.finder = AStarFinder()
         self.path = []

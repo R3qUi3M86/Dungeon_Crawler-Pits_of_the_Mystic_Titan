@@ -19,7 +19,6 @@ def set_player_tile_index():
         for col_index,cell in enumerate(level_layout_row):
             if cell_is_starting_position(row_index,col_index,cell):
                 player_starting_tile_index = row_index,col_index
-                print(f"hero starting tile: {player_starting_tile_index}")
                 entity_manager.hero.tile_index = player_starting_tile_index
 
 def set_player_position_on_map():
