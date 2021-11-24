@@ -8,6 +8,7 @@ from utilities import collision_manager
 from utilities import entity_manager
 from utilities import level_painter
 from utilities import monster_ai
+from utilities.level_painter import level
 from utilities.constants import *
 from images.characters.ettin_images import *
 from entities.shadow import Shadow
@@ -17,7 +18,7 @@ class Ettin(pygame.sprite.Sprite):
     def __init__(self,tile_index):
         super().__init__()
         ###Constants###
-        self.SPRITE_DISPLAY_CORRECTION = 12
+        self.IMAGE_DISPLAY_CORRECTION = 12
         self.NAME = ETTIN
         self.TYPE = MONSTER
 
@@ -25,11 +26,11 @@ class Ettin(pygame.sprite.Sprite):
         self.tile_index = tile_index
         self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
         self.prevous_tile_index = 0,0
-        self.vicinity_collision_tiles = []
-        self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(tile_index)
+        self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+        self.direct_proximity_collision_tiles = []
         self.position = level_painter.get_tile_position(tile_index)
         self.map_position = round(self.position[0]-player_position[0]+entity_manager.hero.tile_index[0],2), round(self.position[1]-player_position[1]+entity_manager.hero.tile_index[1],2)
-        self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
+        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
         
         ###Object ID###
         self.id = util.generate_entity_id()
@@ -85,7 +86,7 @@ class Ettin(pygame.sprite.Sprite):
 
         ###Initial sprite definition###
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
-        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+        self.rect = self.image.get_rect(midbottom = (self.image_position))
 
         ###General variables###
         #Status flags
@@ -120,8 +121,8 @@ class Ettin(pygame.sprite.Sprite):
     def update(self):
         if not self.is_dead:
             self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
-            self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
-            self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+            self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
+            self.rect = self.image.get_rect(midbottom = (self.image_position))
             self.update_owned_sprites()
     
             if self.is_living:
@@ -135,7 +136,7 @@ class Ettin(pygame.sprite.Sprite):
 
     def update_position(self, vector):
         self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
-        self.sprite_position = self.position[0], self.position[1] + self.SPRITE_DISPLAY_CORRECTION
+        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
         self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
         self.tile_index = int(self.map_position[1]-level_painter.screen_height//2)//level_painter.TILE_SIZE[1] , int(self.map_position[0]-level_painter.screen_width//2)//level_painter.TILE_SIZE[0]
         
@@ -143,9 +144,9 @@ class Ettin(pygame.sprite.Sprite):
             self.prevous_tile_index = self.tile_index
             self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
             self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
-            self.update_vicinity_collision_tiles()
+            self.update_direct_proximity_tile_collision_matrix()
         
-        self.rect = self.image.get_rect(midbottom = (self.sprite_position))
+        self.rect = self.image.get_rect(midbottom = (self.image_position))
         self.update_owned_sprites_position()
     
     def update_decisions(self):
@@ -228,16 +229,18 @@ class Ettin(pygame.sprite.Sprite):
                 auxilary_sprite.position = self.position
                 auxilary_sprite.update()
 
-    def update_vicinity_collision_tiles(self):
-        vicinity_collision_tiles = []
+    def update_direct_proximity_tile_collision_matrix(self):
+        direct_proximity_collision_tiles = []
         for row in self.vicinity_index_matrix:
             for tile_index in row:
-                collision_tile = entity_manager.get_level_collision_sprite_by_index(tile_index)
+                
+                if len(level) > tile_index[0] >= 0 and len(level[0]) > tile_index[1] >= 0:
+                    collision_tile = entity_manager.get_level_collision_sprite_by_index(tile_index)
                 
                 if collision_tile != None:
-                    vicinity_collision_tiles.append(collision_tile)
+                    direct_proximity_collision_tiles.append(collision_tile)
         
-        self.vicinity_collision_tiles = vicinity_collision_tiles
+        self.direct_proximity_collision_tiles = direct_proximity_collision_tiles
 
     #Animations
     def character_pain_animation(self):

@@ -40,7 +40,7 @@ def player_vs_monster_movement_collision():
                 #slow_down_player()
                 
 def entity_vs_level_collision(character_sprite):
-    for level_collision_sprite in character_sprite.vicinity_collision_tiles:
+    for level_collision_sprite in character_sprite.direct_proximity_collision_tiles:
         
         if character_sprite.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
             

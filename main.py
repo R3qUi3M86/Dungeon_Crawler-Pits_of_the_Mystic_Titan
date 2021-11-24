@@ -97,7 +97,7 @@ def order_sprites():
     
     for _ in range(len(entity_manager.entity_sprite_groups)-1):
         for j in range(len(entity_manager.entity_sprite_groups)-1):
-            if entity_manager.entity_sprite_groups[j].sprite.sprite_position[Y] > entity_manager.entity_sprite_groups[j+1].sprite.sprite_position[Y]:
+            if entity_manager.entity_sprite_groups[j].sprite.image_position[Y] > entity_manager.entity_sprite_groups[j+1].sprite.image_position[Y]:
                     entity_manager.entity_sprite_groups[j], entity_manager.entity_sprite_groups[j+1] = entity_manager.entity_sprite_groups[j+1], entity_manager.entity_sprite_groups[j]
 
 def draw_sprites():
@@ -114,7 +114,7 @@ def draw_sprites():
         entity.draw(screen)
 
 entity_manager.initialize_player_object()
-level_painter.create_all_level_tiles()
+level_painter.paint_level()
 entity_manager.generate_monsters()
 
 #Main game loop

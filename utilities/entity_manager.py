@@ -14,7 +14,7 @@ level_sprite_groups = []
 projectile_sprite_groups = []
 
 #Collision entities
-level_collision_sprite_groups = [] #For collision search optimization
+level_collision_sprites_matrix = [] #For collision search optimization
 melee_sector_sprite_groups = []
 entity_collision_sprite_groups = []
 
@@ -27,9 +27,8 @@ def initialize_player_object():
 
 #Get sprites
 def get_level_collision_sprite_by_index(index):
-    for level_collision_sprite_group in level_collision_sprite_groups:
-        if level_collision_sprite_group.sprite.get_index() == index:
-            return level_collision_sprite_group.sprite
+    if level_collision_sprites_matrix[index[0]][index[1]]:
+        return level_collision_sprites_matrix[index[0]][index[1]]
 
 def get_entity_sprite_by_id(entity_id):
     for entity in entity_sprite_groups:
@@ -55,9 +54,10 @@ def update_all_entities():
 
 def update_all_non_player_entities_position_by_vector(vector):
     update_non_player_group_single_entities_position(vector,entity_sprite_groups)
-    if round(hero.speed_scalar[0],2) != 0.0 or round(hero.speed_scalar[1],2) != 0.0:
-        update_non_player_group_single_entities_position(vector,level_collision_sprite_groups)
     update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
+    if round(hero.speed_scalar[0],2) != 0.0 or round(hero.speed_scalar[1],2) != 0.0:
+        update_vicinity_level_colliders_position(vector)
+    
 
 def update_hero_position():
     hero.update_position(hero.speed_vector)
@@ -72,6 +72,12 @@ def update_non_player_group_entities_position(vector,entities):
         entity_sprites = entities.sprites()
         for entity_sprite in entity_sprites:
             entity_sprite.update_position(vector)
+
+def update_vicinity_level_colliders_position(vector):
+    for row in level_collision_sprites_matrix:
+        for cell in row:
+            if cell:
+                cell.update_position(vector)
 
 #Monster generation
 def generate_monsters():

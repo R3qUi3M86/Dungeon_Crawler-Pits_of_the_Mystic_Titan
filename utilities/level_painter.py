@@ -25,31 +25,41 @@ def set_player_position_on_map():
     entity_manager.hero.map_position = TILE_SIZE[0]//2+(48*entity_manager.hero.tile_index[1])+screen_width//2,TILE_SIZE[1]//2+(48*entity_manager.hero.tile_index[0]+screen_height//2)
     level
 
-def create_all_level_tiles():
+def paint_level():
     global level_surface
 
+    create_all_level_tiles()
+    generate_pathfinding_matrix()
+    level_surface.fill([25, 23, 22])
+    
+    for tile in entity_manager.level_sprite_groups:
+        level_surface.blit(tile.sprite.image,(tile.sprite.map_position))
+
+def create_all_level_tiles():
     set_player_tile_index()
     set_player_position_on_map()
 
     for row_index,level_layout_row in enumerate(level):
+        collision_tiles_row = []
+        
         for col_index,cell in enumerate(level_layout_row):
             type = cell
             tile_index = row_index,col_index
             position = get_tile_position(tile_index)
-            vicinity_matrix = get_vicinity_matrix_for_tile_index(tile_index)
-            create_level_tile(type,tile_index,position,TILE_SIZE,vicinity_matrix)
-    
-    generate_pathfinding_matrix()
-
-    level_surface.fill([25, 23, 22])
-    for tile in entity_manager.level_sprite_groups:
-        level_surface.blit(tile.sprite.image,(tile.sprite.map_position))
+            vicinity_matrix = get_proximity_matrix_for_tile_index(tile_index)
+            new_tile_sprite = create_level_tile(type,tile_index,position,TILE_SIZE,vicinity_matrix)
+            
+            if new_tile_sprite.passable == False:
+                collision_tiles_row.append(new_tile_sprite)
+            else:
+                collision_tiles_row.append(None)
+        
+        entity_manager.level_collision_sprites_matrix.append(collision_tiles_row)
 
 def create_level_tile(type,level_position_index,position,size,vicinity_matrix):
     new_tile_sprite = Tile(type,level_position_index,position,size,vicinity_matrix)
     entity_manager.level_sprite_groups.append(pygame.sprite.GroupSingle(new_tile_sprite))
-    if new_tile_sprite.passable == False:
-        entity_manager.level_collision_sprite_groups.append(pygame.sprite.GroupSingle(new_tile_sprite))
+    return new_tile_sprite
 
 def cell_is_starting_position(row_index,col_index,cell):
     if level[row_index-1][col_index-1] == ENTRANCE and level[row_index-1][col_index] == ENTRANCE and level[row_index-1][col_index+1] == ENTRANCE and cell == FLOOR:
@@ -73,7 +83,7 @@ def get_tile_sprite_by_index(tile_index):
         if tile.sprite.tile_index == tile_index:
             return tile.sprite
 
-def get_vicinity_matrix_for_tile_index(index_x_y):
+def get_proximity_matrix_for_tile_index(index_x_y):
     vicinity_matrix = []
     for i in range(3):
         vicinity_matrix_row = []
