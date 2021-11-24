@@ -126,11 +126,11 @@ while True:
     get_player_mouse_input()
 
     #Updates
-    entity_manager.update_all_entities()
+    cursor.cursor.update()
     entity_manager.update_hero_position()
     entity_manager.update_all_non_player_entities_position_by_vector(entity_manager.hero.speed_vector)
+    entity_manager.update_all_entities()
     collision_manager.detect_all_collisions()
-    cursor.cursor.update()
 
     #Events
     for event in pygame.event.get():

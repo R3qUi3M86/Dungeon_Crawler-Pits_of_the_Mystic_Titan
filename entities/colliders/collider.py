@@ -16,9 +16,6 @@ class Collider(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
     #Update functions
-    def update(self):
-        self.rect = self.image.get_rect(center = (self.position))
-
     def update_position(self,position):
         self.position = position
         self.rect = self.image.get_rect(center = (self.position))

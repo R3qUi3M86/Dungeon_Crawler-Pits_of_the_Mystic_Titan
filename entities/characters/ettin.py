@@ -123,7 +123,16 @@ class Ettin(pygame.sprite.Sprite):
             self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
             self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
             self.rect = self.image.get_rect(midbottom = (self.image_position))
-            self.update_owned_sprites()
+            self.update_owned_sprites_position()
+
+            self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
+            self.tile_index = int(self.map_position[1]-level_painter.screen_height//2)//level_painter.TILE_SIZE[1] , int(self.map_position[0]-level_painter.screen_width//2)//level_painter.TILE_SIZE[0]
+        
+            if self.tile_index != self.prevous_tile_index:
+                self.prevous_tile_index = self.tile_index
+                self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+                self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
+                self.update_direct_proximity_tile_collision_matrix()
     
             if self.is_living:
                 self.update_decisions()
@@ -136,16 +145,7 @@ class Ettin(pygame.sprite.Sprite):
 
     def update_position(self, vector):
         self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
-        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
-        self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
-        self.tile_index = int(self.map_position[1]-level_painter.screen_height//2)//level_painter.TILE_SIZE[1] , int(self.map_position[0]-level_painter.screen_width//2)//level_painter.TILE_SIZE[0]
-        
-        if self.tile_index != self.prevous_tile_index:
-            self.prevous_tile_index = self.tile_index
-            self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-            self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
-            self.update_direct_proximity_tile_collision_matrix()
-        
+        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
         self.rect = self.image.get_rect(midbottom = (self.image_position))
         self.update_owned_sprites_position()
     
@@ -223,12 +223,6 @@ class Ettin(pygame.sprite.Sprite):
                 auxilary_sprite.position = self.position
                 auxilary_sprite.update_position(self.position)
     
-    def update_owned_sprites(self):
-        for auxilary_sprites_row in self.entity_auxilary_sprites:
-            for auxilary_sprite in auxilary_sprites_row:
-                auxilary_sprite.position = self.position
-                auxilary_sprite.update()
-
     def update_direct_proximity_tile_collision_matrix(self):
         direct_proximity_collision_tiles = []
         for row in self.vicinity_index_matrix:
