@@ -108,10 +108,10 @@ def adjust_monster_movement_vector(monster, collision_matrix):
     elif south_west_collider_collides(collision_matrix):
         monster.monster_ai.avoid_obstacle(SECTOR_SW)
 
-def adjust_player_speed_scalar(correction_vector,factor=30):
+def adjust_player_speed_scalar(original_speed_scalar, correction_vector,factor=30):
     speed_scalar_x = correction_vector[0]*factor
     speed_scalar_y = correction_vector[1]*factor
-    entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[0]+speed_scalar_x, entity_manager.hero.speed_scalar[1]+speed_scalar_y
+    entity_manager.hero.speed_scalar = original_speed_scalar[0]+speed_scalar_x, original_speed_scalar[1]+speed_scalar_y
 
 #Character bounce-back
 def correct_character_position_by_vector(current_entity_sprite,colliding_entity_sprite, collision_matrix):
@@ -127,7 +127,12 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
     level_collision_sprite_west = entity_manager.get_level_collision_sprite_by_index(west_tile_index)
 
     current_collision_matrix = collision_matrix
+    
     speed_vector = current_entity_sprite.speed_vector
+    original_speed_scalar = 0,0
+    if current_entity_sprite == entity_manager.hero:
+        original_speed_scalar = entity_manager.hero.speed_scalar
+    
     speed_correction_vector = 0,0
     correction_vector = 0,0
 
@@ -313,6 +318,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         speed_correction_vector = correction_vector
 
         if current_entity_sprite == entity_manager.hero:
+            adjust_player_speed_scalar(original_speed_scalar,speed_correction_vector,15)
             entity_manager.hero.update_position(correction_vector)
             entity_manager.update_all_non_player_entities_position_by_vector(correction_vector)
         
@@ -323,9 +329,6 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
 
         correction_vector = 0,0
         current_collision_matrix = get_collision_matrix(current_entity_sprite,colliding_entity_sprite)
-
-    if current_entity_sprite == entity_manager.hero:
-        adjust_player_speed_scalar(speed_correction_vector,15)
         
 def bump_monster_back(player_sprite, monster_sprite, collision_matrix):
     bounce_vector = 0,0
@@ -369,7 +372,7 @@ def bump_monster_back(player_sprite, monster_sprite, collision_matrix):
         bounce_vector = get_bounce_vector_for_static_player(player_sprite, monster_sprite)
 
     monster_sprite.update_position((-bounce_vector[0],-bounce_vector[1]))
-    adjust_player_speed_scalar((-bounce_vector[0],-bounce_vector[1]),15)
+    adjust_player_speed_scalar(entity_manager.hero.speed_scalar,(-bounce_vector[0],-bounce_vector[1]),15)
 
 def get_bounce_vector_for_static_player(player_sprite, monster_sprite):
     bounce_direction_sector = util.get_facing_direction(player_sprite.map_position, monster_sprite.map_position)

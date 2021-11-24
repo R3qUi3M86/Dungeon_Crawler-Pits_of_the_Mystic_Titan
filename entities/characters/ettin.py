@@ -122,7 +122,6 @@ class Ettin(pygame.sprite.Sprite):
         if not self.is_dead:
             self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
             self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
-            self.rect = self.image.get_rect(midbottom = (self.image_position))
             self.update_owned_sprites_position()
 
             self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
@@ -142,6 +141,7 @@ class Ettin(pygame.sprite.Sprite):
             entity_manager.kill_entity_colliders_and_melee_entities(self.id)
         
         self.update_animation()
+        self.rect = self.image.get_rect(midbottom = (self.image_position))
 
     def update_position(self, vector):
         self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
@@ -203,7 +203,7 @@ class Ettin(pygame.sprite.Sprite):
             self.set_character_animation_direction_indices()
             self.character_walk_forward_animation()
 
-        if self.is_in_pain:
+        if self.is_in_pain and not self.is_attacking:
             self.set_character_animation_direction_indices()
             self.character_pain_animation()
         
@@ -231,8 +231,8 @@ class Ettin(pygame.sprite.Sprite):
                 if len(level) > tile_index[0] >= 0 and len(level[0]) > tile_index[1] >= 0:
                     collision_tile = entity_manager.get_level_collision_sprite_by_index(tile_index)
                 
-                if collision_tile != None:
-                    direct_proximity_collision_tiles.append(collision_tile)
+                    if collision_tile != None:
+                        direct_proximity_collision_tiles.append(collision_tile)
         
         self.direct_proximity_collision_tiles = direct_proximity_collision_tiles
 

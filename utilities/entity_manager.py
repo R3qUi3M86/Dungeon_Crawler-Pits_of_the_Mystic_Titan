@@ -27,8 +27,11 @@ def initialize_player_object():
 
 #Get sprites
 def get_level_collision_sprite_by_index(index):
-    if level_collision_sprites_matrix[index[0]][index[1]]:
-        return level_collision_sprites_matrix[index[0]][index[1]]
+    if 0 <= index[0] < len(level_collision_sprites_matrix) and 0 <= index[1] < len(level_collision_sprites_matrix[0]):
+        if level_collision_sprites_matrix[index[0]][index[1]]:
+            return level_collision_sprites_matrix[index[0]][index[1]]
+    else:
+        return level_collision_sprites_matrix[0][0]
 
 def get_entity_sprite_by_id(entity_id):
     for entity in entity_sprite_groups:

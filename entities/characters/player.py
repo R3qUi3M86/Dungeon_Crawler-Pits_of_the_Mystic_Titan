@@ -124,6 +124,7 @@ class Hero(pygame.sprite.Sprite):
             self.walking_animation()
 
         self.update_animation()
+        self.rect = self.image.get_rect(midbottom = (self.image_position))
 
     def update_position(self,vector):
         self.map_position = round(self.map_position[0] + vector[0],2),round(self.map_position[1] + vector[1],2)
@@ -156,8 +157,8 @@ class Hero(pygame.sprite.Sprite):
                 if len(level) > tile_index[0] >= 0 and len(level[0]) > tile_index[1] >= 0:
                     collision_tile = entity_manager.get_level_collision_sprite_by_index(tile_index)
                 
-                if collision_tile != None:
-                    direct_proximity_collision_tiles.append(collision_tile)
+                    if collision_tile != None:
+                        direct_proximity_collision_tiles.append(collision_tile)
         
         self.direct_proximity_collision_tiles = direct_proximity_collision_tiles
 
