@@ -201,17 +201,25 @@ class Ai():
     #Combat decisions
     def monster_can_melee_attack_player(self):
         if entity_manager.hero.is_living == True:
-            self.player_direction_sector = util.get_facing_direction(self.monster.position,player_position)
-            if self.monster.entity_melee_sector_sprites[0].rect.colliderect(entity_manager.hero.small_square):
-                for melee_sprite in self.monster.entity_melee_sector_sprites:
-                    if pygame.sprite.collide_mask(melee_sprite, entity_manager.hero.small_square):
-                        return True
+            
+            if self.monster.is_preparing_attack or self.monster.is_attacking:
+                return True
+            
+            else:
+                monster_map_pos = self.monster.map_position
+                hero_map_pos = entity_manager.hero.map_position
+                melee_range = self.monster.melee_range
+                hero_size = entity_manager.hero.size
+            
+            if util.elipses_intersect(monster_map_pos,hero_map_pos,melee_range,hero_size):
+                    return True
         return False
 
     #Combat decisions timer
     def increment_attack_decision_timer(self):
         self.attack_decision_timer += 0.05
         if int(self.attack_decision_timer) == self.attack_decision_timer_limit:
+            self.monster.is_preparing_attack = False
             self.monster.is_attacking = True
             self.monster.attack_can_be_interrupted = True
             self.attack_decision_timer = 0.0

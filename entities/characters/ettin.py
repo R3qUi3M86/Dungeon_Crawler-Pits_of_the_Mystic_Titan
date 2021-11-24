@@ -63,32 +63,22 @@ class Ettin(pygame.sprite.Sprite):
         self.entity_collider_sw    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SW)
         self.entity_collider_se    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SE)
         self.entity_collider_omni  = Collider(player_position, self.id, ENTITY_OMNI)
-        self.medium_square_collider = Collider(self.position, self.id, SQUARE, size=SIZE_MEDIUM)
-
-        #Melee sectors
-        self.melee_collider_e  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_E)
-        self.melee_collider_ne = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_NE)
-        self.melee_collider_n  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_N)
-        self.melee_collider_nw = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_NW)
-        self.melee_collider_w  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_W)
-        self.melee_collider_sw = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_SW)
-        self.melee_collider_s  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_S)
-        self.melee_collider_se = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_SE)
 
         #Shadow
         self.shadow = Shadow(self.position, self.id, SIZE_MEDIUM)
         
         #Sprite lists
-        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se,self.medium_square_collider]
-        self.entity_melee_sector_sprites = [self.melee_collider_e,self.melee_collider_ne,self.melee_collider_n,self.melee_collider_nw,self.melee_collider_w,self.melee_collider_sw,self.melee_collider_s,self.melee_collider_se]
-        self.entity_auxilary_sprites     = [[self.shadow],self.entity_melee_sector_sprites,self.entity_collider_sprites]
+        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se]
+        self.entity_auxilary_sprites     = [[self.shadow],self.entity_collider_sprites]
 
         ###Initial sprite definition###
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
         self.rect = self.image.get_rect(midbottom = (self.image_position))
+        self.monster_ai = monster_ai.Ai(self, collision_manager.pathfinding_matrix, tile_index)
 
-        ###General variables###
-        #Status flags
+        #####General variables#####
+        ###Status flags###
+        self.is_preparing_attack = False
         self.is_attacking = False
         self.is_living = True
         self.is_dying = False
@@ -98,23 +88,31 @@ class Ettin(pygame.sprite.Sprite):
         self.is_corpse = False
         self.has_los = False
         
-        #Character properties
+        ###Character properties###
+        #General
         self.health = 10
         self.maxhealth = 10
+
+        #Combat
         self.damage = 0
-        self.x_range = 58
-        self.y_range = 32
+        self.x_melee_range = 50
+        self.y_melee_range = 27
+        self.melee_range = self.x_melee_range, self.y_melee_range
         self.x_size = 20
         self.y_size = 11
+        self.size = self.x_size, self.y_size
         self.attack_interruption_chance = 50
         self.attack_can_be_interrupted = True
         self.can_shoot = False
         self.projectile_type = None
+
+        #Abilities
         self.abilities = []
+
+        #Movement
         self.facing_direction = SECTOR_S
         self.speed = 1.4,1
         self.speed_vector = 0,0
-        self.monster_ai = monster_ai.Ai(self, collision_manager.pathfinding_matrix, tile_index)
 
     #Update functions
     def update(self):
@@ -135,9 +133,11 @@ class Ettin(pygame.sprite.Sprite):
             if self.is_living:
                 self.update_decisions()
 
-        elif not self.is_corpse or not self.is_overkilled:
+        elif not self.is_corpse or self.is_overkilled:
             self.is_corpse = True
-            entity_manager.kill_entity_colliders_and_melee_entities(self.id)
+            entity_manager.kill_entity_colliders(self.id)
+            entity_manager.fix_all_dead_objects_to_pixel_accuracy()
+            entity_manager.fix_player_position_to_pixel_accuracy()
         
         self.update_animation()
         self.rect = self.image.get_rect(midbottom = (self.image_position))
@@ -156,33 +156,10 @@ class Ettin(pygame.sprite.Sprite):
                 self.monster_ai.increment_direction_change_decision_timer()
 
             elif self.monster_ai.monster_can_melee_attack_player():
-                self.speed_vector = 0,0
-                self.facing_direction = util.get_facing_direction(self.position,player_position)
-                self.monster_ai.increment_attack_decision_timer()
-                self.monster_ai.reset_obstacle_avoidance_flags()
-                self.monster_ai.end_pathfinding()
-                
-                if self.is_attacking and self.is_in_pain:
-                    if self.attack_can_be_interrupted and self.attack_interupted():
-                        self.interrupt_attack()
+                self.initialize_attack_sequence()
             
             else:
-                if not self.monster_ai.is_following_path and not self.monster_ai.is_path_finding:
-                    self.monster_ai.increment_direction_change_decision_timer()
-                    self.monster_ai.increment_pathfinding_prepare_timer()
-                    self.set_speed_vector()
-                
-                else:
-                    if self.monster_ai.is_path_finding and not self.monster_ai.is_following_path:
-                        self.monster_ai.pathfinder.monster_tile_index = self.tile_index
-                        self.monster_ai.pathfinder.create_path()
-                        self.monster_ai.next_tile_pos_x = level_painter.get_tile_sprite_by_index((self.monster_ai.pathfinder.path[0][1],self.monster_ai.pathfinder.path[0][0])).map_position[0]
-                        self.monster_ai.next_tile_pos_y = level_painter.get_tile_sprite_by_index((self.monster_ai.pathfinder.path[0][1],self.monster_ai.pathfinder.path[0][0])).map_position[1]
-                        self.monster_ai.is_path_finding = False
-                        self.monster_ai.is_following_path = True
-                
-                    elif self.monster_ai.is_following_path and len(self.monster_ai.pathfinder.path) != 0:
-                        self.monster_ai.change_to_next_point_direction()
+                self.start_walking()
         
         elif not self.is_dead:
             self.speed_vector = 0,0
@@ -266,9 +243,30 @@ class Ettin(pygame.sprite.Sprite):
                 self.character_attack_index[0] = sector
                 self.character_pain_index = sector           
 
-    #Walk speed vector setting
+    #Walking functions
+    def start_walking(self):
+        if not self.monster_ai.is_following_path and not self.monster_ai.is_path_finding:
+            self.monster_ai.increment_direction_change_decision_timer()
+            self.monster_ai.increment_pathfinding_prepare_timer()
+            self.set_speed_vector()
+        
+        else:
+            self.use_pathfinding_logic()
+
+    def use_pathfinding_logic(self):
+        if self.monster_ai.is_path_finding and not self.monster_ai.is_following_path:
+            self.monster_ai.pathfinder.monster_tile_index = self.tile_index
+            self.monster_ai.pathfinder.create_path()
+            self.monster_ai.next_tile_pos_x = level_painter.get_tile_sprite_by_index((self.monster_ai.pathfinder.path[0][1],self.monster_ai.pathfinder.path[0][0])).map_position[0]
+            self.monster_ai.next_tile_pos_y = level_painter.get_tile_sprite_by_index((self.monster_ai.pathfinder.path[0][1],self.monster_ai.pathfinder.path[0][0])).map_position[1]
+            self.monster_ai.is_path_finding = False
+            self.monster_ai.is_following_path = True
+        
+        elif self.monster_ai.is_following_path and len(self.monster_ai.pathfinder.path) != 0:
+            self.monster_ai.change_to_next_point_direction()
+
     def set_speed_vector(self):
-        if self.is_living:
+        if self.is_living and not self.is_preparing_attack and not self.is_attacking:
             if self.facing_direction == SECTOR_E:
                 self.speed_vector = 1.4,0
             elif self.facing_direction == SECTOR_NE:
@@ -287,6 +285,21 @@ class Ettin(pygame.sprite.Sprite):
                 self.speed_vector = 0.99,0.58
             
     #Combat functions
+    def initialize_attack_sequence(self):
+        self.speed_vector = 0,0
+                
+        if not self.is_preparing_attack and not self.is_attacking:
+            self.is_preparing_attack = True
+            self.facing_direction = util.get_facing_direction(self.position,player_position)
+            self.monster_ai.reset_obstacle_avoidance_flags()
+            self.monster_ai.end_pathfinding()
+
+        elif self.is_preparing_attack:
+            self.monster_ai.increment_attack_decision_timer()
+        
+        elif self.is_attacking and self.is_in_pain and self.attack_can_be_interrupted and self.attack_interupted():
+                self.interrupt_attack()
+
     def take_damage(self, damage):
         self.health -= damage
         
@@ -300,9 +313,6 @@ class Ettin(pygame.sprite.Sprite):
             self.is_living = False
             self.is_in_pain = False
             self.is_dying = True
-
-            entity_manager.fix_all_dead_objects_to_pixel_accuracy()
-            entity_manager.fix_player_position_to_pixel_accuracy()
             
             if -(self.maxhealth//2) >= self.health:
                 sound_player.ettin_death_sound.stop()
@@ -311,10 +321,6 @@ class Ettin(pygame.sprite.Sprite):
                 self.is_in_pain = False
                 self.is_dying = False
                 self.is_overkilled = True
-
-                entity_manager.kill_entity_colliders_and_melee_entities(self.id)
-                entity_manager.fix_all_dead_objects_to_pixel_accuracy()
-                entity_manager.fix_player_position_to_pixel_accuracy()
 
     def interrupt_attack(self):
         self.is_attacking = False

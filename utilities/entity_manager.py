@@ -23,7 +23,6 @@ entity_collision_sprite_groups = []
 def initialize_player_object():
     entity_sprite_groups.append(pygame.sprite.GroupSingle(hero))
     shadow_sprite_groups.append(pygame.sprite.GroupSingle(hero.shadow))
-    melee_sector_sprite_groups.append(pygame.sprite.Group(hero.entity_melee_sector_sprites))
     entity_collision_sprite_groups.append(pygame.sprite.Group(hero.entity_collider_sprites))  
 
 #Get sprites
@@ -96,7 +95,7 @@ def update_far_proximity_level_colliders_position():
 
 #Monster generation
 def generate_monsters():
-    # generate_monster(ETTIN,(4,2))
+    generate_monster(ETTIN,(4,2))
     # generate_monster(ETTIN, (4,3))
     # generate_monster(ETTIN, (4,1))
     # generate_monster(ETTIN, (7,3))
@@ -140,36 +139,23 @@ def append_sprite_groups_lists(object_entity):
     global entity_sprite_groups
     global shadow_sprite_groups
     global entity_collision_sprite_groups
-    global melee_sector_sprite_groups
 
     entity_sprite_groups.append(pygame.sprite.GroupSingle(object_entity))
     shadow_sprite_groups.append(pygame.sprite.GroupSingle(object_entity.shadow))
     entity_collision_sprite_groups.append(pygame.sprite.Group(object_entity.entity_collider_sprites))
-    
-    if object_entity.TYPE == MONSTER:
-        melee_sector_sprite_groups.append(pygame.sprite.Group(object_entity.entity_melee_sector_sprites))
 
 #Misc
-def kill_entity_colliders_and_melee_entities(id):
+def kill_entity_colliders(id):
     global entity_collision_sprite_groups
-    global melee_sector_sprite_groups
 
     for entity_collision_sprite_group in entity_collision_sprite_groups:
         if entity_collision_sprite_group.sprites()[0].id == id:
             entity_collision_sprite_groups.remove(entity_collision_sprite_group)
-    
-    for melee_sector_sprite_group in melee_sector_sprite_groups:
-        if melee_sector_sprite_group.sprites()[0].id == id:
-            melee_sector_sprite_groups.remove(melee_sector_sprite_group)
 
 def fix_all_dead_objects_to_pixel_accuracy():
     for entity_sprite_group in entity_sprite_groups:
         if entity_sprite_group.sprite.is_living == False:
             entity_sprite_group.sprite.position = math.ceil(entity_sprite_group.sprite.position[0]), math.ceil(entity_sprite_group.sprite.position[1])
-
-def fix_all_tiles_to_pixel_accuracy():
-    for level_sprite_group in level_sprite_groups:
-        level_sprite_group.sprite.position = math.ceil(level_sprite_group.sprite.position[0]), math.ceil(level_sprite_group.sprite.position[1])
 
 def fix_player_position_to_pixel_accuracy():
     hero.position = math.floor(hero.position[0]), math.floor(hero.position[1])

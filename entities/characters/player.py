@@ -63,25 +63,13 @@ class Hero(pygame.sprite.Sprite):
         self.entity_collider_sw    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SW)
         self.entity_collider_se    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SE)
         self.entity_collider_omni  = Collider(player_position, self.id, ENTITY_OMNI)
-        self.small_square         = Collider(self.position, self.id, SQUARE)
-
-        #Melee sectors
-        self.melee_collider_e  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_E)
-        self.melee_collider_ne = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_NE)
-        self.melee_collider_n  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_N)
-        self.melee_collider_nw = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_NW)
-        self.melee_collider_w  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_W)
-        self.melee_collider_sw = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_SW)
-        self.melee_collider_s  = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_S)
-        self.melee_collider_se = Collider(self.position, self.id, MELEE_SECTOR, SECTOR_SE)
 
         #Shadow
         self.shadow = Shadow(player_position, PLAYER_ID, SIZE_SMALL)
 
         #Sprite lists
-        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se,self.small_square]
-        self.entity_melee_sector_sprites = [self.melee_collider_e,self.melee_collider_ne,self.melee_collider_n,self.melee_collider_nw,self.melee_collider_w,self.melee_collider_sw,self.melee_collider_s,self.melee_collider_se]
-        self.entity_auxilary_sprites     = [[self.shadow],self.entity_melee_sector_sprites,self.entity_collider_sprites]
+        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se]
+        self.entity_auxilary_sprites     = [[self.shadow],self.entity_collider_sprites]
 
         ###Initial sprite definition###
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
@@ -97,22 +85,31 @@ class Hero(pygame.sprite.Sprite):
         self.is_in_pain = False
         self.is_dead = False
 
-        #Character properties
+        ###Character properties###
+        #General
         self.health = 20
         self.maxhealth = 20
+
+        #Combat
         self.damage = 4
-        self.x_range = 58
-        self.y_range = 32
+        self.x_melee_range = 58
+        self.y_melee_range = 32
+        self.melee_range = self.x_melee_range, self.y_melee_range
         self.x_size = 20
         self.y_size = 11
+        self.size = self.x_size, self.y_size
         self.attack_can_be_interrupted = False
         self.can_shoot = False
         self.projectile_type = None
+        
+        #Abilities
         self.abilities = []
-        self.facing_direction = SECTOR_S
+        
+        #Movement
         self.speed = 3
         self.speed_scalar = 0,0
         self.speed_vector = 0,0
+        self.facing_direction = SECTOR_S
 
     #Update functions
     def update(self):

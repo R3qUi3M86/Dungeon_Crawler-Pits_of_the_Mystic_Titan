@@ -39,3 +39,4 @@ def display_runic5_text(text, color="Red", x = 10, y = 10):
     text_surf = runic5_font.render(text,True,color)
     text_rect = text_surf.get_rect(center = (x,y))
     screen.blit(text_surf,text_rect)
+

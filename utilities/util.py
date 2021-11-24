@@ -4,6 +4,7 @@ from copy import deepcopy
 from utilities.constants import *
 from utilities import entity_manager
 from settings import *
+from utilities import text_printer
 
 center_x = 0
 center_y = 0
@@ -98,6 +99,36 @@ def get_vicinity_matrix_indices_for_index(index_x_y, size=(3,3)):
         vicinity_matrix.append(deepcopy(vicinity_matrix_row))
 
     return vicinity_matrix
+
+def elipses_intersect(entity1_map_pos,entity2_map_pos,entity1_a_b,entity2_a_b):
+    x_abs_distance = abs(entity1_map_pos[0] - entity2_map_pos[0])
+    y_abs_distance = abs(entity1_map_pos[1] - entity2_map_pos[1])
+    
+    if x_abs_distance > (entity1_a_b[0]+entity2_a_b[0]) or y_abs_distance > (entity1_a_b[1]+entity2_a_b[1]):
+        return False
+    
+    else:
+        print(f"entity1 ab:{entity1_a_b}")
+        print(f"entity1 ab:{entity2_a_b}")
+        angle = get_total_angle(entity1_map_pos,entity2_map_pos)
+        entity1_x_abs_reach = abs(entity1_a_b[0]*math.cos(math.radians(angle)))
+        entity1_y_abs_reach = abs(entity1_a_b[1]*math.sin(math.radians(angle)))
+        entity2_x_abs_reach = abs(entity2_a_b[0]*math.cos(math.radians(angle)))
+        entity2_y_abs_reach = abs(entity2_a_b[1]*math.sin(math.radians(angle)))
+        total_x_reach = entity1_x_abs_reach + entity2_x_abs_reach
+        total_y_reach = entity1_y_abs_reach + entity2_y_abs_reach
+
+        distance = math.sqrt((x_abs_distance*x_abs_distance)+(y_abs_distance*y_abs_distance))
+        reach = math.sqrt((total_x_reach*total_x_reach)+(total_y_reach*total_y_reach))
+
+        print(f"entity1_y_abs_reach: {entity1_y_abs_reach},entity2_y_abs_reach: {entity2_y_abs_reach}")
+        print(f"angle: {angle}, total_x_reach: {total_x_reach}, total_y_reach: {total_y_reach}, x_abs_distance: {x_abs_distance}, y_abs_distance: {y_abs_distance}")
+        print(f"distance: {distance}, reach: {reach}")
+
+        if distance<reach:
+            return True
+    return False
+
 # def draw_pathfinding_path_for_monster(monster_index):
 #     monster_sprite = entity_manager.get_entity_sprite_by_id(monster_index)
 #     if monster_sprite != None:
