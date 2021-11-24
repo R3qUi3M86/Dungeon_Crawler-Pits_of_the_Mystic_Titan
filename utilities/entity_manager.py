@@ -53,9 +53,9 @@ def update_all_entities():
             projectile_sprite.update()
 
 def update_all_non_player_entities_position_by_vector(vector):
-    update_non_player_group_single_entities_position(vector,entity_sprite_groups)
-    update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
     if round(hero.speed_scalar[0],2) != 0.0 or round(hero.speed_scalar[1],2) != 0.0:
+        update_non_player_group_single_entities_position(vector,entity_sprite_groups)
+        update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
         update_vicinity_level_colliders_position(vector)
     
 
