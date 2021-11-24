@@ -336,8 +336,8 @@ class Ettin(pygame.sprite.Sprite):
     #Conditions
     def outside_of_update_range(self):
         hero_tile_index = entity_manager.hero.tile_index
-        tile_row_offset = screen_height//2//TILE_SIZE[Y]+far_colliders_matrix_offset_y//2
-        tile_col_offset = screen_width//2//TILE_SIZE[X]+far_colliders_matrix_offset_x//2
+        tile_row_offset = screen_height//2//TILE_SIZE[Y]+far_colliders_matrix_offset_y//4
+        tile_col_offset = screen_width//2//TILE_SIZE[X]+far_colliders_matrix_offset_x//4
 
         if abs(self.tile_index[0]-hero_tile_index[0]) > tile_row_offset or abs(self.tile_index[1]-hero_tile_index[1]) > tile_col_offset:
             return True
