@@ -23,7 +23,7 @@ class Ettin(pygame.sprite.Sprite):
 
         ###Position variables###
         self.tile_index = tile_index
-        self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
+        self.current_tile_map_position = round(self.tile_index[1] * TILE_SIZE[Y] + TILE_SIZE[Y]//2), round(self.tile_index[0] * TILE_SIZE[X] + TILE_SIZE[X]//2,2)
         self.prevous_tile_index = 0,0
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.direct_proximity_collision_tiles = []
@@ -117,21 +117,21 @@ class Ettin(pygame.sprite.Sprite):
     #Update functions
     def update(self):
         if not self.is_dead:
+            
             self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
             self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
             self.update_owned_sprites_position()
 
             self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
-            self.tile_index = int(self.map_position[1]-level_painter.screen_height//2)//level_painter.TILE_SIZE[1] , int(self.map_position[0]-level_painter.screen_width//2)//level_painter.TILE_SIZE[0]
+            self.tile_index = util.get_tile_index(self.map_position)
         
             if self.tile_index != self.prevous_tile_index:
                 self.prevous_tile_index = self.tile_index
                 self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
                 self.direct_proximity_collision_tiles = entity_manager.get_proximity_objects_list(self.direct_proximity_index_matrix)
                 self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
-            
-            if self.is_living:
-                self.update_decisions()
+
+            self.update_decisions()
 
         elif not self.is_corpse:
             self.is_corpse = True
@@ -148,9 +148,14 @@ class Ettin(pygame.sprite.Sprite):
         self.update_owned_sprites_position()
     
     def update_decisions(self):
-        if self.is_living == True:
+        if self.is_living:
+
+            if entity_manager.hero.is_living and self.monster_ai.is_idle:
+                if not self.outside_of_update_range():
+                    self.monster_ai.increment_los_emmision_timer()
+                    self.monster_ai.increment_direction_change_decision_timer()
             
-            if  entity_manager.hero.is_living == False or self.outside_of_update_range():
+            elif not entity_manager.hero.is_living or self.outside_of_update_range():
                 self.speed_vector = 0,0
                 self.monster_ai.increment_direction_change_decision_timer()
                 self.monster_ai.reset_obstacle_avoidance_flags()
@@ -333,6 +338,25 @@ class Ettin(pygame.sprite.Sprite):
         self.attack_can_be_interrupted = False
         return False
     
+    def emit_los_particle(self):
+        if util.monster_has_line_of_sight(self.map_position):
+            hero_sector = util.get_facing_direction(self.position,player_position)
+            
+            if self.facing_direction+1 == 8 and hero_sector in [7,0,1]:
+                self.monster_ai.direction_change_decision_timer_limit = 60
+                self.monster_ai.is_idle = False
+                self.monster_ai.is_roaming = True
+            
+            elif self.facing_direction+2 == 8 and hero_sector in [6,7,0]:
+                self.monster_ai.direction_change_decision_timer_limit = 60
+                self.monster_ai.is_idle = False
+                self.monster_ai.is_roaming = True
+            
+            elif hero_sector in [self.facing_direction-1,self.facing_direction,self.facing_direction+1]:
+                self.monster_ai.direction_change_decision_timer_limit = 60
+                self.monster_ai.is_idle = False
+                self.monster_ai.is_roaming = True
+
     #Conditions
     def outside_of_update_range(self):
         hero_tile_index = entity_manager.hero.tile_index

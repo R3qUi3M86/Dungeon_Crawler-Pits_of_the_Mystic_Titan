@@ -3,8 +3,8 @@ import math
 from copy import deepcopy
 from utilities.constants import *
 from utilities import entity_manager
+from utilities import level_painter
 from settings import *
-from utilities import text_printer
 
 center_x = 0
 center_y = 0
@@ -120,6 +120,38 @@ def elipses_intersect(entity1_map_pos,entity2_map_pos,entity1_a_b,entity2_a_b):
         reach = math.sqrt((total_x_reach*total_x_reach)+(total_y_reach*total_y_reach))
 
         if distance<reach:
+            return True
+    
+    return False
+
+def get_tile_index(map_pos):
+    return int(map_pos[1]-screen_height//2)//level_painter.TILE_SIZE[Y] , int(map_pos[0]-screen_width//2)//level_painter.TILE_SIZE[X]
+
+def monster_has_line_of_sight(monster_map_pos, particle_speed = 10, max_travel_x = screen_width//2, max_travel_y = screen_height//2):
+    hero_map_pos = entity_manager.hero.map_position
+    angle = get_total_angle(monster_map_pos,hero_map_pos)
+    particle_map_pos = monster_map_pos
+    current_tile_index = get_tile_index(monster_map_pos)
+    previous_tile_index = current_tile_index
+    traveled_distance_x = 0
+    traveled_distance_y = 0
+
+    x_speed = particle_speed*math.cos(math.radians(angle))
+    y_speed = -particle_speed*math.sin(math.radians(angle))
+
+    while abs(traveled_distance_x) < max_travel_x and abs(traveled_distance_y) < max_travel_y:
+        particle_map_pos = particle_map_pos[0] + x_speed, particle_map_pos[1] + y_speed
+        current_tile_index = get_tile_index(particle_map_pos)
+        traveled_distance_x = int(traveled_distance_x + x_speed)
+        traveled_distance_y = int(traveled_distance_y + y_speed)
+        
+        if current_tile_index != previous_tile_index:
+            previous_tile_index = current_tile_index
+            
+            if entity_manager.level_collision_sprites_matrix[current_tile_index[0]][current_tile_index[1]] != None:
+                return False
+
+        if hero_map_pos[0]-particle_speed//2 <= particle_map_pos[0] <= hero_map_pos[0]+particle_speed//2 and hero_map_pos[1]-particle_speed//2 <= particle_map_pos[1] <= hero_map_pos[1]+particle_speed//2:
             return True
     
     return False
