@@ -39,7 +39,7 @@ def get_entity_sprite_by_id(entity_id):
         if entity.sprite.id == entity_id:
             return entity.sprite
 
-def get_direct_proximity_collision_tiles_list(matrix):
+def get_proximity_collision_tiles_list(matrix):
     direct_proximity_collision_tiles = []
     for row in matrix:
         for tile_index in row:
@@ -73,7 +73,7 @@ def update_all_non_player_entities_position_by_vector(vector):
     if round(hero.speed_scalar[0],2) != 0.0 or round(hero.speed_scalar[1],2) != 0.0:
         update_non_player_group_single_entities_position(vector,entity_sprite_groups)
         update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
-        update_vicinity_level_colliders_position(vector)
+        update_far_proximity_level_colliders_position()
     
 
 def update_hero_position():
@@ -90,17 +90,15 @@ def update_non_player_group_entities_position(vector,entities):
         for entity_sprite in entity_sprites:
             entity_sprite.update_position(vector)
 
-def update_vicinity_level_colliders_position(vector):
-    for row in level_collision_sprites_matrix:
-        for cell in row:
-            if cell:
-                cell.update_position(vector)
+def update_far_proximity_level_colliders_position():
+    for tile in hero.far_proximity_collision_tiles:
+        tile.update_position()
 
 #Monster generation
 def generate_monsters():
-    generate_monster(ETTIN,(4,2))
-    generate_monster(ETTIN, (4,3))
-    generate_monster(ETTIN, (4,1))
+    # generate_monster(ETTIN,(4,2))
+    # generate_monster(ETTIN, (4,3))
+    # generate_monster(ETTIN, (4,1))
     # generate_monster(ETTIN, (7,3))
     # generate_monster(ETTIN, (7,8))
     # generate_monster(ETTIN, (6,7))

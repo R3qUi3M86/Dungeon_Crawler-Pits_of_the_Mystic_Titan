@@ -130,7 +130,7 @@ class Ettin(pygame.sprite.Sprite):
                 self.prevous_tile_index = self.tile_index
                 self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
                 self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
-                self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_collision_tiles_list(self.direct_proximity_index_matrix)
+                self.direct_proximity_collision_tiles = entity_manager.get_proximity_collision_tiles_list(self.direct_proximity_index_matrix)
 
             if self.is_living:
                 self.update_decisions()

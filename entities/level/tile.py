@@ -5,6 +5,7 @@ from images.level.cave_images import *
 from images.misc.colliders import *
 from utilities.constants import *
 from utilities import level_painter
+from utilities import entity_manager
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self,type,tile_index,pos,size,vicinity_matrix):
@@ -24,8 +25,8 @@ class Tile(pygame.sprite.Sprite):
         self.mask = self.get_tile_mask()
         self.rect = self.image.get_rect(center = (self.position))
 
-    def update_position(self, vector):
-        self.position = round(self.position[0] - vector[0],2), round(self.position[1] - vector[1],2)
+    def update_position(self):
+        self.position = self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0], self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1]
         self.rect = self.image.get_rect(center = (self.position))
 
     def get_tile_image(self):
