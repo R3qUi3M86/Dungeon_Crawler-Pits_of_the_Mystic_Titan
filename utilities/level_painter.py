@@ -7,15 +7,15 @@ from utilities import entity_manager
 from utilities import collision_manager
 
 TILE_SIZE = 48,48
-level = level_01_map
-level_surface = pygame.Surface((((len(level[0])*TILE_SIZE[0])+screen_width,(len(level)*TILE_SIZE[1])+screen_height)))
-#level = test_map
+level_layout = level_01_map
+level_surface = pygame.Surface((((len(level_layout[0])*TILE_SIZE[0])+screen_width,(len(level_layout)*TILE_SIZE[1])+screen_height)))
+#level_layout = test_map
 player_starting_tile_index = 0,0
 
 def set_player_tile_index():
     global player_starting_tile_index
 
-    for row_index,level_layout_row in enumerate(level):
+    for row_index,level_layout_row in enumerate(level_layout):
         for col_index,cell in enumerate(level_layout_row):
             if cell_is_starting_position(row_index,col_index,cell):
                 player_starting_tile_index = row_index,col_index
@@ -23,7 +23,7 @@ def set_player_tile_index():
 
 def set_player_position_on_map():
     entity_manager.hero.map_position = TILE_SIZE[0]//2+(48*entity_manager.hero.tile_index[1])+screen_width//2,TILE_SIZE[1]//2+(48*entity_manager.hero.tile_index[0]+screen_height//2)
-    level
+    level_layout
 
 def paint_level():
     global level_surface
@@ -39,7 +39,7 @@ def create_all_level_tiles():
     set_player_tile_index()
     set_player_position_on_map()
 
-    for row_index,level_layout_row in enumerate(level):
+    for row_index,level_layout_row in enumerate(level_layout):
         collision_tiles_row = []
         
         for col_index,cell in enumerate(level_layout_row):
@@ -62,7 +62,7 @@ def create_level_tile(type,level_position_index,position,size,vicinity_matrix):
     return new_tile_sprite
 
 def cell_is_starting_position(row_index,col_index,cell):
-    if level[row_index-1][col_index-1] == ENTRANCE and level[row_index-1][col_index] == ENTRANCE and level[row_index-1][col_index+1] == ENTRANCE and cell == FLOOR:
+    if level_layout[row_index-1][col_index-1] == ENTRANCE and level_layout[row_index-1][col_index] == ENTRANCE and level_layout[row_index-1][col_index+1] == ENTRANCE and cell == FLOOR:
         return True
     return False
 
@@ -89,8 +89,8 @@ def get_proximity_matrix_for_tile_index(index_x_y):
         vicinity_matrix_row = []
         
         for j in range(3):
-            if 0 <= index_x_y[0]+i-1 < len(level) and 0 <= index_x_y[1]+j-1 < len(level[0]):
-                cell = level[index_x_y[0]+i-1][index_x_y[1]+j-1]
+            if 0 <= index_x_y[0]+i-1 < len(level_layout) and 0 <= index_x_y[1]+j-1 < len(level_layout[0]):
+                cell = level_layout[index_x_y[0]+i-1][index_x_y[1]+j-1]
             else:
                 cell = WALL
             vicinity_matrix_row.append(cell)
@@ -100,7 +100,7 @@ def get_proximity_matrix_for_tile_index(index_x_y):
     return vicinity_matrix
 
 def generate_pathfinding_matrix():
-    for row_index,level_layout_row in enumerate(level):
+    for row_index,level_layout_row in enumerate(level_layout):
         matrix_row = []
         for col_index,_ in enumerate(level_layout_row):
             tile_index = row_index,col_index

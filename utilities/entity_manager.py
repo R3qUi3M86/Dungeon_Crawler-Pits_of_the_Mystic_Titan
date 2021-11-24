@@ -1,6 +1,7 @@
 import pygame
 import math
 from utilities.constants import *
+from utilities.level_painter import level_layout
 from entities.characters.ettin import Ettin
 from entities.characters.player import Hero
 
@@ -37,6 +38,19 @@ def get_entity_sprite_by_id(entity_id):
     for entity in entity_sprite_groups:
         if entity.sprite.id == entity_id:
             return entity.sprite
+
+def get_direct_proximity_collision_tiles_list(matrix):
+    direct_proximity_collision_tiles = []
+    for row in matrix:
+        for tile_index in row:
+            
+            if len(level_layout) > tile_index[0] >= 0 and len(level_layout[0]) > tile_index[1] >= 0:
+                collision_tile = get_level_collision_sprite_by_index(tile_index)
+            
+                if collision_tile != None:
+                    direct_proximity_collision_tiles.append(collision_tile)
+    
+    return direct_proximity_collision_tiles
 
 #Updates
 def update_all_entities():
@@ -85,8 +99,8 @@ def update_vicinity_level_colliders_position(vector):
 #Monster generation
 def generate_monsters():
     generate_monster(ETTIN,(4,2))
-    # generate_monster(ETTIN, (5,6))
-    # generate_monster(ETTIN, (4,1))
+    generate_monster(ETTIN, (4,3))
+    generate_monster(ETTIN, (4,1))
     # generate_monster(ETTIN, (7,3))
     # generate_monster(ETTIN, (7,8))
     # generate_monster(ETTIN, (6,7))

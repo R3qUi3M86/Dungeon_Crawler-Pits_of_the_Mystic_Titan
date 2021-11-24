@@ -5,7 +5,6 @@ from sounds import sound_player
 from utilities import combat_manager
 from utilities import util
 from utilities.level_painter import TILE_SIZE
-from utilities.level_painter import level
 from utilities.text_printer import *
 from utilities.constants import *
 from utilities import entity_manager
@@ -26,6 +25,8 @@ class Hero(pygame.sprite.Sprite):
         self.prevous_tile_index = self.tile_index
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.direct_proximity_collision_tiles = []
+        self.far_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index,(screen_height//48+5,screen_width//screen_width+4))
+        self.far_proximity_collision_tiles = []
         self.position = position
         self.map_position = 0,0
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
@@ -115,14 +116,6 @@ class Hero(pygame.sprite.Sprite):
 
     #Update functions
     def update(self):
-        
-        if self.is_living == False:
-            self.speed_vector = 0,0
-        else:
-            self.set_character_animation_direction_indices()
-            self.image = character_walk[int(self.character_walk_index[0])][int(self.character_walk_index[1])]
-            self.walking_animation()
-
         self.update_animation()
         self.rect = self.image.get_rect(midbottom = (self.image_position))
 
@@ -132,35 +125,30 @@ class Hero(pygame.sprite.Sprite):
         
         if self.tile_index != self.prevous_tile_index:
             self.prevous_tile_index = self.tile_index
-            self.vicinity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-            self.update_direct_proximity_tile_collision_matrix()
+            self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+            self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_collision_tiles_list(self.direct_proximity_index_matrix)
+
+            self.far_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index,(screen_height//48+5,screen_width//screen_width+4))
 
     def update_animation(self):
         if not self.is_dead:
-            if self.is_attacking == True:
-                self.character_attack_animation()
-
-            if self.is_in_pain == True:
-                self.character_pain_animation()
+            self.set_character_animation_direction_indices()
             
-            if self.is_dying == True:
+            if self.is_living:
+                self.walking_animation()
+                self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
+
+                if self.is_attacking == True:             
+                    self.character_attack_animation()
+
+                elif self.is_in_pain == True:
+                    self.character_pain_animation()
+            
+            elif self.is_dying == True:
                 self.character_death_animation()
 
-            if self.is_overkilled == True:
+            elif self.is_overkilled == True:
                 self.character_overkill_animation()
-
-    def update_direct_proximity_tile_collision_matrix(self):
-        direct_proximity_collision_tiles = []
-        for row in self.vicinity_index_matrix:
-            for tile_index in row:
-                
-                if len(level) > tile_index[0] >= 0 and len(level[0]) > tile_index[1] >= 0:
-                    collision_tile = entity_manager.get_level_collision_sprite_by_index(tile_index)
-                
-                    if collision_tile != None:
-                        direct_proximity_collision_tiles.append(collision_tile)
-        
-        self.direct_proximity_collision_tiles = direct_proximity_collision_tiles
 
     #Animations
     def walking_animation(self):
@@ -185,6 +173,7 @@ class Hero(pygame.sprite.Sprite):
     def character_pain_animation(self):
         if self.is_attacking or self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
             self.is_in_pain = False
+            self.character_pain_timer = 0
         else:
             self.character_pain_timer += 0.05
             self.image = character_pain[self.character_pain_index]
@@ -252,14 +241,12 @@ class Hero(pygame.sprite.Sprite):
             sound_player.player_pain_sound.stop()
             sound_player.player_death_sound.play()
             self.is_living = False
-            self.is_in_pain = False
             self.is_dying = True
 
             if -(self.maxhealth//2) >= self.health:
                 sound_player.player_death_sound.stop()
                 random.choice(sound_player.player_overkill_sounds).play()
                 self.is_living = False
-                self.is_in_pain = False
                 self.is_dying = False
                 self.is_overkilled = True
 

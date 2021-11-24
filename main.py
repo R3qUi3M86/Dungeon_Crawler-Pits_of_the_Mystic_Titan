@@ -16,62 +16,68 @@ set_volume_for_all_sounds(VOLUME)
 def get_player_wsad_input():
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_s] and entity_manager.hero.speed_scalar[Y] < 30.0:
-        entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+1
+    if entity_manager.hero.is_living:
+        if keys[pygame.K_s] and entity_manager.hero.speed_scalar[Y] < 30.0:
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+1
 
-    if (not keys[pygame.K_s] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[Y] > 0:
-        if entity_manager.hero.speed_scalar[Y] < 3:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],0
-        else:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]-3
+        if (not keys[pygame.K_s] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[Y] > 0:
+            if entity_manager.hero.speed_scalar[Y] < 3:
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],0
+            else:
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]-3
+        
+        if keys[pygame.K_w] and entity_manager.hero.speed_scalar[Y] > -30.0:
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]-1
+
+        if (not keys[pygame.K_w] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[Y] < 0:
+            if entity_manager.hero.speed_scalar[Y] > -3:
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],0
+            else:
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+3
+
+        if keys[pygame.K_a] and entity_manager.hero.speed_scalar[X] > -30.0:
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]-1,entity_manager.hero.speed_scalar[1]
+
+        if (not keys[pygame.K_a] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[X] < 0:
+            if entity_manager.hero.speed_scalar[X] > -3:
+                entity_manager.hero.speed_scalar = 0,entity_manager.hero.speed_scalar[Y]
+            else:
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]+3,entity_manager.hero.speed_scalar[Y]
+        
+        if keys[pygame.K_d] and entity_manager.hero.speed_scalar[X] < 30.0:
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]+1,entity_manager.hero.speed_scalar[Y]
+
+        if (not keys[pygame.K_d] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[X] > 0:
+            if entity_manager.hero.speed_scalar[X] < 3:
+                entity_manager.hero.speed_scalar = 0,entity_manager.hero.speed_scalar[Y]
+            else:
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]-3,entity_manager.hero.speed_scalar[Y]
+
+        if entity_manager.hero.speed_scalar[X] > 21.2 and entity_manager.hero.speed_scalar[Y] > 22.54:
+            entity_manager.hero.speed_scalar = 21.2,22.54
+        elif entity_manager.hero.speed_scalar[X] > 21.2 and entity_manager.hero.speed_scalar[Y] < -22.54:
+            entity_manager.hero.speed_scalar = 21.2,-22.54
+        elif entity_manager.hero.speed_scalar[X] < -21.2 and entity_manager.hero.speed_scalar[Y] > 22.54:
+            entity_manager.hero.speed_scalar = -21.2,22.54
+        elif entity_manager.hero.speed_scalar[X] < -21.2 and entity_manager.hero.speed_scalar[Y] < -22.54:
+            entity_manager.hero.speed_scalar = -21.2,-22.54
+
+        if entity_manager.hero.speed_scalar[X] > 30.0:
+            entity_manager.hero.speed_scalar = 30.0, entity_manager.hero.speed_scalar[Y]
+        elif entity_manager.hero.speed_scalar[X] < -30.0:
+            entity_manager.hero.speed_scalar = -30.0, entity_manager.hero.speed_scalar[Y]
+        if entity_manager.hero.speed_scalar[Y] > 30.0:
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X], 30.0
+        elif entity_manager.hero.speed_scalar[Y] < -30.0:
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X], -30.0
+
+        entity_manager.hero.speed_scalar = round(entity_manager.hero.speed_scalar[0],2),round(entity_manager.hero.speed_scalar[1],2)
+        entity_manager.hero.speed_vector = round((entity_manager.hero.speed_scalar[X]/30)*entity_manager.hero.speed,2), round((entity_manager.hero.speed_scalar[Y]/30)*entity_manager.hero.speed*0.55,2)
     
-    if keys[pygame.K_w] and entity_manager.hero.speed_scalar[Y] > -30.0:
-        entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]-1
-
-    if (not keys[pygame.K_w] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[Y] < 0:
-        if entity_manager.hero.speed_scalar[Y] > -3:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],0
-        else:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+3
-
-    if keys[pygame.K_a] and entity_manager.hero.speed_scalar[X] > -30.0:
-        entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]-1,entity_manager.hero.speed_scalar[1]
-
-    if (not keys[pygame.K_a] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[X] < 0:
-        if entity_manager.hero.speed_scalar[X] > -3:
-            entity_manager.hero.speed_scalar = 0,entity_manager.hero.speed_scalar[Y]
-        else:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]+3,entity_manager.hero.speed_scalar[Y]
+    else:
+        entity_manager.hero.speed_scalar = 0,0
+        entity_manager.hero.speed_vector = 0,0
     
-    if keys[pygame.K_d] and entity_manager.hero.speed_scalar[X] < 30.0:
-        entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]+1,entity_manager.hero.speed_scalar[Y]
-
-    if (not keys[pygame.K_d] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[X] > 0:
-        if entity_manager.hero.speed_scalar[X] < 3:
-            entity_manager.hero.speed_scalar = 0,entity_manager.hero.speed_scalar[Y]
-        else:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]-3,entity_manager.hero.speed_scalar[Y]
-
-    if entity_manager.hero.speed_scalar[X] > 21.2 and entity_manager.hero.speed_scalar[Y] > 22.54:
-        entity_manager.hero.speed_scalar = 21.2,22.54
-    elif entity_manager.hero.speed_scalar[X] > 21.2 and entity_manager.hero.speed_scalar[Y] < -22.54:
-        entity_manager.hero.speed_scalar = 21.2,-22.54
-    elif entity_manager.hero.speed_scalar[X] < -21.2 and entity_manager.hero.speed_scalar[Y] > 22.54:
-        entity_manager.hero.speed_scalar = -21.2,22.54
-    elif entity_manager.hero.speed_scalar[X] < -21.2 and entity_manager.hero.speed_scalar[Y] < -22.54:
-        entity_manager.hero.speed_scalar = -21.2,-22.54
-
-    if entity_manager.hero.speed_scalar[X] > 30.0:
-        entity_manager.hero.speed_scalar = 30.0, entity_manager.hero.speed_scalar[Y]
-    elif entity_manager.hero.speed_scalar[X] < -30.0:
-        entity_manager.hero.speed_scalar = -30.0, entity_manager.hero.speed_scalar[Y]
-    if entity_manager.hero.speed_scalar[Y] > 30.0:
-        entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X], 30.0
-    elif entity_manager.hero.speed_scalar[Y] < -30.0:
-        entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X], -30.0
-
-    entity_manager.hero.speed_scalar = round(entity_manager.hero.speed_scalar[0],2),round(entity_manager.hero.speed_scalar[1],2)
-    entity_manager.hero.speed_vector = round((entity_manager.hero.speed_scalar[X]/30)*entity_manager.hero.speed,2), round((entity_manager.hero.speed_scalar[Y]/30)*entity_manager.hero.speed*0.55,2)
 
 def get_player_mouse_input():
     mouse_pos = pygame.mouse.get_pos()

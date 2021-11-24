@@ -530,7 +530,7 @@ def all_sector_colliders_collide(collision_matrix):
     return False
 
 def entity_in_vicinity(current_entity_sprite, other_entity_sprite):
-    for vicinity_index_matrix_row in current_entity_sprite.vicinity_index_matrix:
+    for vicinity_index_matrix_row in current_entity_sprite.direct_proximity_index_matrix:
         if other_entity_sprite.tile_index in vicinity_index_matrix_row:
             return True
     
