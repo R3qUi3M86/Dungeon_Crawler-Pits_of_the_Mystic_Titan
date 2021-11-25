@@ -95,7 +95,7 @@ def update_far_proximity_level_colliders_position():
 
 #Monster generation
 def generate_monsters():
-    generate_monster(ETTIN,(9,22))
+    generate_monster(ETTIN,(4,4))
     # generate_monster(ETTIN,(4,2))
     # generate_monster(ETTIN, (4,3))
     # generate_monster(ETTIN, (4,1))

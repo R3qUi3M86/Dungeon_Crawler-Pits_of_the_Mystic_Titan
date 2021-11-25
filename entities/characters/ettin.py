@@ -152,8 +152,11 @@ class Ettin(pygame.sprite.Sprite):
 
             if entity_manager.hero.is_living and self.monster_ai.is_idle:
                 if not self.outside_of_update_range():
-                    self.monster_ai.increment_los_emmision_timer()
-                    self.monster_ai.increment_direction_change_decision_timer()
+                    if not self.monster_ai.waking_up:
+                        self.monster_ai.increment_los_emmision_timer()
+                        self.monster_ai.increment_direction_change_decision_timer()
+                    else:
+                        self.monster_ai.increment_waking_up_timer()
             
             elif not entity_manager.hero.is_living or self.outside_of_update_range():
                 self.speed_vector = 0,0
@@ -308,6 +311,9 @@ class Ettin(pygame.sprite.Sprite):
 
     def take_damage(self, damage):
         self.health -= damage
+        
+        if self.monster_ai.is_idle:
+            self.monster_ai.waking_up = True
         
         if self.health > 0:
             self.is_in_pain = True

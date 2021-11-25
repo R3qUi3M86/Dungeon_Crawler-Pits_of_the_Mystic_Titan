@@ -24,10 +24,14 @@ class Ai():
         self.los_emmision_timer = 0
         self.los_emmision_timer_limit = 120
 
+        self.waking_up_timer = 0
+        self.waking_up_timer_limit = 30
+
         self.pathfinder = pathfinder.Pathfinder(pathfinding_matrix, tile_index)
         self.next_tile_pos_x = 0
         self.next_tile_pos_y = 0
         self.is_idle = True
+        self.waking_up = False
         self.is_roaming = False
         self.is_path_finding = False
         self.is_following_path = False
@@ -247,3 +251,9 @@ class Ai():
             self.monster.emit_los_particle()
             self.los_emmision_timer = 0
 
+    def increment_waking_up_timer(self):
+        self.waking_up_timer += 1
+        if self.waking_up_timer == self.waking_up_timer_limit:
+            self.waking_up = False
+            self.is_idle = False
+            self.is_roaming = True
