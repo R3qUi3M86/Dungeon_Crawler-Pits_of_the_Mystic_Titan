@@ -6,12 +6,11 @@ from utilities import util
 def attack_monster_with_melee_attack(damage):
     hit_monsters = []
     
-    for entity_sprite_group in entity_manager.entity_sprite_groups:
-        entity = entity_sprite_group.sprite
+    for character_sprite in entity_manager.far_proximity_character_sprites_list:
         hero = entity_manager.hero
         
-        if entity != hero and not (entity.is_dead or entity.is_overkilled) and hero.facing_direction == util.get_facing_direction(hero.map_position, entity.map_position) and util.elipses_intersect(hero.map_position,entity.map_position,hero.melee_range,entity.size):
-            hit_monsters.append(entity)
+        if character_sprite != hero and not (character_sprite.is_dead or character_sprite.is_overkilled) and hero.facing_direction == util.get_facing_direction(hero.map_position, character_sprite.map_position) and util.elipses_intersect(hero.map_position,character_sprite.map_position,hero.melee_range,character_sprite.size):
+            hit_monsters.append(character_sprite)
 
     if hit_monsters:
         play_melee_attack_sound(PLAYER, HIT)

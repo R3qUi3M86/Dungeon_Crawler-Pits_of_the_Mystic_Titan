@@ -1,25 +1,45 @@
 from settings import *
 
 test_map = [
-"                                  ",
-"                                  ",
-"                                  ",
-"                                  ",
-"                                  ",
-"                                  ",
-"                                  ",
-"            EEE                   ",
-"            EEE                   ",
-"            EEE                   ",    
-"                                  ",
-"                                  ",
-"                                  ",
-"                                  ",
-"                                  ",
-"                                  ",
-"                                  ",
-"                                  "
-]
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"X                                                              XX",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                      XXXX                                     X",
+"X                      X  X                                     X",
+"XXXO                   XXXX  O       XXXX   ``XXX              XX",
+"X                         ~~                                    X",
+"X             EEE         ~~                                    X",
+"X             EEE                                               X",
+"X             EEE                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",    
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                              XX",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                               X",
+"X                                                              XX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
 
 level_01_map = [
 "XXXEEEXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -43,7 +63,7 @@ level_01_map = [
 "XNNNX        XXXX~~           ~~~~X",
 "X            XXXX~~~            ~~X",
 "XXXXXXXXXXXXXXXXX~~~~          ~~~X",
-"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",]
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
 
 # Legend
 ENTRANCE = "E" 

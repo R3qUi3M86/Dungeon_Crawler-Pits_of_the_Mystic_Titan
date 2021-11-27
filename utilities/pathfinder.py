@@ -1,6 +1,4 @@
 import random
-import pygame
-from settings import screen
 from pathfinding.core.grid import Grid
 from pathfinding.finder.a_star import AStarFinder
 from utilities import entity_manager

@@ -23,10 +23,9 @@ class Hero(pygame.sprite.Sprite):
         ###Position variables###
         self.tile_index = 0,0
         self.prevous_tile_index = self.tile_index
-        self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+        self.direct_proximity_index_matrix = []
         self.direct_proximity_collision_tiles = []
-        self.far_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index,(screen_height//48+5,screen_width//screen_width+4))
-        self.far_proximity_collision_tiles = []
+        self.direct_proximity_monsters = []
         self.position = position
         self.map_position = 0,0
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
@@ -58,14 +57,14 @@ class Hero(pygame.sprite.Sprite):
         
         ###Owned sprites###
         #Colliders
-        self.entity_collider_nw    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NW)
-        self.entity_collider_ne    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NE)
-        self.entity_collider_sw    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SW)
-        self.entity_collider_se    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SE)
+        self.entity_collider_nw    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_NW)
+        self.entity_collider_ne    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_NE)
+        self.entity_collider_sw    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_SW)
+        self.entity_collider_se    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_SE)
         self.entity_collider_omni  = Collider(player_position, self.id, ENTITY_OMNI)
 
         #Shadow
-        self.shadow = Shadow(player_position, PLAYER_ID, SIZE_SMALL)
+        self.shadow = Shadow(player_position, self.map_position, PLAYER_ID, SIZE_SMALL)
 
         #Sprite lists
         self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se]
@@ -85,6 +84,7 @@ class Hero(pygame.sprite.Sprite):
         self.is_in_pain = False
         self.is_dead = False
         self.is_corpse = False
+        self.can_collide = True
 
         ###Character properties###
         #General
@@ -122,12 +122,11 @@ class Hero(pygame.sprite.Sprite):
         self.tile_index = util.get_tile_index(self.map_position)
         
         if self.tile_index != self.prevous_tile_index:
-            self.prevous_tile_index = self.tile_index
-
-            self.far_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index,(screen_height//TILE_SIZE[Y]+far_colliders_matrix_offset_y,screen_width//TILE_SIZE[X]+far_colliders_matrix_offset_x))
-            self.far_proximity_collision_tiles = entity_manager.get_proximity_objects_list(self.far_proximity_index_matrix)
             self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-            self.direct_proximity_collision_tiles = entity_manager.get_proximity_objects_list(self.direct_proximity_index_matrix)
+            self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
+            self.direct_proximity_monsters = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, MONSTER)
+            entity_manager.update_far_proximity_matrices_and_lists(util.get_tile_offset(self.prevous_tile_index, self.tile_index))
+            self.prevous_tile_index = self.tile_index
 
     def update_animation(self):
         if not self.is_dead:

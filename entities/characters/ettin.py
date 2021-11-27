@@ -23,10 +23,11 @@ class Ettin(pygame.sprite.Sprite):
 
         ###Position variables###
         self.tile_index = tile_index
+        self.prevous_tile_index = tile_index
         self.current_tile_map_position = round(self.tile_index[1] * TILE_SIZE[Y] + TILE_SIZE[Y]//2), round(self.tile_index[0] * TILE_SIZE[X] + TILE_SIZE[X]//2,2)
-        self.prevous_tile_index = 0,0
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-        self.direct_proximity_collision_tiles = []
+        self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
+        self.direct_proximity_monsters = []
         self.position = level_painter.get_tile_position(tile_index)
         self.map_position = round(self.position[0]-player_position[0]+entity_manager.hero.tile_index[0],2), round(self.position[1]-player_position[1]+entity_manager.hero.tile_index[1],2)
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
@@ -65,7 +66,7 @@ class Ettin(pygame.sprite.Sprite):
         self.entity_collider_omni  = Collider(player_position, self.id, ENTITY_OMNI)
 
         #Shadow
-        self.shadow = Shadow(self.position, self.id, SIZE_MEDIUM)
+        self.shadow = Shadow(self.position, self.map_position, self.id, SIZE_MEDIUM, self.tile_index)
         
         #Sprite lists
         self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se]
@@ -87,6 +88,8 @@ class Ettin(pygame.sprite.Sprite):
         self.is_dead = False
         self.is_corpse = False
         self.has_los = False
+        self.can_collide = False
+        self.active = False
         
         ###Character properties###
         #General
@@ -116,49 +119,59 @@ class Ettin(pygame.sprite.Sprite):
 
     #Update functions
     def update(self):
-        if not self.is_dead:
+        if not self.leaving_far_proximity_matrix_margin():
+            self.activate()
+
+            if not self.is_dead:
+                self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
+                self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
+                self.update_owned_sprites_position()
+
+                self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
+                self.tile_index = util.get_tile_index(self.map_position)
             
-            self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
-            self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
-            self.update_owned_sprites_position()
+                if self.tile_index != self.prevous_tile_index:
+                    self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+                    self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
+                    entity_manager.update_all_nearby_monsters_and_self_direct_proximity_monsters_lists(self.direct_proximity_index_matrix)
+                    entity_manager.move_monster_in_all_matrices(self.id, self.prevous_tile_index, self.tile_index)
+                    self.prevous_tile_index = self.tile_index
+                
+                self.update_decisions()
 
+            elif not self.is_corpse:
+                self.is_corpse = True
+                entity_manager.fix_all_dead_objects_to_pixel_accuracy()
+                entity_manager.fix_player_position_to_pixel_accuracy()
+            
+            self.update_animation()
+            self.rect = self.image.get_rect(midbottom = (self.image_position))
+
+        else:
+            self.deactivate()
+
+    def update_position(self, vector=None):
+        if not self.leaving_far_proximity_matrix_margin():
+            if vector:
+                self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
+            else:
+                self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
             self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
-            self.tile_index = util.get_tile_index(self.map_position)
-        
-            if self.tile_index != self.prevous_tile_index:
-                self.prevous_tile_index = self.tile_index
-                self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-                self.direct_proximity_collision_tiles = entity_manager.get_proximity_objects_list(self.direct_proximity_index_matrix)
-                self.current_tile_map_position = round(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2), round(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2,2)
-
-            self.update_decisions()
-
-        elif not self.is_corpse:
-            self.is_corpse = True
-            entity_manager.fix_all_dead_objects_to_pixel_accuracy()
-            entity_manager.fix_player_position_to_pixel_accuracy()
-        
-        self.update_animation()
-        self.rect = self.image.get_rect(midbottom = (self.image_position))
-
-    def update_position(self, vector):
-        self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
-        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
-        self.rect = self.image.get_rect(midbottom = (self.image_position))
-        self.update_owned_sprites_position()
+            self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
+            self.rect = self.image.get_rect(midbottom = (self.image_position))
+            self.update_owned_sprites_position()
     
     def update_decisions(self):
         if self.is_living:
 
             if entity_manager.hero.is_living and self.monster_ai.is_idle:
-                if not self.outside_of_update_range():
-                    if not self.monster_ai.waking_up:
-                        self.monster_ai.increment_los_emmision_timer()
-                        self.monster_ai.increment_direction_change_decision_timer()
-                    else:
-                        self.monster_ai.increment_waking_up_timer()
+                if not self.monster_ai.waking_up:
+                    self.monster_ai.increment_los_emmision_timer()
+                    self.monster_ai.increment_direction_change_decision_timer()
+                else:
+                    self.monster_ai.increment_waking_up_timer()
             
-            elif not entity_manager.hero.is_living or self.outside_of_update_range():
+            elif not entity_manager.hero.is_living:
                 self.speed_vector = 0,0
                 self.monster_ai.increment_direction_change_decision_timer()
                 self.monster_ai.reset_obstacle_avoidance_flags()
@@ -202,6 +215,7 @@ class Ettin(pygame.sprite.Sprite):
         for auxilary_sprites_row in self.entity_auxilary_sprites:
             for auxilary_sprite in auxilary_sprites_row:
                 auxilary_sprite.position = self.position
+                auxilary_sprite.tile_index = self.tile_index
                 auxilary_sprite.update_position(self.position)
     
     #Animations
@@ -344,7 +358,7 @@ class Ettin(pygame.sprite.Sprite):
         self.attack_can_be_interrupted = False
         return False
     
-    def emit_los_particle(self):
+    def emit_los_particle_and_wake_up_if_player_is_seen(self):
         if util.monster_has_line_of_sight(self.map_position):
             hero_sector = util.get_facing_direction(self.position,player_position)
             
@@ -363,12 +377,25 @@ class Ettin(pygame.sprite.Sprite):
                 self.monster_ai.is_idle = False
                 self.monster_ai.is_roaming = True
 
-    #Conditions
-    def outside_of_update_range(self):
-        hero_tile_index = entity_manager.hero.tile_index
-        tile_row_offset = screen_height//2//TILE_SIZE[Y]+far_colliders_matrix_offset_y//4
-        tile_col_offset = screen_width//2//TILE_SIZE[X]+far_colliders_matrix_offset_x//4
+    #Misc
+    def activate(self):
+        self.active = True
+        self.can_collide = True
 
+    def deactivate(self):
+        self.speed_vector = 0,0
+        self.can_collide = False
+        self.active = False
+
+        if not self.monster_ai.is_idle:
+            self.monster_ai.end_pathfinding()
+            self.monster_ai.reset_obstacle_avoidance_flags()
+
+    #Conditions
+    def leaving_far_proximity_matrix_margin(self):
+        hero_tile_index = entity_manager.hero.tile_index
+        tile_row_offset = screen_height//2//TILE_SIZE[Y]+far_matrix_offset_y//3
+        tile_col_offset = screen_width//2//TILE_SIZE[X]+far_matrix_offset_x//3
         if abs(self.tile_index[0]-hero_tile_index[0]) > tile_row_offset or abs(self.tile_index[1]-hero_tile_index[1]) > tile_col_offset:
             return True
         return False

@@ -4,6 +4,7 @@ from copy import deepcopy
 from utilities.constants import *
 from utilities import entity_manager
 from utilities import level_painter
+from entities.level.level import ENTRANCE, WALL, WATER
 from settings import *
 
 center_x = 0
@@ -119,10 +120,16 @@ def elipses_intersect(entity1_map_pos,entity2_map_pos,entity1_a_b,entity2_a_b):
         distance = math.sqrt((x_abs_distance*x_abs_distance)+(y_abs_distance*y_abs_distance))
         reach = math.sqrt((total_x_reach*total_x_reach)+(total_y_reach*total_y_reach))
 
-        if distance<reach:
+        if distance < reach:
             return True
     
     return False
+
+def get_tile_offset(prevous_tile_index, tile_index):
+    offset_x = tile_index[X] - prevous_tile_index[X]
+    offset_y = tile_index[Y] - prevous_tile_index[Y]
+
+    return offset_x,offset_y
 
 def get_tile_index(map_pos):
     return int(map_pos[1]-screen_height//2)//level_painter.TILE_SIZE[Y] , int(map_pos[0]-screen_width//2)//level_painter.TILE_SIZE[X]
@@ -148,15 +155,67 @@ def monster_has_line_of_sight(monster_map_pos, particle_speed = 10, max_travel_x
         if current_tile_index != previous_tile_index:
             previous_tile_index = current_tile_index
             
-            if entity_manager.level_collision_sprites_matrix[current_tile_index[0]][current_tile_index[1]] != None:
+            if particle_collided_with_wall(current_tile_index):
                 return False
 
-        if hero_map_pos[0]-particle_speed//2 <= particle_map_pos[0] <= hero_map_pos[0]+particle_speed//2 and hero_map_pos[1]-particle_speed//2 <= particle_map_pos[1] <= hero_map_pos[1]+particle_speed//2:
+        if particle_collided_with_player(hero_map_pos, particle_map_pos, particle_speed):
             return True
     
     return False
 
-# def draw_pathfinding_path_for_monster(monster_index):
-#     monster_sprite = entity_manager.get_entity_sprite_by_id(monster_index)
-#     if monster_sprite != None:
-#         monster_sprite.monster_ai.pathfinder.draw_path()
+#Conditions
+def particle_collided_with_player(hero_map_pos, particle_map_pos, particle_speed):
+    if hero_map_pos[0]-particle_speed//2 <= particle_map_pos[0] <= hero_map_pos[0]+particle_speed//2 and hero_map_pos[1]-particle_speed//2 <= particle_map_pos[1] <= hero_map_pos[1]+particle_speed//2:
+        return True
+    return False
+
+def particle_collided_with_wall(current_tile_index):
+    if entity_manager.level_sprites_matrix[current_tile_index[0]][current_tile_index[1]].TYPE == WALL:
+        return True
+    return False
+
+#Misc
+print_limit = 20
+tick = 0
+
+def increment_print_matrix_timer(matrix, mode="S"):
+    global tick
+    tick += 1
+    if tick == print_limit:
+        tick = 0
+        print_matrix(matrix, mode)
+        
+def print_matrix(matrix, mode="S"):
+    if mode == "S":
+        for row, matrix_row in enumerate(matrix):
+            row_string = ""
+            for col, cell in enumerate(matrix_row):
+                
+                if matrix == entity_manager.far_proximity_level_sprite_matrix or matrix == entity_manager.level_sprites_matrix:
+                    if cell.TYPE in IMPASSABLE_TILES and cell.TYPE is not WATER:
+                        row_string = row_string+"X"
+                    elif cell.TYPE == WATER:
+                        row_string = row_string+"W"
+                    else:
+                        row_string = row_string+"."
+
+                elif matrix == entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix:
+                    if entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix[row][col]:
+                        row_string = row_string+"M"
+                    else:
+                        row_string = row_string+"."
+
+            print(row_string)
+
+    else:
+        for row in matrix:
+            row_string = ""
+            for col in row:
+                row_string = row_string + str(col)
+            
+            print(row_string)
+
+    print("")
+    print(entity_manager.far_proximity_entity_sprite_group_list)
+    print("")
+    # print(entity_manager.far_proximity_level_collider_sprites_list)

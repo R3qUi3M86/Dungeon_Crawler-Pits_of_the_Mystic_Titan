@@ -10,8 +10,7 @@ from utilities import entity_manager
 class Tile(pygame.sprite.Sprite):
     def __init__(self,type,tile_index,pos,size,vicinity_matrix):
         super().__init__()
-        self.type = type
-        self.TYPE = TILE
+        self.TYPE = type
         self.tile_index = tile_index
         self.position = pos
         self.map_position = int(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2+screen_width//2), int(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2 + screen_height//2)
@@ -30,7 +29,7 @@ class Tile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (self.position))
 
     def get_tile_image(self):
-        if self.type == FLOOR:
+        if self.TYPE == FLOOR:
             if self.vicinity_matrix[0][1] != ENTRANCE:
                 if random.choice(range(20)) > 1:
                     return random.choice(floor_tile_images)
@@ -43,7 +42,7 @@ class Tile(pygame.sprite.Sprite):
                     return floor_tile_entrance_images[2]
                 else:
                     return floor_tile_entrance_images[1]
-        elif self.type == WATER:
+        elif self.TYPE == WATER:
             if self.deep_water():
                 return random.choice(blue_water_images)
             elif self.left_water_border():
@@ -111,7 +110,7 @@ class Tile(pygame.sprite.Sprite):
 
 
     def get_passable(self):
-        if self.type in IMPASSABLE_TILES:
+        if self.TYPE in IMPASSABLE_TILES:
             return False
         return True
 

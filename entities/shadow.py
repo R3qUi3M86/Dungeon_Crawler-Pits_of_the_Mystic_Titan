@@ -1,12 +1,15 @@
 import pygame
 from utilities.constants import *
+from utilities import entity_manager
 from images.misc.shadow_images import *
 
 class Shadow(pygame.sprite.Sprite):
-    def __init__(self, position, id, size):
+    def __init__(self, position, map_position, id, size, tile_index=None):
         super().__init__()
+        self.TYPE = SHADOW
         self.shadow_size = size
         self.position = position
+        self.map_position = map_position
         self.id = id
 
         self.image = self.get_image()

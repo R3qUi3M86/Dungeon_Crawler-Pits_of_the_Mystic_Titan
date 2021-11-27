@@ -21,8 +21,8 @@ class Ai():
         self.attack_decision_timer = 0
         self.attack_decision_timer_limit = 30
 
-        self.los_emmision_timer = 0
-        self.los_emmision_timer_limit = 120
+        self.los_emision_timer = 0
+        self.los_emision_timer_limit = 120
 
         self.waking_up_timer = 0
         self.waking_up_timer_limit = 30
@@ -35,12 +35,12 @@ class Ai():
         self.is_roaming = False
         self.is_path_finding = False
         self.is_following_path = False
-        self.path_finding_is_ready = True
         self.is_avoiding_obstacle = False
-        self.obstacle_sector = None
-        self.avoidance_direction_sector = None
         self.is_doing_diagonal_avoidance = False
         self.is_on_final_approach = False
+        self.path_finding_is_ready = True
+        self.obstacle_sector = None
+        self.avoidance_direction_sector = None
     
     #Movement directional change timer
     def increment_direction_change_decision_timer(self):
@@ -246,10 +246,10 @@ class Ai():
             self.attack_decision_timer = 0
 
     def increment_los_emmision_timer(self):
-        self.los_emmision_timer += 1
-        if self.los_emmision_timer == self.los_emmision_timer_limit:
-            self.monster.emit_los_particle()
-            self.los_emmision_timer = 0
+        self.los_emision_timer += 1
+        if self.los_emision_timer == self.los_emision_timer_limit:
+            self.monster.emit_los_particle_and_wake_up_if_player_is_seen()
+            self.los_emision_timer = 0
 
     def increment_waking_up_timer(self):
         self.waking_up_timer += 1

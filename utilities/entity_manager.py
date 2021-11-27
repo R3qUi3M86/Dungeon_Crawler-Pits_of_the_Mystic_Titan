@@ -1,101 +1,728 @@
+from numpy import mat
 import pygame
 import math
+from utilities import util
 from utilities.constants import *
+from utilities import level_painter
 from utilities.level_painter import level_layout
+from utilities.level_painter import TILE_SIZE
+from entities.level.level import WATER
 from entities.characters.ettin import Ettin
 from entities.characters.player import Hero
 
 entities_id = []
 
-#Standard entities
+##### Entities #####
+### Whole level ###
 hero = Hero(player_position)
-entity_sprite_groups = []
-shadow_sprite_groups = []
-level_sprite_groups = []
-projectile_sprite_groups = []
+all_monsters = []
 
-#Collision entities
-level_collision_sprites_matrix = [] #For collision search optimization
-melee_sector_sprite_groups = []
-entity_collision_sprite_groups = []
+level_sprites_matrix = [[]]
+all_entity_and_shadow_sprite_group_matrix = [[[]]]
 
-#Hero entity initialization
-def initialize_player_object():
-    entity_sprite_groups.append(pygame.sprite.GroupSingle(hero))
-    shadow_sprite_groups.append(pygame.sprite.GroupSingle(hero.shadow))
-    entity_collision_sprite_groups.append(pygame.sprite.Group(hero.entity_collider_sprites))  
 
-#Get sprites
-def get_level_collision_sprite_by_index(index):
-    if 0 <= index[0] < len(level_collision_sprites_matrix) and 0 <= index[1] < len(level_collision_sprites_matrix[0]):
-        if level_collision_sprites_matrix[index[0]][index[1]]:
-            return level_collision_sprites_matrix[index[0]][index[1]]
-    else:
-        return level_collision_sprites_matrix[0][0]
+### Far proximity ###
+#Matrices
+far_proximity_index_matrix = [[]] #Only indices
+far_proximity_level_sprite_matrix = [[]]
+far_proximity_entity_and_shadow_sprite_group_matrix = [[[]]]
 
-def get_entity_sprite_by_index(index):
-    for entity in entity_sprite_groups:
-        if entity.sprite.tile_index == index:
-            return entity
+#Lists
+far_proximity_entity_sprite_group_list = [pygame.sprite.GroupSingle(hero)] #For faster update, update_position, sprite ordering and drawing on screen
+far_proximity_shadow_sprite_group_list = [pygame.sprite.GroupSingle(hero.shadow)] #For faster update, update_position, sprite ordering and drawing on screen
+
+far_proximity_character_sprites_list = [] #For faster collision type handling
+far_proximity_item_sprites_list = [] #For faster collision type handling
+far_proximity_projectile_sprites_list = [] #For faster collision type handling
+
+far_proximity_level_collider_sprites_list = [] #For faster update_position
+far_proximity_level_water_sprites_list = [] #For faster update_position - animation to be implemented
+
+#Initialization
+def initialize_player():
+    hero.tile_index = level_painter.player_starting_tile
+    hero.prevous_tile_index = level_painter.player_starting_tile
+    hero.map_position = TILE_SIZE[X]//2+(48*hero.tile_index[1])+screen_width//2, TILE_SIZE[Y]//2+(48*hero.tile_index[0]+screen_height//2)
+
+def initialize_level_sprites_matrix():
+    global level_sprites_matrix
+    
+    level_sprites_matrix = []
+
+    x = len(level_layout)
+    y = len(level_layout[0])
+    for _ in range(x):
+        row = []
+        for _ in range (y):
+            row.append(0)
+        level_sprites_matrix.append(row)  
+
+def initialize_all_entities_and_shadows_sprite_group_matrix():
+    global all_entity_and_shadow_sprite_group_matrix
+    
+    all_entity_and_shadow_sprite_group_matrix = []
+    x = len(level_layout)
+    y = len(level_layout[0])
+    
+    for _ in range(x):
+        row = []
+
+        for _ in range (y):
+            row.append([])
+        all_entity_and_shadow_sprite_group_matrix.append(row)
+
+def initialize_far_proximity_matrix_and_lists(matrix_type):
+    if matrix_type == far_proximity_level_sprite_matrix:
+        initialize_far_proximity_level_sprite_matrix()
+        initialize_far_proximity_level_collider_and_water_sprites_list()
+    
+    elif matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
+        initialize_far_proximity_entity_and_shadow_sprite_group_matrix()
+        initialize_far_proximity_all_entities_and_shadows_sprite_group_lists()
+
+def initialize_far_proximity_level_sprite_matrix():
+    global far_proximity_level_sprite_matrix
+    
+    matrix = []
+    for row in far_proximity_index_matrix:
+        new_row = []
+        for cell in row:
+            if 0 <= cell[0] < len(level_layout) and 0 <= cell[1] < len(level_layout[0]):
+                tile_sprite = level_sprites_matrix[cell[0]][cell[1]]
+                new_row.append(tile_sprite)
+        if len(new_row) > 0:
+            matrix.append(new_row)
+
+    far_proximity_level_sprite_matrix = matrix 
+
+def initialize_far_proximity_entity_and_shadow_sprite_group_matrix():
+    global far_proximity_entity_and_shadow_sprite_group_matrix
+
+    matrix = []
+    for row in far_proximity_index_matrix:
+        new_list = []
+        for cell in row:
+            if 0 <= cell[0] < len(level_layout) and 0 <= cell[1] < len(level_layout[0]):
+                entity_sprite_groups_list = all_entity_and_shadow_sprite_group_matrix[cell[0]][cell[1]]
+                new_list.append(entity_sprite_groups_list)
+        if len(new_list) > 0:
+            matrix.append(new_list)
+
+    far_proximity_entity_and_shadow_sprite_group_matrix = matrix 
+
+def initialize_far_proximity_level_collider_and_water_sprites_list():
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_level_water_sprites_list
+
+    for row in far_proximity_level_sprite_matrix:
+        for tile in row:
+            if tile.TYPE in IMPASSABLE_TILES:
+                far_proximity_level_collider_sprites_list.append(tile)
+                if tile.TYPE == WATER:
+                    far_proximity_level_water_sprites_list.append(tile)
+
+def initialize_far_proximity_all_entities_and_shadows_sprite_group_lists():
+    global far_proximity_entity_sprite_group_list
+    global far_proximity_shadow_sprite_group_list
+
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+
+    for row in far_proximity_entity_and_shadow_sprite_group_matrix:
+        for entity_sprite_group_list in row:
+            for entity_sprite_group in entity_sprite_group_list:
+                if entity_sprite_group.sprite.TYPE == SHADOW:
+                    far_proximity_shadow_sprite_group_list.append(entity_sprite_group)
+                else:
+                    far_proximity_entity_sprite_group_list.append(entity_sprite_group)
+                    if entity_sprite_group.sprite.TYPE == MONSTER:
+                        far_proximity_character_sprites_list.append(entity_sprite_group.sprite)
+                    
+                    elif entity_sprite_group.sprite.TYPE == ITEM:
+                        far_proximity_item_sprites_list.append(entity_sprite_group.sprite)
+
+                    elif entity_sprite_group.sprite.TYPE == PROJECTILE:
+                        far_proximity_projectile_sprites_list.append(entity_sprite_group.sprite)
+
+def finish_init():
+    hero.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(hero.tile_index)
+    hero.direct_proximity_collision_tiles = get_direct_proximity_objects_list(hero.direct_proximity_index_matrix)
+    hero.direct_proximity_monsters = get_direct_proximity_objects_list(hero.direct_proximity_index_matrix, MONSTER)
+
+#Getters
+def get_entity_sprite_group_by_id_from_matrix_cell(entity_id, tile_index, type=MONSTER):
+    if type == MONSTER:
+        for entity in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
+            if entity.sprite.TYPE is MONSTER and entity.sprite.id == entity_id:
+                return entity
+    
+    if type == SHADOW:
+        for shadow in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
+            if shadow.sprite.TYPE is SHADOW and shadow.sprite.id == entity_id:
+                return shadow
+
+def get_direct_proximity_objects_list(matrix, object_type = IMPASSABLE_TILES):
+    if object_type == IMPASSABLE_TILES:
+        direct_proximity_impassable_tile_sprites = []
+        for row in matrix:
+            for tile_index in row:
+                if level_sprites_matrix[tile_index[0]][tile_index[1]].passable == False:
+                    direct_proximity_impassable_tile_sprites.append(level_sprites_matrix[tile_index[0]][tile_index[1]])
+                
+        return direct_proximity_impassable_tile_sprites
+    
+    elif object_type == MONSTER:
+        direct_proximity_monster_sprites = []
+        for row in matrix:
+            for tile_index in row:
+                for entity in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
+                    if entity.sprite.TYPE == MONSTER:
+                        direct_proximity_monster_sprites.append(entity.sprite)
+        
+        return direct_proximity_monster_sprites
 
 def get_entity_sprite_by_id(entity_id):
-    for entity in entity_sprite_groups:
-        if entity.sprite.id == entity_id:
-            return entity.sprite
+    for monster in all_monsters:
+        if monster.id == entity_id:
+            return monster
 
-def get_proximity_objects_list(matrix):
-    proximity_objects = []
-    
-    for row in matrix:
-        for tile_index in row:
-            
-            if len(level_layout) > tile_index[0] >= 0 and len(level_layout[0]) > tile_index[1] >= 0:
-                object = get_level_collision_sprite_by_index(tile_index)
-                if object != None:
-                    proximity_objects.append(object)
-            
-    return proximity_objects
+#Objects updates
+def update_all_objects_in_far_proximity():
+    hero.update()
 
-#Updates
-def update_all_entities():
-    for entity_sprite_group in entity_sprite_groups:
-        entity_sprite_group.sprite.update()
-    
-    # for level_sprite_group in level_sprite_groups:
-    #     level_sprite_group.sprite.update()
+    for character_sprite in far_proximity_character_sprites_list:
+        character_sprite.update()
 
-    for projectile_sprite_group in projectile_sprite_groups:
-        sprites = projectile_sprite_group.sprites()
-        for projectile_sprite in sprites:
-            projectile_sprite.update()
+    for shadow_sprite_group in far_proximity_shadow_sprite_group_list:
+        shadow_sprite_group.sprite.update()
 
-def update_all_non_player_entities_position_by_vector(vector):
-    if round(hero.speed_scalar[0],2) != 0.0 or round(hero.speed_scalar[1],2) != 0.0:
-        update_non_player_group_single_entities_position(vector,entity_sprite_groups)
-        update_non_player_group_single_entities_position(vector,projectile_sprite_groups)
+    for item_sprite in far_proximity_item_sprites_list:
+        item_sprite.update()
+
+    for projectile_sprite in far_proximity_projectile_sprites_list:
+        projectile_sprite.update()
+
+    for water_sprite in far_proximity_level_water_sprites_list:
+        water_sprite.update()
+
+def update_all_objects_position_in_far_proximity():
+    if round(hero.speed_scalar[0],2) != 0.00 or round(hero.speed_scalar[1],2) != 0.00:
+        hero.update_position(hero.speed_vector)
+        update_far_proximity_non_player_entities_position(far_proximity_entity_sprite_group_list)
         update_far_proximity_level_colliders_position()
-    
-def update_hero_position():
-    hero.update_position(hero.speed_vector)
 
-def update_non_player_group_single_entities_position(vector,entities):
+def update_far_proximity_non_player_entities_position(entities):
     for entity in entities:
-        if entity.sprite != hero:
-            entity.sprite.update_position(vector)
-
-def update_non_player_group_entities_position(vector,entities):
-    for _ in entities:
-        entity_sprites = entities.sprites()
-        for entity_sprite in entity_sprites:
-            entity_sprite.update_position(vector)
+        if entity.sprite is not hero:
+            entity.sprite.update_position()
 
 def update_far_proximity_level_colliders_position():
-    for tile in hero.far_proximity_collision_tiles:
+    for tile in far_proximity_level_collider_sprites_list:
         tile.update_position()
+
+def update_all_nearby_monsters_and_self_direct_proximity_monsters_lists(direct_proximity_matrix):
+    for row in direct_proximity_matrix:
+        for tile_index in row:
+            for entity in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
+                if entity.sprite.TYPE == MONSTER:
+                    monster = entity.sprite
+                    monster.direct_proximity_monsters = get_direct_proximity_objects_list(monster.direct_proximity_index_matrix, MONSTER)
+
+##### Matrix updates #####
+def update_far_proximity_matrices_and_lists(offset = None):
+    update_far_proximity_index_matrix(offset)
+    
+    update_far_proximity_matrix_and_lists(far_proximity_entity_and_shadow_sprite_group_matrix, offset)
+    update_far_proximity_matrix_and_lists(far_proximity_level_sprite_matrix, offset)
+
+def update_far_proximity_index_matrix(offset = None):
+    global far_proximity_index_matrix
+
+    size = screen_height // TILE_SIZE[Y] + far_matrix_offset_y, screen_width // TILE_SIZE[X] + far_matrix_offset_x
+
+    if offset == None:
+        far_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(hero.tile_index, size)
+    else:
+        new_row = []
+        if offset[0] == 1:
+            del far_proximity_index_matrix[0]
+            for index in far_proximity_index_matrix[-1]:
+                new_tile_index = index[0]+1, index[1]
+                new_row.append(new_tile_index)
+            far_proximity_index_matrix.append(new_row)
+
+        elif offset[0] == -1:
+            del far_proximity_index_matrix[-1]
+            for index in far_proximity_index_matrix[0]:
+                new_tile_index = index[0]-1, index[1]
+                new_row.append(new_tile_index)
+            far_proximity_index_matrix.insert(0, new_row)
+
+        if offset[1] == 1:
+            for row in far_proximity_index_matrix:
+                del row[0]
+                new_tile_index = row[-1][0], row[-1][1]+1
+                row.append(new_tile_index)
+
+        elif offset[1] == -1:          
+            for row in far_proximity_index_matrix:
+                del row[-1]
+                new_tile_index = row[0][0], row[0][1]-1
+                row.insert(0, new_tile_index)
+
+def update_far_proximity_matrix_and_lists(matrix_type, offset = None):
+    if offset == None:
+        initialize_far_proximity_matrix_and_lists(matrix_type)
+    else:
+        offset_far_proximity_matrix_and_update_lists(matrix_type, offset)
+
+def offset_far_proximity_matrix_and_update_lists(matrix_type, offset):
+    corrected_y_offset_matrix = None
+    if offset[0] != 0 and offset[1] != 0:
+        corrected_y_offset_matrix = get_diagonal_corrected_far_proximity_index_matrix(offset[1])
+        if offset[0] == 1:
+            remove_first_row_from_matrix_and_objects_from_lists(matrix_type)
+            append_last_row_to_matrix_and_objects_to_lists(matrix_type, corrected_y_offset_matrix)
+
+        elif offset[0] == -1:
+            remove_last_row_from_matrix_and_objects_from_lists(matrix_type)
+            insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, corrected_y_offset_matrix)
+    else:
+        if offset[0] == 1:
+            remove_first_row_from_matrix_and_objects_from_lists(matrix_type)
+            append_last_row_to_matrix_and_objects_to_lists(matrix_type, far_proximity_index_matrix)
+
+        elif offset[0] == -1:
+            remove_last_row_from_matrix_and_objects_from_lists(matrix_type)
+            insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, far_proximity_index_matrix)
+
+    if offset[1] == 1:
+        remove_first_col_from_matrix_and_objects_from_lists(matrix_type)
+        append_last_col_to_matrix_and_objects_to_lists(matrix_type)
+
+    elif offset[1] == -1:
+        remove_last_col_from_matrix_and_objects_from_lists(matrix_type)
+        insert_first_col_in_matrix_and_append_objects_to_lists(matrix_type)
+ 
+### X MATRIX OFFSET ### 
+#X = +1
+def remove_first_row_from_matrix_and_objects_from_lists(matrix_type):
+    global far_proximity_entity_and_shadow_sprite_group_matrix
+    global far_proximity_level_sprite_matrix
+
+    global far_proximity_entity_sprite_group_list
+    global far_proximity_shadow_sprite_group_list
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_level_water_sprites_list
+    
+    #Entities and shadows (3D MATRIX)
+    if far_proximity_index_matrix[0][0][0] > 0: 
+        if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix: #3D MATRIX
+            for cell in far_proximity_entity_and_shadow_sprite_group_matrix[0]:
+                for entity in cell:
+                    if entity.sprite.TYPE is not SHADOW:
+                        far_proximity_entity_sprite_group_list.remove(entity)
+                        if entity.sprite.TYPE == MONSTER:
+                            far_proximity_character_sprites_list.remove(entity.sprite)
+
+                        elif entity.sprite.TYPE == ITEM:
+                            far_proximity_item_sprites_list.remove(entity.sprite)
+
+                        elif entity.sprite.TYPE == PROJECTILE:
+                            far_proximity_projectile_sprites_list.remove(entity.sprite)
+                    else:
+                        far_proximity_shadow_sprite_group_list.remove(entity)
+
+            del far_proximity_entity_and_shadow_sprite_group_matrix[0]
+
+        #Level sprites (2D MATRIX)
+        elif matrix_type == far_proximity_level_sprite_matrix:
+            for tile in far_proximity_level_sprite_matrix[0]:
+                if tile.TYPE in IMPASSABLE_TILES:
+                    far_proximity_level_collider_sprites_list.remove(tile)
+                    if tile.TYPE is WATER:
+                        far_proximity_level_water_sprites_list.remove(tile)
+            
+            del far_proximity_level_sprite_matrix[0]
+
+def append_last_row_to_matrix_and_objects_to_lists(matrix_type, tile_indices_matrix):
+    global far_proximity_entity_and_shadow_sprite_group_matrix
+    global far_proximity_level_sprite_matrix
+
+    global far_proximity_entity_sprite_group_list
+    global far_proximity_shadow_sprite_group_list
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_level_water_sprites_list    
+    
+    if tile_indices_matrix[-1][0][0] < len(level_layout):
+
+        #Entities and shadows (3D MATRIX)
+        if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
+            new_row = []
+
+            for tile_index in tile_indices_matrix[-1]:
+                if 0 <= tile_index[1] < len(level_layout[0]):
+                    entities = all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]
+                    new_row.append(entities)
+                    for entity in entities:
+                        if entity.sprite.TYPE is not SHADOW:
+                            far_proximity_entity_sprite_group_list.append(entity)
+                            if entity.sprite.TYPE is MONSTER:
+                                far_proximity_character_sprites_list.append(entity.sprite)
+
+                            elif entity.sprite.TYPE is ITEM:
+                                far_proximity_item_sprites_list.append(entity.sprite)
+
+                            elif entity.sprite.TYPE is PROJECTILE:
+                                far_proximity_projectile_sprites_list.append(entity.sprite)                                
+                        else:
+                            far_proximity_shadow_sprite_group_list.append(entity)
+
+            far_proximity_entity_and_shadow_sprite_group_matrix.append(new_row)
+
+        #Level sprites (2D MATRIX)
+        elif matrix_type == far_proximity_level_sprite_matrix:
+            new_row = []
+            
+            for tile_index in tile_indices_matrix[-1]:
+                if 0 <= tile_index[1] < len(level_layout[0]):
+                    tile = level_sprites_matrix[tile_index[0]][tile_index[1]]
+                    new_row.append(tile)
+                    if tile.TYPE in IMPASSABLE_TILES:
+                        far_proximity_level_collider_sprites_list.append(tile)
+                        if tile.TYPE == WATER:
+                            far_proximity_level_water_sprites_list.append(tile)
+            
+            far_proximity_level_sprite_matrix.append(new_row)
+
+#X = -1
+def remove_last_row_from_matrix_and_objects_from_lists(matrix_type):
+    global far_proximity_entity_and_shadow_sprite_group_matrix
+    global far_proximity_level_sprite_matrix
+
+    global far_proximity_entity_sprite_group_list
+    global far_proximity_shadow_sprite_group_list
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_level_water_sprites_list
+
+    
+    if far_proximity_index_matrix[-1][0][0] < len(level_layout)-1: 
+        
+        #Entities and shadows (3D MATRIX)
+        if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
+            for cell in far_proximity_entity_and_shadow_sprite_group_matrix[-1]:
+                for entity in cell:
+                    print(entity)
+                    if entity.sprite.TYPE is not SHADOW:
+                        far_proximity_entity_sprite_group_list.remove(entity)
+                        if entity.sprite.TYPE == MONSTER:
+                            far_proximity_character_sprites_list.remove(entity.sprite)
+
+                        elif entity.sprite.TYPE == ITEM:
+                            far_proximity_item_sprites_list.remove(entity.sprite)
+
+                        elif entity.sprite.TYPE == PROJECTILE:
+                            far_proximity_projectile_sprites_list.remove(entity.sprite)
+
+                    else:
+                        far_proximity_shadow_sprite_group_list.remove(entity)
+
+            del far_proximity_entity_and_shadow_sprite_group_matrix[-1]
+
+        #Level sprites (2D MATRIX)
+        elif matrix_type == far_proximity_level_sprite_matrix:
+            for tile in far_proximity_level_sprite_matrix[-1]:
+                if tile.TYPE in IMPASSABLE_TILES:
+                    far_proximity_level_collider_sprites_list.remove(tile)
+                    if tile.TYPE is WATER:
+                        far_proximity_level_water_sprites_list.remove(tile)
+            
+            del far_proximity_level_sprite_matrix[-1]
+
+def insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, tile_indices_matrix):
+    global far_proximity_entity_and_shadow_sprite_group_matrix
+    global far_proximity_level_sprite_matrix
+
+    global far_proximity_entity_sprite_group_list
+    global far_proximity_shadow_sprite_group_list
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_level_water_sprites_list
+
+    if tile_indices_matrix[0][0][0] >= 0:
+
+        #Entities and shadows (3D MATRIX)
+        if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
+            new_row = []
+
+            for tile_index in tile_indices_matrix[0]:
+                if 0 <= tile_index[1] < len(level_layout[0]):
+                    entities = all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]
+                    new_row.append(entities)
+                    for entity in entities:
+                        if entity.sprite.TYPE is not SHADOW:
+                            far_proximity_entity_sprite_group_list.append(entity)
+                            if entity.sprite.TYPE is MONSTER:
+                                far_proximity_character_sprites_list.append(entity.sprite)
+
+                            elif entity.sprite.TYPE is ITEM:
+                                far_proximity_item_sprites_list.append(entity.sprite)
+
+                            elif entity.sprite.TYPE is PROJECTILE:
+                                far_proximity_projectile_sprites_list.append(entity.sprite)                                
+                        else:
+                            far_proximity_shadow_sprite_group_list.append(entity)
+                
+            far_proximity_entity_and_shadow_sprite_group_matrix.insert(0, new_row)
+
+        #Level sprites (2D MATRIX)
+        elif matrix_type == far_proximity_level_sprite_matrix:
+            new_row = []
+            
+            for tile_index in tile_indices_matrix[0]:
+                if 0 <= tile_index[1] < len(level_layout[0]):
+                    tile = level_sprites_matrix[tile_index[0]][tile_index[1]]
+                    new_row.append(tile)
+                    if tile.TYPE in IMPASSABLE_TILES:
+                        far_proximity_level_collider_sprites_list.append(tile)
+                        if tile.TYPE == WATER:
+                            far_proximity_level_water_sprites_list.append(tile)
+            
+            far_proximity_level_sprite_matrix.insert(0, new_row)
+
+### Y MATRIX OFFSET ###
+#Y = +1
+def remove_first_col_from_matrix_and_objects_from_lists(matrix_type):
+    global far_proximity_entity_and_shadow_sprite_group_matrix
+    global far_proximity_level_sprite_matrix
+
+    global far_proximity_entity_sprite_group_list
+    global far_proximity_shadow_sprite_group_list
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_level_water_sprites_list
+
+    
+    if far_proximity_index_matrix[0][0][1] > 0:
+
+        #Entities and shadows (3D MATRIX)
+        if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
+            for i, entities_row in enumerate(far_proximity_entity_and_shadow_sprite_group_matrix):
+                for entity in entities_row[0]:
+                    
+                    if entity.sprite.TYPE is not SHADOW:
+                        far_proximity_entity_sprite_group_list.remove(entity)
+
+                        if entity.sprite.TYPE is MONSTER:
+                            far_proximity_character_sprites_list.remove(entity.sprite)
+                        elif entity.sprite.TYPE is ITEM:
+                            far_proximity_item_sprites_list.remove(entity.sprite)
+                        elif entity.sprite.TYPE is PROJECTILE:
+                            far_proximity_projectile_sprites_list.remove(entity.sprite)
+                    else:
+                        far_proximity_shadow_sprite_group_list.remove(entity)
+
+                del far_proximity_entity_and_shadow_sprite_group_matrix[i][0]
+
+        #Level sprites (2D MATRIX)
+        if matrix_type == far_proximity_level_sprite_matrix:
+            for i, tile_row in enumerate(far_proximity_level_sprite_matrix):
+
+                if tile_row[0].TYPE in IMPASSABLE_TILES:
+                    far_proximity_level_collider_sprites_list.remove(tile_row[0])
+                    if tile_row[0].TYPE == WATER:
+                        far_proximity_level_water_sprites_list.remove(tile_row[0])
+                
+                del far_proximity_level_sprite_matrix[i][0]
+                
+def append_last_col_to_matrix_and_objects_to_lists(matrix_type):
+    global far_proximity_entity_and_shadow_sprite_group_matrix
+    global far_proximity_level_sprite_matrix
+
+    global far_proximity_entity_sprite_group_list
+    global far_proximity_shadow_sprite_group_list
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_level_water_sprites_list
+
+    i = 0
+    for row_indices in far_proximity_index_matrix:
+        if 0 <= row_indices[-1][0] < len(level_layout) and row_indices[-1][1] < len(level_layout[0]):
+            
+
+            #Entities and shadows (3D MATRIX)
+            if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
+                entities = all_entity_and_shadow_sprite_group_matrix[row_indices[-1][0]][row_indices[-1][1]]
+                far_proximity_entity_and_shadow_sprite_group_matrix[i].append(entities)
+                
+                for entity in entities:
+                    if entity.sprite.TYPE is not SHADOW:
+                        far_proximity_entity_sprite_group_list.append(entity)
+                        if entity.sprite.TYPE is MONSTER:
+                            far_proximity_character_sprites_list.append(entity.sprite)
+
+                        elif entity.sprite.TYPE is ITEM:
+                            far_proximity_item_sprites_list.append(entity.sprite)
+
+                        elif entity.sprite.TYPE is PROJECTILE:
+                            far_proximity_projectile_sprites_list.append(entity.sprite)
+                    else:
+                        far_proximity_shadow_sprite_group_list.append(entity)
+
+            #Level sprites (2D MATRIX)
+            elif matrix_type == far_proximity_level_sprite_matrix:
+                tile = level_sprites_matrix[row_indices[-1][0]][row_indices[-1][1]]
+                far_proximity_level_sprite_matrix[i].append(tile)
+                if tile.TYPE in IMPASSABLE_TILES:
+                    far_proximity_level_collider_sprites_list.append(tile)
+                    if tile.TYPE is WATER:
+                        far_proximity_level_water_sprites_list.append(tile)
+            i += 1
+
+#Y = -1
+def remove_last_col_from_matrix_and_objects_from_lists(matrix_type):
+    global far_proximity_entity_and_shadow_sprite_group_matrix
+    global far_proximity_level_sprite_matrix
+
+    global far_proximity_entity_sprite_group_list
+    global far_proximity_shadow_sprite_group_list
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_level_water_sprites_list
+    
+    if far_proximity_index_matrix[0][-1][1] < len(level_layout[0])-1:
+        
+        #Entities and shadows (3D MATRIX)
+        if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
+            for i, entities_row in enumerate(far_proximity_entity_and_shadow_sprite_group_matrix):
+                for entity in entities_row[-1]:
+        
+                    if entity.sprite.TYPE is not SHADOW:
+                        far_proximity_entity_sprite_group_list.remove(entity)
+
+                        if entity.sprite.TYPE is MONSTER:
+                            far_proximity_character_sprites_list.remove(entity.sprite)
+                        elif entity.sprite.TYPE is ITEM:
+                            far_proximity_item_sprites_list.remove(entity.sprite)
+                        elif entity.sprite.TYPE is PROJECTILE:
+                            far_proximity_projectile_sprites_list.remove(entity.sprite)
+                    else:
+                        far_proximity_shadow_sprite_group_list.remove(entity)
+
+                del far_proximity_entity_and_shadow_sprite_group_matrix[i][-1]
+
+        #Level sprites (2D MATRIX)
+        elif matrix_type == far_proximity_level_sprite_matrix:
+            for i, tile_row in enumerate(far_proximity_level_sprite_matrix):
+                    
+                if tile_row[-1].TYPE in IMPASSABLE_TILES:
+                    far_proximity_level_collider_sprites_list.remove(tile_row[-1])
+                    if tile_row[-1].TYPE is WATER:
+                        far_proximity_level_water_sprites_list.remove(tile_row[-1])
+
+                del far_proximity_level_sprite_matrix[i][-1]
+                    
+def insert_first_col_in_matrix_and_append_objects_to_lists(matrix_type):
+    global far_proximity_entity_and_shadow_sprite_group_matrix
+    global far_proximity_level_sprite_matrix
+
+    global far_proximity_entity_sprite_group_list
+    global far_proximity_shadow_sprite_group_list
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_level_water_sprites_list
+    
+    i = 0
+    for row_indices in far_proximity_index_matrix:
+        if 0 <= row_indices[0][0] < len(level_layout) and 0 <= row_indices[0][1]:
+
+            #Entities and shadows (3D MATRIX)
+            if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
+                entities = all_entity_and_shadow_sprite_group_matrix[row_indices[0][0]][row_indices[0][1]]
+                far_proximity_entity_and_shadow_sprite_group_matrix[i].insert(0, entities)
+                
+                for entity in entities:
+                    if entity.sprite.TYPE is not SHADOW:
+                        far_proximity_entity_sprite_group_list.append(entity)
+                        if entity.sprite.TYPE is MONSTER:
+                            far_proximity_character_sprites_list.append(entity.sprite)
+
+                        elif entity.sprite.TYPE is ITEM:
+                            far_proximity_item_sprites_list.append(entity.sprite)
+
+                        elif entity.sprite.TYPE is PROJECTILE:
+                            far_proximity_projectile_sprites_list.append(entity.sprite)
+                    else:
+                        far_proximity_shadow_sprite_group_list.append(entity)
+        
+            #Level sprites (2D MATRIX)
+            elif matrix_type == far_proximity_level_sprite_matrix:
+                tile = level_sprites_matrix[row_indices[0][0]][row_indices[0][1]]
+                far_proximity_level_sprite_matrix[i].insert(0, tile)
+                if tile.TYPE in IMPASSABLE_TILES:
+                    far_proximity_level_collider_sprites_list.append(tile)
+                    if tile.TYPE is WATER:
+                        far_proximity_level_water_sprites_list.append(tile)
+            i += 1
+
+def get_diagonal_corrected_far_proximity_index_matrix(y_offset):
+    matrix = []
+    for row in far_proximity_index_matrix:
+        new_matrix_row = []
+        for cell in row:
+            new_matrix_row.append(cell)
+        matrix.append(new_matrix_row)
+
+    for row in matrix:
+        if y_offset == 1:
+            del row[-1]
+            row.insert(0, (row[0][0],row[0][1]-1))
+
+        elif y_offset == -1:
+            del row[0]
+            row.append((row[-1][0],row[-1][1]+1))
+
+    return matrix
+
+#Monster matrix movement
+def move_monster_in_all_matrices(object_id, old_tile_index, new_tile_index):
+    entity_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(object_id, old_tile_index, MONSTER)
+    shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(object_id, old_tile_index, SHADOW)
+
+    all_entity_and_shadow_sprite_group_matrix[old_tile_index[0]][old_tile_index[1]].remove(entity_sprite_group)
+    all_entity_and_shadow_sprite_group_matrix[old_tile_index[0]][old_tile_index[1]].remove(shadow_sprite_group)
+    all_entity_and_shadow_sprite_group_matrix[new_tile_index[0]][new_tile_index[1]].append(entity_sprite_group)
+    all_entity_and_shadow_sprite_group_matrix[new_tile_index[0]][new_tile_index[1]].append(shadow_sprite_group)
+
+    if entity_is_in_far_proximity_matrix(new_tile_index):
+        far_proximity_entity_and_shadow_sprite_group_matrix[old_tile_index[0]][old_tile_index[1]].remove(entity_sprite_group)
+        far_proximity_entity_and_shadow_sprite_group_matrix[old_tile_index[0]][old_tile_index[1]].remove(shadow_sprite_group)
+        far_proximity_entity_and_shadow_sprite_group_matrix[new_tile_index[0]][new_tile_index[1]].append(entity_sprite_group)
+        far_proximity_entity_and_shadow_sprite_group_matrix[new_tile_index[0]][new_tile_index[1]].append(shadow_sprite_group)
 
 #Monster generation
 def generate_monsters():
-    generate_monster(ETTIN,(4,4))
+    generate_monster(ETTIN,(17,24))
     # generate_monster(ETTIN,(4,2))
     # generate_monster(ETTIN, (4,3))
     # generate_monster(ETTIN, (4,1))
@@ -128,36 +755,38 @@ def generate_monsters():
     pass
 
 def generate_monster(monster_type, tile_index):
+    global all_entity_and_shadow_sprite_group_matrix
+    global all_monsters
+
     if monster_type == ETTIN:
-        create_ettin_monster(tile_index)
+        monster = Ettin(tile_index)
 
-def create_ettin_monster(position):
-    monster = Ettin(position)
-    append_sprite_groups_lists(monster)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster))
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster.shadow))
+    all_monsters.append(monster)
 
-#Object auxilary entities generation
-def append_sprite_groups_lists(object_entity):
-    global entity_sprite_groups
-    global shadow_sprite_groups
-    global entity_collision_sprite_groups
-
-    entity_sprite_groups.append(pygame.sprite.GroupSingle(object_entity))
-    shadow_sprite_groups.append(pygame.sprite.GroupSingle(object_entity.shadow))
-    entity_collision_sprite_groups.append(pygame.sprite.Group(object_entity.entity_collider_sprites))
+#Item generation
+def generate_items():
+    pass
 
 #Misc
-def kill_entity_colliders(id):
-    global entity_collision_sprite_groups
-
-    for entity_collision_sprite_group in entity_collision_sprite_groups:
-        if entity_collision_sprite_group.sprites()[0].id == id:
-            entity_collision_sprite_groups.remove(entity_collision_sprite_group)
-
 def fix_all_dead_objects_to_pixel_accuracy():
-    for entity_sprite_group in entity_sprite_groups:
-        if entity_sprite_group.sprite.is_living == False:
-            entity_sprite_group.sprite.position = math.ceil(entity_sprite_group.sprite.position[0]), math.ceil(entity_sprite_group.sprite.position[1])
+    for character in far_proximity_character_sprites_list:
+        if character.is_living == False:
+            character.position = math.ceil(character.position[0]), math.ceil(character.position[1])
 
 def fix_player_position_to_pixel_accuracy():
     hero.position = math.floor(hero.position[0]), math.floor(hero.position[1])
     hero.map_position = math.floor(hero.map_position[0]), math.floor(hero.map_position[1])
+
+def set_entity_screen_position(entity):
+    position_x = player_position[0] + entity.sprite.map_position[0] - hero.map_position[0]
+    position_y = player_position[1] + entity.sprite.map_position[1] - hero.map_position[1]
+
+    entity.sprite.position = position_x,position_y
+
+#Conditions
+def entity_is_in_far_proximity_matrix(new_tile_index):
+    if (far_proximity_index_matrix[0][0][0] <= new_tile_index[0] <= far_proximity_index_matrix[0][-1][0]) and (far_proximity_index_matrix[0][0][1] <= new_tile_index[1] <= far_proximity_index_matrix[-1][0][1]):
+        return True
+    return False

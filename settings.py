@@ -10,8 +10,8 @@ screen_width = 1200
 screen_height = 800
 screen = pygame.display.set_mode((screen_width, screen_height))
 
-far_colliders_matrix_offset_x = 4
-far_colliders_matrix_offset_y = 5
+far_matrix_offset_x = 6
+far_matrix_offset_y = 7
 
 player_position = screen_width//2, screen_height//2
 

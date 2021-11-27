@@ -1,64 +1,54 @@
 from utilities.constants import *
 from utilities import entity_manager
 from utilities import util
+from utilities.level_painter import level_layout
 
 #Master function
 def detect_all_collisions():
+    player_vs_monster_movement_collision()
+    entity_vs_level_collision(entity_manager.hero)
 
-    for entity_sprite_group in entity_manager.entity_sprite_groups:
-        entity = entity_sprite_group.sprite
-        
-        if entity is entity_manager.hero:
-            player_vs_monster_movement_collision()
-            entity_vs_level_collision(entity)
+    for character in entity_manager.far_proximity_character_sprites_list:
+        monster_vs_monster_collision(character)
+        entity_vs_level_collision(character)
 
-        elif entity.TYPE is MONSTER:
-            monster_vs_monster_collision(entity)
-            entity_vs_level_collision(entity)
-        
-        elif entity.TYPE is PROJECTILE:    
-            projectile_collision(entity)
-            entity_vs_level_collision(entity)
+    for projectile in entity_manager.far_proximity_projectile_sprites_list:   
+        projectile_collision(projectile)
+        entity_vs_level_collision(projectile)
 
-        elif entity.TYPE is ITEM:
-            item_collision(entity)
-            entity_vs_level_collision(entity)
+    for item in entity_manager.far_proximity_item_sprites_list:
+        item_collision(item)
 
 #Collision types
 def player_vs_monster_movement_collision():
-    for entity_sprite_group in entity_manager.entity_sprite_groups:
-        entity = entity_sprite_group.sprite
-        hero = entity_manager.hero
-
-        if entity is not hero and not entity.is_corpse and not entity.is_overkilled and hero.entity_collider_omni.rect.colliderect(entity.entity_collider_omni.rect):
-            collision_matrix = get_collision_matrix(entity_manager.hero,entity)
+    hero = entity_manager.hero
+    
+    for monster in entity_manager.hero.direct_proximity_monsters:
+        if not monster.is_corpse and not monster.is_overkilled and util.elipses_intersect(hero.map_position, monster.map_position, hero.size, monster.size):
+            collision_matrix = get_collision_matrix(entity_manager.hero, monster)
                        
             if any_sector_collider_collides(collision_matrix):
-                bump_monster_back(entity_manager.hero, entity, collision_matrix)
+                bump_monster_back(entity_manager.hero, monster, collision_matrix)
                 #slow_down_player()
                 
 def entity_vs_level_collision(character):
     for level_collision_sprite in character.direct_proximity_collision_tiles:
         
-        if character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
+        if character.can_collide and character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
             collision_matrix = get_collision_matrix(character,level_collision_sprite)
-                        
+
             if any_sector_collider_collides(collision_matrix):
                 correct_character_position_by_vector(character,level_collision_sprite, collision_matrix)
-
+                 
                 if character.TYPE == MONSTER and character.monster_ai.is_path_finding == False and character.monster_ai.path_finding_is_ready:
                     character.monster_ai.initialize_monster_path_finding()
 
 def monster_vs_monster_collision(monster):
-    for entity_sprite_group in entity_manager.entity_sprite_groups:
-        entity = entity_sprite_group.sprite
+    for character in monster.direct_proximity_monsters:
         
-        if entity != monster and entity != entity_manager.hero and not entity.is_corpse and not entity.is_overkilled:
-            monster_collider = monster.entity_collider_omni
-            entity_collider = entity.entity_collider_omni.rect
-            
-            if monster_collider.rect.colliderect(entity_collider):
-                collision_matrix = get_collision_matrix(monster,entity)
+        if character.can_collide and character != monster and not character.is_corpse and not character.is_overkilled:            
+            if util.elipses_intersect(monster.map_position, character.map_position, monster.size, character.size):
+                collision_matrix = get_collision_matrix(monster, character)
 
                 if any_sector_collider_collides(collision_matrix):
                     adjust_monster_movement_vector(monster, collision_matrix)
@@ -72,9 +62,9 @@ def item_collision(item_sprite):
     pass
 
 #Movement vector adjustment
-def slow_down_player():
-    entity_manager.hero.speed_scalar = round(entity_manager.hero.speed_scalar[0]/3,2), round(entity_manager.hero.speed_scalar[1]/3,2)
-    entity_manager.hero.speed_vector = round(entity_manager.hero.speed_vector[0]/3,2), round(entity_manager.hero.speed_scalar[1]/3,2)
+def slow_down_player(factor=3):
+    entity_manager.hero.speed_scalar = round(entity_manager.hero.speed_scalar[0]/3,2), round(entity_manager.hero.speed_scalar[1]/factor,2)
+    entity_manager.hero.speed_vector = round(entity_manager.hero.speed_vector[0]/3,2), round(entity_manager.hero.speed_scalar[1]/factor,2)
 
 def adjust_monster_movement_vector(monster, collision_matrix):
 
@@ -107,19 +97,37 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
     west_tile_index = colliding_tile_index[0],colliding_tile_index[1]-1
     south_tile_index = colliding_tile_index[0]+1,colliding_tile_index[1]
     north_tile_index = colliding_tile_index[0]-1,colliding_tile_index[1]
+
+    print(colliding_tile_index)
     
-    level_collision_sprite_south = entity_manager.get_level_collision_sprite_by_index(south_tile_index)
-    level_collision_sprite_north = entity_manager.get_level_collision_sprite_by_index(north_tile_index)
-    level_collision_sprite_east = entity_manager.get_level_collision_sprite_by_index(east_tile_index)
-    level_collision_sprite_west = entity_manager.get_level_collision_sprite_by_index(west_tile_index)
+    if colliding_tile_index[0] == 0:
+        level_collision_sprite_north = entity_manager.level_sprites_matrix[0][0]
+    else:
+        level_collision_sprite_north = entity_manager.level_sprites_matrix[north_tile_index[0]][north_tile_index[1]]        
+        
+    if colliding_tile_index[0] == len(level_layout)-1:
+        level_collision_sprite_south = entity_manager.level_sprites_matrix[0][0]
+    else:
+        level_collision_sprite_south = entity_manager.level_sprites_matrix[south_tile_index[0]][south_tile_index[1]]
+
+    if colliding_tile_index[1] == len(level_layout[0])-1:
+        level_collision_sprite_east = entity_manager.level_sprites_matrix[0][0]
+    else:
+        level_collision_sprite_east = entity_manager.level_sprites_matrix[east_tile_index[0]][east_tile_index[1]]
+
+    if colliding_tile_index[1] == 0:
+        level_collision_sprite_west = entity_manager.level_sprites_matrix[0][0]
+    else:
+        level_collision_sprite_west = entity_manager.level_sprites_matrix[west_tile_index[0]][west_tile_index[1]]
 
     current_collision_matrix = collision_matrix
     
-    speed_vector = current_entity_sprite.speed_vector
+
     original_speed_scalar = 0,0
     if current_entity_sprite == entity_manager.hero:
         original_speed_scalar = entity_manager.hero.speed_scalar
     
+    speed_vector = current_entity_sprite.speed_vector
     speed_correction_vector = 0,0
     correction_vector = 0,0
 
@@ -148,14 +156,14 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         elif character_moving_east(current_entity_sprite):
             if north_east_collision:
                 if level_collision_sprite_south != None:
-                    correction_vector = -1,0
-                else:
                     correction_vector = 0,1
+                else:
+                    correction_vector = -1,0
             elif south_east_collision:
                 if level_collision_sprite_north != None:
-                    correction_vector = -1,0
-                else:
                     correction_vector = 0,-1
+                else:
+                    correction_vector = -1,0
             elif north_west_collision:
                 correction_vector = 1,1
             elif south_west_collision:
@@ -164,14 +172,14 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         elif character_moving_west(current_entity_sprite):
             if north_west_collision:
                 if level_collision_sprite_south != None:
-                    correction_vector = 1,0
-                else:
                     correction_vector = 0,1
+                else:
+                    correction_vector = 1,0
             elif south_west_collision:
                 if level_collision_sprite_north != None:
-                    correction_vector = 1,0
-                else:
                     correction_vector = 0,-1
+                else:
+                    correction_vector = 1,0
             elif north_east_collision:
                 correction_vector = -1,1
             elif south_east_collision:
@@ -180,14 +188,14 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         elif character_moving_north(current_entity_sprite):
             if north_west_collision:
                 if level_collision_sprite_east != None:
-                    correction_vector = 0,1
-                else:
                     correction_vector = 1,0
+                else:
+                    correction_vector = 0,1
             elif north_east_collision:
                 if level_collision_sprite_west != None:
-                    correction_vector = 0,1
-                else:
                     correction_vector = -1,0
+                else:
+                    correction_vector = 0,1
             elif south_west_collision:
                 correction_vector = 1,-1
             elif south_east_collision:
@@ -196,14 +204,14 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         elif character_moving_south(current_entity_sprite):
             if south_west_collision:
                 if level_collision_sprite_east != None:
-                    correction_vector = 0,-1
-                else:
                     correction_vector = 1,0
+                else:
+                    correction_vector = 0,-1
             elif south_east_collision:
                 if level_collision_sprite_west != None:
-                    correction_vector = 0,-1
-                else:
                     correction_vector = -1,0
+                else:
+                    correction_vector = 0,-1
             elif north_west_collision:
                 correction_vector = 1,1
             elif north_east_collision:
@@ -212,7 +220,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         elif character_moving_north_east(current_entity_sprite):
             if north_east_collision:
                 if level_collision_sprite_south == None and level_collision_sprite_west == None:
-                    correction_vector = -1*speed_vector[0], -1*speed_vector[1]
+                    correction_vector = -speed_vector[0], -speed_vector[1]
                 elif level_collision_sprite_south != None:
                     correction_vector = -1, 0
                 elif level_collision_sprite_west != None:
@@ -220,7 +228,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
             elif north_west_collision:
                 correction_vector = 0, 1
             elif south_east_collision:
-                correction_vector = -1, 0
+                correction_vector = -1,0
             elif south_west_collision:
                 correction_vector = 1,-1
 
@@ -307,8 +315,8 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         if current_entity_sprite == entity_manager.hero:
             adjust_player_speed_scalar(original_speed_scalar,speed_correction_vector,15)
             entity_manager.hero.update_position(correction_vector)
-            entity_manager.update_all_non_player_entities_position_by_vector(correction_vector)
-        
+            entity_manager.update_far_proximity_non_player_entities_position(correction_vector, entity_manager.far_proximity_entity_sprite_group_list)
+            entity_manager.update_far_proximity_level_colliders_position()   
         else:
             current_entity_sprite.update_position((-2*correction_vector[0],-2*correction_vector[1]))
             current_entity_sprite.facing_direction = util.get_facing_direction(current_entity_sprite.map_position,current_entity_sprite.current_tile_map_position)
@@ -385,21 +393,21 @@ def get_bounce_vector_for_static_player(player_sprite, monster_sprite):
 
 #Collision getters
 def get_ne_collider_collision(current_entity_sprite,colliding_entity_sprite):
-    if colliding_entity_sprite.TYPE == TILE and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite) != None:
+    if colliding_entity_sprite.TYPE in IMPASSABLE_TILES and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite) != None:
         return True
     elif (colliding_entity_sprite.TYPE == MONSTER or colliding_entity_sprite.TYPE == PLAYER) and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite.entity_collider_omni) != None:
         return True
     return False
 
 def get_nw_collider_collision(current_entity_sprite,colliding_entity_sprite):
-    if colliding_entity_sprite.TYPE == TILE and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite) != None:
+    if colliding_entity_sprite.TYPE in IMPASSABLE_TILES and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite) != None:
         return True
     elif (colliding_entity_sprite.TYPE == MONSTER or colliding_entity_sprite.TYPE == PLAYER) and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite.entity_collider_omni) != None:
         return True
     return False
 
 def get_se_collider_collision(current_entity_sprite,colliding_entity_sprite):
-    if colliding_entity_sprite.TYPE == TILE and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) != None:
+    if colliding_entity_sprite.TYPE in IMPASSABLE_TILES and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) != None:
         return True
         
     elif (colliding_entity_sprite.TYPE == MONSTER or colliding_entity_sprite.TYPE == PLAYER) and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite.entity_collider_omni) != None:
@@ -407,7 +415,7 @@ def get_se_collider_collision(current_entity_sprite,colliding_entity_sprite):
     return False
 
 def get_sw_collider_collision(current_entity_sprite,colliding_entity_sprite):
-    if colliding_entity_sprite.TYPE == TILE and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) != None:
+    if colliding_entity_sprite.TYPE in IMPASSABLE_TILES and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) != None:
         return True
     elif (colliding_entity_sprite.TYPE == MONSTER or colliding_entity_sprite.TYPE == PLAYER) and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite.entity_collider_omni) != None:
         return True
