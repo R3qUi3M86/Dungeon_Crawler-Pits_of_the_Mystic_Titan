@@ -133,7 +133,6 @@ def initialize_far_proximity_entity_sprite_group_matrix():
     
     far_proximity_entity_sprite_group_matrix = matrix
 
-
 def initialize_far_proximity_level_collider_and_water_sprites_list():
     global far_proximity_level_collider_sprites_list
     global far_proximity_level_water_sprites_list

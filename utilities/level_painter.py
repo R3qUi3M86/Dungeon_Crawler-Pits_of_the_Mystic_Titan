@@ -4,14 +4,12 @@ from settings import *
 from entities.level.level import *
 from entities.level.tile import Tile
 from utilities import entity_manager
-from utilities import util
 
 TILE_SIZE = 48,48
 level_layout = level_01_map
 pathfinding_matrix = []
 level_surface = None
 player_starting_tile = None
-
 
 def set_player_tile_index():
     global player_starting_tile

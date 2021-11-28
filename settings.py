@@ -1,4 +1,5 @@
 import pygame
+from pygame.constants import DOUBLEBUF
 
 #Full screen mode
 # screen_width = pygame.display.Info().current_w
@@ -8,7 +9,7 @@ import pygame
 #Windowed mode
 screen_width = 1200
 screen_height = 800
-screen = pygame.display.set_mode((screen_width, screen_height))
+screen = pygame.display.set_mode((screen_width, screen_height), DOUBLEBUF)
 
 far_matrix_offset_x = 6
 far_matrix_offset_y = 7

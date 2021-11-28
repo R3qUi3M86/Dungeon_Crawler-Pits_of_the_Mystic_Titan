@@ -16,6 +16,7 @@ sorting_timer = 20
 sorting_timer_limit = 20
 sorted_entity_matrix = None
 set_volume_for_all_sounds(VOLUME)
+pygame.event.set_allowed([pygame.QUIT])
 
 #Player inputs
 def get_player_wsad_input():
@@ -144,7 +145,7 @@ entity_manager.initialize_level_sprites_matrix()
 level_painter.paint_level()
 entity_manager.initialize_player()
 entity_manager.initialize_all_entities_and_shadows_sprite_group_matrix()
-#entity_manager.fill_map_with_monsters(20)
+#entity_manager.fill_map_with_monsters(1)
 entity_manager.generate_monsters()
 entity_manager.generate_items()
 entity_manager.update_far_proximity_matrices_and_lists()
@@ -184,9 +185,9 @@ while True:
     debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
     debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
     # debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(0).position}",x = 10, y = 60)
-    debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 60)
+    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 60)
     # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
-    debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 75)
+    # debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 75)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
 
     #util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")

@@ -25,7 +25,7 @@ class Pathfinder:
             end_grid = self.grid.node(entity_manager.hero.tile_index[1], entity_manager.hero.tile_index[0])
         
         self.path, _ = self.finder.find_path(start_grid, end_grid, self.grid)
-        #print(self.grid.grid_str(self.path, start_grid, end_grid))
+        # print(self.grid.grid_str(self.path, start_grid, end_grid))
         self.grid.cleanup()
 
     def get_alternative_tile(self):
