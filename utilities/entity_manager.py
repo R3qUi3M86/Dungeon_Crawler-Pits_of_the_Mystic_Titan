@@ -540,7 +540,7 @@ def insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, tile_ind
                     new_entities_row.append(new_entities_cell)
 
             far_proximity_entity_and_shadow_sprite_group_matrix.insert(0, new_entities_and_shadows_row)
-            far_proximity_entity_sprite_group_matrix.append(new_entities_row)
+            far_proximity_entity_sprite_group_matrix.insert(0, new_entities_row)
 
         #Level sprites (2D MATRIX)
         elif matrix_type == far_proximity_level_sprite_matrix:
@@ -734,7 +734,7 @@ def insert_first_col_in_matrix_and_append_objects_to_lists(matrix_type):
                             far_proximity_projectile_sprites_list.append(object.sprite)
                     else:
                         far_proximity_shadow_sprite_group_list.append(object)
-                far_proximity_entity_sprite_group_matrix[i].append(entities)
+                far_proximity_entity_sprite_group_matrix[i].insert(0,entities)
         
             #Level sprites (2D MATRIX)
             elif matrix_type == far_proximity_level_sprite_matrix:
@@ -777,23 +777,23 @@ def move_entity_in_all_matrices(entity_id, entity_type, old_tile_index, new_tile
     all_entity_and_shadow_sprite_group_matrix[new_tile_index[0]][new_tile_index[1]].append(shadow_sprite_group)
 
 
-    # if entity_is_in_far_proximity_matrix(new_tile_index):
-    #     proximity_matrix_old_index = get_far_proximity_entity_and_shadow_matrix_index(old_tile_index)
-    #     proximity_matrix_new_index = get_far_proximity_entity_and_shadow_matrix_index(new_tile_index)
+    if entity_is_in_far_proximity_matrix(new_tile_index):
+        proximity_matrix_old_index = get_far_proximity_entity_and_shadow_matrix_index(old_tile_index)
+        proximity_matrix_new_index = get_far_proximity_entity_and_shadow_matrix_index(new_tile_index)
 
-    #     util.print_matrix(far_proximity_entity_sprite_group_matrix)
-    #     print(proximity_matrix_old_index,proximity_matrix_new_index)
-    #     far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].remove(entity_sprite_group)
-    #     far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].remove(shadow_sprite_group)
-    #     far_proximity_entity_sprite_group_matrix[proximity_matrix_old_index[0]][proximity_matrix_old_index[1]].remove(entity_sprite_group)
+        # util.print_matrix(far_proximity_entity_sprite_group_matrix)
+        # util.print_matrix(far_proximity_entity_and_shadow_sprite_group_matrix)
+        # far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_old_index[0]][proximity_matrix_old_index[1]].remove(entity_sprite_group)
+        # far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_old_index[0]][proximity_matrix_old_index[1]].remove(shadow_sprite_group)
+        far_proximity_entity_sprite_group_matrix[proximity_matrix_old_index[0]][proximity_matrix_old_index[1]].remove(entity_sprite_group)
         
-    #     far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_old_index[0]][proximity_matrix_old_index[1]].append(entity_sprite_group)
-    #     far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_old_index[0]][proximity_matrix_old_index[1]].append(shadow_sprite_group)
-    #     far_proximity_entity_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].append(entity_sprite_group)
+        # far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].append(entity_sprite_group)
+        # far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].append(shadow_sprite_group)
+        far_proximity_entity_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].append(entity_sprite_group)
 
 #Monster generation
 def generate_monsters():
-    # generate_monster(ETTIN,(4,3))
+    generate_monster(ETTIN,(4,3))
     # generate_monster(ETTIN,(4,2))
     # generate_monster(ETTIN, (4,1))
     # generate_monster(ETTIN, (7,3))

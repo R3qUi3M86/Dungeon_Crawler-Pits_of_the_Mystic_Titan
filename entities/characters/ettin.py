@@ -366,18 +366,15 @@ class Ettin(pygame.sprite.Sprite):
             if self.monster_ai.is_idle:
                 if self.facing_direction+1 == 8 and hero_sector in [7,0,1]:
                     self.monster_ai.direction_change_decision_timer_limit = 60
-                    self.monster_ai.is_idle = False
-                    self.monster_ai.is_roaming = True
+                    self.monster_ai.is_waking_up = True
                 
                 elif self.facing_direction+2 == 8 and hero_sector in [6,7,0]:
                     self.monster_ai.direction_change_decision_timer_limit = 60
-                    self.monster_ai.is_idle = False
-                    self.monster_ai.is_roaming = True
+                    self.monster_ai.is_waking_up = True
                 
                 elif hero_sector in [self.facing_direction-1,self.facing_direction,self.facing_direction+1]:
                     self.monster_ai.direction_change_decision_timer_limit = 60
-                    self.monster_ai.is_idle = False
-                    self.monster_ai.is_roaming = True
+                    self.monster_ai.is_waking_up = True
 
     #Misc
     def activate(self):

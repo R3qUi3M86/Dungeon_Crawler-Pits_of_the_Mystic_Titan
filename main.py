@@ -11,6 +11,9 @@ from entities import cursor
 
 pygame.init()
 clock = pygame.time.Clock()
+sorting_timer = 20
+sorting_timer_limit = 20
+sorted_entity_matrix = None
 set_volume_for_all_sounds(VOLUME)  
 
 def get_player_wsad_input():
@@ -87,7 +90,17 @@ def get_player_mouse_input():
             entity_manager.hero.is_in_pain = False
             entity_manager.hero.is_attacking = True
 
+def increment_sprite_sorting_timer():
+    global sorting_timer
+
+    sorting_timer += 1
+    if sorting_timer == sorting_timer_limit:
+        order_sprites()
+        sorting_timer = 0
+
 def order_sprites():
+    global sorted_entity_matrix
+    
     sorted_entity_matrix = []
     hero_matrix_index = entity_manager.get_far_proximity_entity_and_shadow_matrix_index(entity_manager.hero.tile_index)
 
@@ -95,10 +108,10 @@ def order_sprites():
         sorted_entities_row = []
         
         for j, cell in enumerate(row):
-            for entity in cell:
-                sorted_entities_row.append(entity)
             if (i,j) == hero_matrix_index:
                 sorted_entities_row.append(entity_manager.hero_sprite_group)
+            for entity in cell:
+                sorted_entities_row.append(entity)
                 
         
         for _ in range(len(sorted_entities_row)-1):
@@ -112,7 +125,6 @@ def order_sprites():
 def draw_sprites():
     screen.blit(level_painter.level_surface,(level_painter.get_level_surface_translation_vector()))
     
-    #Draw ordered entities
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
         shadow.draw(screen)
 
@@ -125,13 +137,15 @@ entity_manager.initialize_level_sprites_matrix()
 level_painter.paint_level()
 entity_manager.initialize_player()
 entity_manager.initialize_all_entities_and_shadows_sprite_group_matrix()
-entity_manager.fill_map_with_monsters(20)
+#entity_manager.fill_map_with_monsters(20)
+entity_manager.generate_monsters()
 entity_manager.generate_items()
 entity_manager.update_far_proximity_matrices_and_lists()
 entity_manager.finish_init()
 
 #Main game loop
 while True:
+    increment_sprite_sorting_timer()
 
     #Inputs
     get_player_wsad_input()
@@ -157,9 +171,9 @@ while True:
     debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
     debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
     # debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(0).position}",x = 10, y = 60)
-    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 75)
+    debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 60)
     # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
-    # debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 75)
+    debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 75)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
     cursor.cursor.draw(screen)
     
