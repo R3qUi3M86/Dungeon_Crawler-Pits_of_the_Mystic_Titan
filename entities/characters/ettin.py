@@ -14,7 +14,7 @@ from entities.shadow import Shadow
 from entities.colliders.collider import Collider
 
 class Ettin(pygame.sprite.Sprite):
-    def __init__(self,tile_index):
+    def __init__(self,tile_index, facing_direction=SECTOR_S):
         super().__init__()
         ###Constants###
         self.IMAGE_DISPLAY_CORRECTION = 12
@@ -24,12 +24,12 @@ class Ettin(pygame.sprite.Sprite):
         ###Position variables###
         self.tile_index = tile_index
         self.prevous_tile_index = tile_index
-        self.current_tile_map_position = round(self.tile_index[1] * TILE_SIZE[Y] + TILE_SIZE[Y]//2), round(self.tile_index[0] * TILE_SIZE[X] + TILE_SIZE[X]//2,2)
+        self.current_tile_map_position = (tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
         self.direct_proximity_monsters = []
         self.position = level_painter.get_tile_position(tile_index)
-        self.map_position = round(self.position[0]-player_position[0]+entity_manager.hero.tile_index[0],2), round(self.position[1]-player_position[1]+entity_manager.hero.tile_index[1],2)
+        self.map_position = (tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
         
         ###Object ID###
@@ -113,7 +113,7 @@ class Ettin(pygame.sprite.Sprite):
         self.abilities = []
 
         #Movement
-        self.facing_direction = SECTOR_S
+        self.facing_direction = facing_direction
         self.speed = 1.4,1
         self.speed_vector = 0,0
 
@@ -131,10 +131,11 @@ class Ettin(pygame.sprite.Sprite):
                 self.tile_index = util.get_tile_index(self.map_position)
             
                 if self.tile_index != self.prevous_tile_index:
+                    self.current_tile_map_position = (self.tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
                     self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
                     self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
                     entity_manager.update_all_nearby_monsters_and_self_direct_proximity_monsters_lists(self.direct_proximity_index_matrix)
-                    entity_manager.move_monster_in_all_matrices(self.id, self.prevous_tile_index, self.tile_index)
+                    entity_manager.move_entity_in_all_matrices(self.id, MONSTER, self.prevous_tile_index, self.tile_index)
                     self.prevous_tile_index = self.tile_index
                 
                 self.update_decisions()
@@ -165,7 +166,7 @@ class Ettin(pygame.sprite.Sprite):
         if self.is_living:
 
             if entity_manager.hero.is_living and self.monster_ai.is_idle:
-                if not self.monster_ai.waking_up:
+                if not self.monster_ai.is_waking_up:
                     self.monster_ai.increment_los_emmision_timer()
                     self.monster_ai.increment_direction_change_decision_timer()
                 else:
@@ -327,7 +328,7 @@ class Ettin(pygame.sprite.Sprite):
         self.health -= damage
         
         if self.monster_ai.is_idle:
-            self.monster_ai.waking_up = True
+            self.monster_ai.is_waking_up = True
         
         if self.health > 0:
             self.is_in_pain = True
@@ -362,20 +363,21 @@ class Ettin(pygame.sprite.Sprite):
         if util.monster_has_line_of_sight(self.map_position):
             hero_sector = util.get_facing_direction(self.position,player_position)
             
-            if self.facing_direction+1 == 8 and hero_sector in [7,0,1]:
-                self.monster_ai.direction_change_decision_timer_limit = 60
-                self.monster_ai.is_idle = False
-                self.monster_ai.is_roaming = True
-            
-            elif self.facing_direction+2 == 8 and hero_sector in [6,7,0]:
-                self.monster_ai.direction_change_decision_timer_limit = 60
-                self.monster_ai.is_idle = False
-                self.monster_ai.is_roaming = True
-            
-            elif hero_sector in [self.facing_direction-1,self.facing_direction,self.facing_direction+1]:
-                self.monster_ai.direction_change_decision_timer_limit = 60
-                self.monster_ai.is_idle = False
-                self.monster_ai.is_roaming = True
+            if self.monster_ai.is_idle:
+                if self.facing_direction+1 == 8 and hero_sector in [7,0,1]:
+                    self.monster_ai.direction_change_decision_timer_limit = 60
+                    self.monster_ai.is_idle = False
+                    self.monster_ai.is_roaming = True
+                
+                elif self.facing_direction+2 == 8 and hero_sector in [6,7,0]:
+                    self.monster_ai.direction_change_decision_timer_limit = 60
+                    self.monster_ai.is_idle = False
+                    self.monster_ai.is_roaming = True
+                
+                elif hero_sector in [self.facing_direction-1,self.facing_direction,self.facing_direction+1]:
+                    self.monster_ai.direction_change_decision_timer_limit = 60
+                    self.monster_ai.is_idle = False
+                    self.monster_ai.is_roaming = True
 
     #Misc
     def activate(self):

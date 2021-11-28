@@ -19,6 +19,8 @@ def attack_monster_with_melee_attack(damage):
             monster.take_damage(damage)
     else:
         play_melee_attack_sound(PLAYER, MISS)
+
+    entity_manager.wake_up_any_sleeping_monsters_in_far_proximity_matrix()
         
 def attack_player_with_melee_attack(monster, damage):
     hero = entity_manager.hero

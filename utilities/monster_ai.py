@@ -31,7 +31,7 @@ class Ai():
         self.next_tile_pos_x = 0
         self.next_tile_pos_y = 0
         self.is_idle = True
-        self.waking_up = False
+        self.is_waking_up = False
         self.is_roaming = False
         self.is_path_finding = False
         self.is_following_path = False
@@ -48,7 +48,6 @@ class Ai():
         if self.direction_change_decision_timer == self.direction_change_decision_timer_limit:
             self.direction_change()
             self.direction_change_decision_timer = 0
-            
             if self.is_roaming:
                 self.direction_change_decision_timer_limit = 60
                 self.randomize_direction_change_decision_timer_limit() 
@@ -254,6 +253,8 @@ class Ai():
     def increment_waking_up_timer(self):
         self.waking_up_timer += 1
         if self.waking_up_timer == self.waking_up_timer_limit:
-            self.waking_up = False
+            self.is_waking_up = False
             self.is_idle = False
             self.is_roaming = True
+            self.monster.facing_direction = util.get_facing_direction(self.monster.map_position, entity_manager.hero.map_position)
+            self.direction_change_decision_timer = 0

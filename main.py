@@ -87,37 +87,51 @@ def get_player_mouse_input():
             entity_manager.hero.is_in_pain = False
             entity_manager.hero.is_attacking = True
 
-def order_sprites():   
-    for _ in range(len(entity_manager.far_proximity_entity_sprite_group_list)-1):
-        for j in range(len(entity_manager.far_proximity_entity_sprite_group_list)-1):
-            if entity_manager.far_proximity_entity_sprite_group_list[j].sprite.position[Y] > entity_manager.far_proximity_entity_sprite_group_list[j+1].sprite.position[Y]:
-                    entity_manager.far_proximity_entity_sprite_group_list[j], entity_manager.far_proximity_entity_sprite_group_list[j+1] = entity_manager.far_proximity_entity_sprite_group_list[j+1], entity_manager.far_proximity_entity_sprite_group_list[j]
+def order_sprites():
+    sorted_entity_matrix = []
+    hero_matrix_index = entity_manager.get_far_proximity_entity_and_shadow_matrix_index(entity_manager.hero.tile_index)
 
-    for _ in range(len(entity_manager.far_proximity_shadow_sprite_group_list)-1):
-        for j in range(len(entity_manager.far_proximity_shadow_sprite_group_list)-1):
-            if entity_manager.far_proximity_shadow_sprite_group_list[j].sprite.position[Y] > entity_manager.far_proximity_shadow_sprite_group_list[j+1].sprite.position[Y]:
-                    entity_manager.far_proximity_shadow_sprite_group_list[j], entity_manager.far_proximity_shadow_sprite_group_list[j+1] = entity_manager.far_proximity_shadow_sprite_group_list[j+1], entity_manager.far_proximity_shadow_sprite_group_list[j]
+    for i, row in enumerate(entity_manager.far_proximity_entity_sprite_group_matrix):
+        sorted_entities_row = []
+        
+        for j, cell in enumerate(row):
+            for entity in cell:
+                sorted_entities_row.append(entity)
+            if (i,j) == hero_matrix_index:
+                sorted_entities_row.append(entity_manager.hero_sprite_group)
+                
+        
+        for _ in range(len(sorted_entities_row)-1):
+            for j in range(len(sorted_entities_row)-1):
+                if sorted_entities_row[j].sprite.map_position[Y] > sorted_entities_row[j+1].sprite.map_position[Y]:
+                    sorted_entities_row[j], sorted_entities_row[j+1] = sorted_entities_row[j+1], sorted_entities_row[j]
+        sorted_entity_matrix.append(sorted_entities_row)
+
+    return sorted_entity_matrix
 
 def draw_sprites():
     screen.blit(level_painter.level_surface,(level_painter.get_level_surface_translation_vector()))
+    
     #Draw ordered entities
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
         shadow.draw(screen)
-    for entity in entity_manager.far_proximity_entity_sprite_group_list:
-        entity.draw(screen)
+
+    sorted_entity_matrix = order_sprites()
+    for row in sorted_entity_matrix:
+        for entity in row:
+            entity.draw(screen)
 
 entity_manager.initialize_level_sprites_matrix()
 level_painter.paint_level()
 entity_manager.initialize_player()
 entity_manager.initialize_all_entities_and_shadows_sprite_group_matrix()
-entity_manager.generate_monsters()
+entity_manager.fill_map_with_monsters(20)
 entity_manager.generate_items()
 entity_manager.update_far_proximity_matrices_and_lists()
 entity_manager.finish_init()
 
 #Main game loop
 while True:
-    order_sprites()
 
     #Inputs
     get_player_wsad_input()
@@ -142,14 +156,16 @@ while True:
     #debug_text(f"109 pos: {entity_manager.hero.direct_proximity_collision_tiles[1].map_position}",x = 10, y = 30)
     debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
     debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
-    debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 60)
+    # debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(0).position}",x = 10, y = 60)
+    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 75)
+    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
     # debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 75)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
     cursor.cursor.draw(screen)
     
-    # util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")
-
-    util.increment_print_matrix_timer(entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix, "S")
+    #util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")
+    #util.increment_print_matrix_timer(entity_manager.level_sprites_matrix, "S", True)
+    #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix, "S")
 
     #Other
     pygame.display.update()

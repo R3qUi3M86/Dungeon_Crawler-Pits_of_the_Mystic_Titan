@@ -126,6 +126,7 @@ class Hero(pygame.sprite.Sprite):
             self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
             self.direct_proximity_monsters = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, MONSTER)
             entity_manager.update_far_proximity_matrices_and_lists(util.get_tile_offset(self.prevous_tile_index, self.tile_index))
+            #entity_manager.move_entity_in_all_matrices(self.id, self.TYPE, self.prevous_tile_index, self.tile_index)
             self.prevous_tile_index = self.tile_index
 
     def update_animation(self):

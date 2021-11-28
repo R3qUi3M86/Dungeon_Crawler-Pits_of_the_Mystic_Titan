@@ -7,7 +7,6 @@ from utilities import entity_manager
 from utilities import util
 
 TILE_SIZE = 48,48
-#level_layout = level_01_map
 level_layout = test_map
 pathfinding_matrix = []
 level_surface = None

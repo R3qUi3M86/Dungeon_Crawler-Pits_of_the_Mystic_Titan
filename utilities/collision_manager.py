@@ -30,6 +30,8 @@ def player_vs_monster_movement_collision():
             if any_sector_collider_collides(collision_matrix):
                 bump_monster_back(entity_manager.hero, monster, collision_matrix)
                 #slow_down_player()
+                if monster.monster_ai.is_idle:
+                    monster.monster_ai.is_waking_up = True
                 
 def entity_vs_level_collision(character):
     for level_collision_sprite in character.direct_proximity_collision_tiles:
@@ -97,9 +99,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
     west_tile_index = colliding_tile_index[0],colliding_tile_index[1]-1
     south_tile_index = colliding_tile_index[0]+1,colliding_tile_index[1]
     north_tile_index = colliding_tile_index[0]-1,colliding_tile_index[1]
-
-    print(colliding_tile_index)
-    
+  
     if colliding_tile_index[0] == 0:
         level_collision_sprite_north = entity_manager.level_sprites_matrix[0][0]
     else:
@@ -315,7 +315,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         if current_entity_sprite == entity_manager.hero:
             adjust_player_speed_scalar(original_speed_scalar,speed_correction_vector,15)
             entity_manager.hero.update_position(correction_vector)
-            entity_manager.update_far_proximity_non_player_entities_position(correction_vector, entity_manager.far_proximity_entity_sprite_group_list)
+            entity_manager.update_far_proximity_non_player_entities_position(entity_manager.far_proximity_entity_sprites_list, correction_vector)
             entity_manager.update_far_proximity_level_colliders_position()   
         else:
             current_entity_sprite.update_position((-2*correction_vector[0],-2*correction_vector[1]))

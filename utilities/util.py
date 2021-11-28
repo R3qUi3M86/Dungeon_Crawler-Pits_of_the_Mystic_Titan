@@ -178,32 +178,67 @@ def particle_collided_with_wall(current_tile_index):
 print_limit = 20
 tick = 0
 
-def increment_print_matrix_timer(matrix, mode="S"):
+def increment_print_matrix_timer(matrix, mode="S", add_monsters=False, add_items=False):
     global tick
     tick += 1
     if tick == print_limit:
         tick = 0
-        print_matrix(matrix, mode)
+        print_matrix(matrix, mode, add_monsters, add_items)
         
-def print_matrix(matrix, mode="S"):
+def print_matrix(matrix, mode="S", add_monsters=False, add_items=False):
     if mode == "S":
         for row, matrix_row in enumerate(matrix):
             row_string = ""
             for col, cell in enumerate(matrix_row):
                 
-                if matrix == entity_manager.far_proximity_level_sprite_matrix or matrix == entity_manager.level_sprites_matrix:
+                if matrix == entity_manager.far_proximity_level_sprite_matrix:
                     if cell.TYPE in IMPASSABLE_TILES and cell.TYPE is not WATER:
                         row_string = row_string+"X"
                     elif cell.TYPE == WATER:
-                        row_string = row_string+"W"
+                        row_string = row_string+"~"
                     else:
                         row_string = row_string+"."
 
-                elif matrix == entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix:
-                    if entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix[row][col]:
-                        row_string = row_string+"M"
+                elif matrix == entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix or matrix == entity_manager.far_proximity_entity_sprite_group_matrix:
+                    if cell:
+                        for object in cell:
+                            if object.sprite.TYPE == PLAYER:
+                                row_string = row_string+"P"
+                            elif object.sprite.TYPE == MONSTER:
+                                row_string = row_string+"M"
+                            else:
+                                row_string = row_string+"."
+                            break
                     else:
                         row_string = row_string+"."
+                
+                elif matrix == entity_manager.level_sprites_matrix:
+                    if cell.TYPE in IMPASSABLE_TILES and cell.TYPE is not WATER:
+                        row_string = row_string+"X"
+                    elif cell.TYPE == WATER:
+                        row_string = row_string+"~"
+                    else:
+                        if add_monsters == True:
+                            if row == entity_manager.hero.tile_index[0] and col == entity_manager.hero.tile_index[1]:
+                                row_string = row_string+"P"
+                            else:
+                                entities = entity_manager.all_entity_and_shadow_sprite_group_matrix[row][col]
+                                found_monster = False
+                                corpse = False
+                                for entity in entities:
+                                    if entity.sprite.TYPE == MONSTER:
+                                        found_monster = True
+                                        if entity.sprite.is_corpse:
+                                            corpse = True
+                                        break
+                                if found_monster:
+                                    if not corpse:
+                                        row_string = row_string+"M"
+                                    else:
+                                        row_string = row_string+"x"
+                                        corpse = False
+                                else: 
+                                    row_string = row_string+"."
 
             print(row_string)
 
@@ -215,7 +250,5 @@ def print_matrix(matrix, mode="S"):
             
             print(row_string)
 
-    print("")
-    print(entity_manager.far_proximity_entity_sprite_group_list)
     print("")
     # print(entity_manager.far_proximity_level_collider_sprites_list)
