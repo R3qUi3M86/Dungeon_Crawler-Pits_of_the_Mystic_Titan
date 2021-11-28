@@ -16,6 +16,7 @@ sorting_timer_limit = 20
 sorted_entity_matrix = None
 set_volume_for_all_sounds(VOLUME)  
 
+#Player inputs
 def get_player_wsad_input():
     keys = pygame.key.get_pressed()
 
@@ -90,6 +91,7 @@ def get_player_mouse_input():
             entity_manager.hero.is_in_pain = False
             entity_manager.hero.is_attacking = True
 
+#Sprites drawing and sorting
 def increment_sprite_sorting_timer():
     global sorting_timer
 
@@ -133,6 +135,7 @@ def draw_sprites():
         for entity in row:
             entity.draw(screen)
 
+#Game initialization
 entity_manager.initialize_level_sprites_matrix()
 level_painter.paint_level()
 entity_manager.initialize_player()
@@ -165,6 +168,9 @@ while True:
 
     #Drawing
     draw_sprites()
+    cursor.cursor.draw(screen)
+
+    #Debuging
     #debug_text(f"{entity_manager.hero.map_position}")
     #debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
     #debug_text(f"109 pos: {entity_manager.hero.direct_proximity_collision_tiles[1].map_position}",x = 10, y = 30)
@@ -175,8 +181,7 @@ while True:
     # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
     debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 75)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
-    cursor.cursor.draw(screen)
-    
+
     #util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")
     #util.increment_print_matrix_timer(entity_manager.level_sprites_matrix, "S", True)
     #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix, "S")
