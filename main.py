@@ -6,6 +6,7 @@ from utilities import entity_manager
 from utilities import collision_manager
 from utilities import level_painter
 from utilities import util
+from utilities import ui_elements
 from sys import exit
 from entities import cursor
 
@@ -14,7 +15,7 @@ clock = pygame.time.Clock()
 sorting_timer = 20
 sorting_timer_limit = 20
 sorted_entity_matrix = None
-set_volume_for_all_sounds(VOLUME)  
+set_volume_for_all_sounds(VOLUME)
 
 #Player inputs
 def get_player_wsad_input():
@@ -91,7 +92,7 @@ def get_player_mouse_input():
             entity_manager.hero.is_in_pain = False
             entity_manager.hero.is_attacking = True
 
-#Sprites drawing and sorting
+#Visuals drawing and sorting
 def increment_sprite_sorting_timer():
     global sorting_timer
 
@@ -135,6 +136,9 @@ def draw_sprites():
         for entity in row:
             entity.draw(screen)
 
+def draw_ui():
+    screen.blit(ui_elements.fog,(0,0),special_flags=pygame.BLEND_MULT)
+
 #Game initialization
 entity_manager.initialize_level_sprites_matrix()
 level_painter.paint_level()
@@ -168,9 +172,12 @@ while True:
 
     #Drawing
     draw_sprites()
+    draw_ui()
     cursor.cursor.draw(screen)
 
-    #Debuging
+    ################
+    ####Debuging####
+    ################
     #debug_text(f"{entity_manager.hero.map_position}")
     #debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
     #debug_text(f"109 pos: {entity_manager.hero.direct_proximity_collision_tiles[1].map_position}",x = 10, y = 30)
