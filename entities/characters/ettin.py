@@ -24,7 +24,8 @@ class Ettin(pygame.sprite.Sprite):
         ###Position variables###
         self.tile_index = tile_index
         self.prevous_tile_index = tile_index
-        self.current_tile_map_position = (tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
+        self.current_tile_position = (tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
+        self.previous_tile_position = self.current_tile_position
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
         self.direct_proximity_monsters = []
@@ -131,7 +132,8 @@ class Ettin(pygame.sprite.Sprite):
                 self.tile_index = util.get_tile_index(self.map_position)
             
                 if self.tile_index != self.prevous_tile_index:
-                    self.current_tile_map_position = (self.tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
+                    self.previous_tile_position = (self.prevous_tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.prevous_tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
+                    self.current_tile_position = (self.tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
                     self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
                     self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
                     entity_manager.update_all_nearby_monsters_and_self_direct_proximity_monsters_lists(self.direct_proximity_index_matrix)

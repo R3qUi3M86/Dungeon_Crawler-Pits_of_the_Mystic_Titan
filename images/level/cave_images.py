@@ -57,12 +57,23 @@ floor_debree_05 = pygame.image.load("images/level/cave/floors/debris/floor_debre
 floor_debree_06 = pygame.image.load("images/level/cave/floors/debris/floor_debree_06.png").convert_alpha()
 debree_tile_images = [floor_debree_01,floor_debree_02,floor_debree_03,floor_debree_04,floor_debree_05,floor_debree_06]
 
+###Cracks###
+cross_crack = pygame.image.load("images/level/cave/floors/cracks/cross_crack.png").convert_alpha()
+web_crack = pygame.image.load("images/level/cave/floors/cracks/web_crack.png").convert_alpha()
+top_left_crack = pygame.image.load("images/level/cave/floors/cracks/top_left_crack.png").convert_alpha()
+top_right_crack = pygame.image.load("images/level/cave/floors/cracks/top_right_crack.png").convert_alpha()
+bottom_left_crack = pygame.image.load("images/level/cave/floors/cracks/bottom_left_crack.png").convert_alpha()
+bottom_right_crack = pygame.image.load("images/level/cave/floors/cracks/bottom_right_crack.png").convert_alpha()
+simple_crack_images = [cross_crack,web_crack]
+corner_crack_images = [[top_left_crack,top_right_crack],[bottom_left_crack,bottom_right_crack]]
+
 ######################
 ##### Pit images #####
 ######################
 pit_01 = pygame.image.load("images/level/cave/floors/pits/floor_pit_01.png").convert_alpha()
 pit_02 = pygame.image.load("images/level/cave/floors/pits/floor_pit_02.png").convert_alpha()
 pit_03 = pygame.image.load("images/level/cave/floors/pits/floor_pit_03.png").convert_alpha()
+floor_pit_collider = pygame.image.load("images/level/cave/floors/pits/colliders/floor_pit_collider.png").convert_alpha()
 pit_tile_images = [pit_01,pit_02,pit_03]
 
 ##############################
@@ -81,16 +92,20 @@ blue_water_border_bottom_01 = pygame.image.load("images/level/cave/blue_water/co
 blue_water_border_bottom_02 = pygame.image.load("images/level/cave/blue_water/coastal/blue_water_border_bottom_02.png").convert_alpha()
 blue_water_border_bottom_03 = pygame.image.load("images/level/cave/blue_water/coastal/blue_water_border_bottom_03.png").convert_alpha()
 blue_water_border_bottom_04 = pygame.image.load("images/level/cave/blue_water/coastal/blue_water_border_bottom_04.png").convert_alpha()
-blue_water_border_bottom_images = [blue_water_border_bottom_01,blue_water_border_bottom_02,blue_water_border_bottom_03,blue_water_border_bottom_04]
+blue_water_border_bottom_images = [blue_water_border_bottom_01,blue_water_border_bottom_02,blue_water_border_bottom_03]
+blue_water_border_bottom_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_bottom_collider.png").convert_alpha()
 
 blue_water_border_top_01 = pygame.image.load("images/level/cave/blue_water/coastal/blue_water_border_top_01.png").convert_alpha()
 blue_water_border_top_02 = pygame.image.load("images/level/cave/blue_water/coastal/blue_water_border_top_02.png").convert_alpha()
 blue_water_border_top_03 = pygame.image.load("images/level/cave/blue_water/coastal/blue_water_border_top_03.png").convert_alpha()
 blue_water_border_top_04 = pygame.image.load("images/level/cave/blue_water/coastal/blue_water_border_top_04.png").convert_alpha()
-blue_water_border_top_images = [blue_water_border_top_01,blue_water_border_top_02,blue_water_border_top_03,blue_water_border_top_04]
+blue_water_border_top_images = [blue_water_border_top_01,blue_water_border_top_02,blue_water_border_top_03]
+blue_water_border_top_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_top_collider.png").convert_alpha()
 
 blue_water_border_left = pygame.image.load("images/level/cave/blue_water/coastal/blue_water_border_left.png").convert_alpha()
 blue_water_border_right = pygame.image.load("images/level/cave/blue_water/coastal/blue_water_border_right.png").convert_alpha()
+blue_water_border_left_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_left_collider.png").convert_alpha()
+blue_water_border_right_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_right_collider.png").convert_alpha()
 
 #Convex
 blue_water_border_top_left_convex = pygame.image.load("images/level/cave/blue_water/coastal/convex/blue_water_border_top_left_convex.png").convert_alpha()
@@ -111,9 +126,14 @@ blue_water_border_top_left_concave = pygame.image.load("images/level/cave/blue_w
 blue_water_border_top_right_concave = pygame.image.load("images/level/cave/blue_water/coastal/concave/blue_water_border_top_right_concave.png").convert_alpha()
 blue_water_border_bottom_left_concave = pygame.image.load("images/level/cave/blue_water/coastal/concave/blue_water_border_bottom_left_concave.png").convert_alpha()
 blue_water_border_bottom_right_concave = pygame.image.load("images/level/cave/blue_water/coastal/concave/blue_water_border_bottom_right_concave.png").convert_alpha()
+blue_water_border_top_left_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_top_left_concave_collider.png").convert_alpha()
+blue_water_border_top_right_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_top_right_concave_collider.png").convert_alpha()
+blue_water_border_bottom_left_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_bottom_left_concave_collider.png").convert_alpha()
+blue_water_border_bottom_right_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_bottom_right_concave_collider.png").convert_alpha()
 blue_water_border_concave_images = [[blue_water_border_top_left_concave,blue_water_border_top_right_concave],
                                    [blue_water_border_bottom_left_concave,blue_water_border_bottom_right_concave]]
-
+blue_water_border_concave_colliders = [[blue_water_border_top_left_concave_collider,blue_water_border_top_right_concave_collider],
+                                      [blue_water_border_bottom_left_concave_collider,blue_water_border_bottom_right_concave_collider]]
 #######################
 ##### Wall images #####
 #######################

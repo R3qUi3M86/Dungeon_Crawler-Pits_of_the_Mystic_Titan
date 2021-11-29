@@ -214,7 +214,7 @@ class Ai():
         self.is_roaming = True
 
     def monster_reached_point_destination(self):
-        if self.next_tile_pos_x-20 <= self.monster.map_position[0] <= self.next_tile_pos_x+20 and self.next_tile_pos_y-20 < self.monster.map_position[1] <= self.next_tile_pos_y+20:
+        if self.next_tile_pos_x-level_painter.TILE_SIZE[X]//2 <= self.monster.map_position[0] <= self.next_tile_pos_x+level_painter.TILE_SIZE[X]//2 and self.next_tile_pos_y-level_painter.TILE_SIZE[Y]//2 < self.monster.map_position[1] <= self.next_tile_pos_y+level_painter.TILE_SIZE[Y]//2:
             return True
         return False
 

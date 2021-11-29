@@ -319,7 +319,10 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
             entity_manager.update_far_proximity_level_colliders_position()   
         else:
             current_entity_sprite.update_position((-2*correction_vector[0],-2*correction_vector[1]))
-            current_entity_sprite.facing_direction = util.get_facing_direction(current_entity_sprite.map_position,current_entity_sprite.current_tile_map_position)
+            if entity_manager.level_sprites_matrix[colliding_tile_index[0]][colliding_tile_index[1]].is_convex == False:
+                current_entity_sprite.facing_direction = util.get_facing_direction(current_entity_sprite.map_position,current_entity_sprite.current_tile_position)
+            else:
+                current_entity_sprite.facing_direction = util.get_facing_direction(current_entity_sprite.map_position,current_entity_sprite.previous_tile_position)
             current_entity_sprite.set_speed_vector()
 
         correction_vector = 0,0

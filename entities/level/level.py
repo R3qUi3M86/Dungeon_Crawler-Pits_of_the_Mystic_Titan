@@ -58,9 +58,9 @@ level_01_map = [
 "XX      XXXX~~~~~          ~~~~~XXX",
 "XXXXXX  XXXX~~*               ~~XXX",
 "XXXXXX     ~~~                  XXX", 
-"XNNNXX       XXX~~~~          ~~~XX",
+"XNNNXX                        ~~XXX",
 "XNNNXX       XXX~~~~          ~~~~X",
-"XNNNX        XXXX~~           ~~~~X",
+"XNNNX        XXXX~~~          ~~~~X",
 "X            XXXX~~~            ~~X",
 "XXXXXXXXXXXXXXXXX~~~~          ~~~X",
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
@@ -76,6 +76,7 @@ SIMPLE_CRACK = "*"
 CORNER_CRACK = "`"
 
 IMPASSABLE_TILES = [ENTRANCE,EXIT,WALL,WATER,FLOOR_PIT]
+PASSABLE_TILES = [FLOOR,SIMPLE_CRACK,CORNER_CRACK]
 # LEVEL_ENTRANCE = "E" 
 # LEVEL_EXIT = "V"
 # WALL = "X"
