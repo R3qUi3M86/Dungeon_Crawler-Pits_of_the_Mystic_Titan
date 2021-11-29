@@ -40,11 +40,11 @@ def create_all_level_tiles():
             position = get_tile_position(tile_index)
             vicinity_matrix = get_proximity_matrix_for_tile_index(tile_index)
 
-            new_tile_sprite = create_level_tile(type, tile_index, position, TILE_SIZE, vicinity_matrix, wall_mode=HIDDEN)
+            new_tile_sprite = create_level_tile(type, tile_index, position, TILE_SIZE, vicinity_matrix)
             entity_manager.level_sprites_matrix[row_index][col_index] = new_tile_sprite
 
-def create_level_tile(type,tile_index,position,size,vicinity_matrix):
-    new_tile_sprite = Tile(type,tile_index,position,size,vicinity_matrix)
+def create_level_tile(type,tile_index,position,size,vicinity_matrix, wall_mode=HIDDEN):
+    new_tile_sprite = Tile(type,tile_index,position,size,vicinity_matrix, wall_mode)
     return new_tile_sprite
 
 def generate_pathfinding_matrix():

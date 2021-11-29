@@ -44,20 +44,20 @@ test_map = [
 level_01_map = [
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 "XXXEEEXXXXX       XX           XXXX",
-"XXXEEEXXXXX       XX           XX X",
+"XXXEEEXXXXX       XX     O     XX X",
 "XX    XX          XX           XX X",
 "X          XX                  XX X",
 "XX  *    XXXX                ``   X",
-"XXO      XXXX O       XXXX   ``XXXX",
+"XX       XXXX         XXXX   ``XXXX",
 "XX                    XXXX     XXXX",
 "XX    ~~        XX            *XXXX",
-"X     ~~      O XX             XXXX",
+"X     ~~        XX             XXXX",
 "X       XXX     XX                X",
 "X       XXXX                ~~~   X",
-"XX      XXXX~~~~~          ~~~~~  X",
+"XX O    XXXX~~~~~          ~~~~~  X",
 "XX      XXXX~~~~~          ~~~~~XXX",
 "XX      XXXX~~*               ~~XXX",
-"XXXXX      ~~~                  XXX", 
+"XXXXX      ~~~            O     XXX", 
 "XXXXX                         ~~XXX",
 "XNNNX        XXX~~~~          ~~~~X",
 "XNNNX        XXXX~~~          ~~~~X",
@@ -75,8 +75,6 @@ FLOOR_PIT = "O"
 SIMPLE_CRACK = "*"
 CORNER_CRACK = "`"
 
-IMPASSABLE_TILES = [ENTRANCE,EXIT,WALL,WATER,FLOOR_PIT]
-PASSABLE_TILES = [FLOOR,SIMPLE_CRACK,CORNER_CRACK]
 # LEVEL_ENTRANCE = "E" 
 # LEVEL_EXIT = "V"
 # WALL = "X"

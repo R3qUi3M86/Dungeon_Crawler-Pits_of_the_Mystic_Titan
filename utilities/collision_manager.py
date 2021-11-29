@@ -94,7 +94,7 @@ def adjust_player_speed_scalar(original_speed_scalar, correction_vector,factor=3
 
 #Character bounce-back
 def correct_character_position_by_vector(current_entity_sprite,colliding_entity_sprite, collision_matrix):
-    colliding_tile_index = colliding_entity_sprite.get_index()
+    colliding_tile_index = colliding_entity_sprite.tile_index
     east_tile_index = colliding_tile_index[0],colliding_tile_index[1]+1
     west_tile_index = colliding_tile_index[0],colliding_tile_index[1]-1
     south_tile_index = colliding_tile_index[0]+1,colliding_tile_index[1]
