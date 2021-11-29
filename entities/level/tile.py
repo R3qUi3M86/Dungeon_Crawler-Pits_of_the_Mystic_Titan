@@ -24,7 +24,7 @@ class Tile(pygame.sprite.Sprite):
         self.mask = self.get_tile_mask()
         self.rect = self.image.get_rect(center = (self.position))
 
-        self.is_convex = self.get_convex()
+        self.is_convex = False
 
     def update_position(self):
         self.position = self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0], self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1]
@@ -61,12 +61,20 @@ class Tile(pygame.sprite.Sprite):
                     return corner_crack_images[1][1]
         
         elif self.TYPE in IMPASSABLE_TILES:
+            
             if self.TYPE is FLOOR_PIT:
                 return random.choice(pit_tile_images)
             
-            elif self.TYPE == WATER:
+            elif self.TYPE is WATER:
                 if self.deep_water():
                     return random.choice(blue_water_images)
+                elif self.water_under_wall():
+                    if self.water_under_wall_middle():
+                        return random.choice(blue_water_under_wall_images)
+                    elif self.water_under_wall_left():
+                        return blue_water_under_wall_left
+                    elif self.water_under_wall_right():
+                        return blue_water_under_wall_right
                 elif self.left_water_border():
                     return blue_water_border_left
                 elif self.right_water_border():
@@ -76,12 +84,16 @@ class Tile(pygame.sprite.Sprite):
                 elif self.bottom_water_border():
                     return random.choice(blue_water_border_bottom_images)
                 elif self.water_top_left_convex():
+                    self.is_convex = True
                     return blue_water_border_top_left_convex
                 elif self.water_top_right_convex():
+                    self.is_convex = True
                     return blue_water_border_top_right_convex
                 elif self.water_bottom_left_convex():
+                    self.is_convex = True
                     return blue_water_border_bottom_left_convex
                 elif self.water_bottom_right_convex():
+                    self.is_convex = True
                     return blue_water_border_bottom_right_convex
                 elif self.water_top_left_concave():
                     return blue_water_border_top_left_concave
@@ -93,6 +105,14 @@ class Tile(pygame.sprite.Sprite):
                     return blue_water_border_bottom_right_concave
                 else:
                     return blank
+            
+            elif self.TYPE is WALL:
+                if self.wall_bottom_lower_wall_section():
+                    return self.get_bottom_lower_wall_section_image()
+                elif self.wall_bottom_middle_wall_section():
+                    return self.get_bottom_middle_wall_section_image()
+                elif self.wall_bottom_upper_wall_section():
+                    return self.get_bottom_upper_wall_section_image()
             else:
                 return blank
 
@@ -119,6 +139,10 @@ class Tile(pygame.sprite.Sprite):
                 else:         
                     return pygame.mask.from_surface(level_tile_collider)
 
+    ######################
+    ##### CONDITIONS #####
+    ######################
+    ### Corner cracks
     def top_left_corner_crack(self):
         if self.vicinity_matrix[1][0] is not CORNER_CRACK and self.vicinity_matrix[0][1] is not CORNER_CRACK:
             return corner_crack_images[0][0]
@@ -135,18 +159,46 @@ class Tile(pygame.sprite.Sprite):
         if self.vicinity_matrix[1][2] is not CORNER_CRACK and self.vicinity_matrix[2][1] is not CORNER_CRACK:
             return corner_crack_images[1][1]
 
+    ### Water tiles
     def deep_water(self):
         for row in self.vicinity_matrix:
             for cell in row:
                 if cell not in IMPASSABLE_TILES:
                     return False
+        if self.vicinity_matrix[0][1] is WALL:
+            return False
         return True
+
+    def water_under_wall(self):
+        for row in self.vicinity_matrix:
+            for cell in row:
+                if cell not in IMPASSABLE_TILES:
+                    return False
+        if self.vicinity_matrix[0][1] is WALL:
+            return True
+        return False
+
+    def water_under_wall_middle(self):
+        if self.vicinity_matrix[0][0] is WALL and self.vicinity_matrix[0][1] is WALL and self.vicinity_matrix[0][2] is WALL:
+            return True
+        return False
+
+    def water_under_wall_left(self):
+        if self.vicinity_matrix[0][0] is WATER:
+            return True
+        return False
+    
+    def water_under_wall_right(self):
+        if self.vicinity_matrix[0][2] is WATER:
+            return True
+        return False
 
     def left_water_border(self):
         if self.vicinity_matrix[1][0] in PASSABLE_TILES:
             if self.vicinity_matrix[0][1] == WATER and self.vicinity_matrix[2][1] == WATER:
                 return True
         return False
+
     def right_water_border(self):
         if self.vicinity_matrix[1][2] in PASSABLE_TILES:
             if self.vicinity_matrix[0][1] == WATER and self.vicinity_matrix[2][1] == WATER:
@@ -180,6 +232,7 @@ class Tile(pygame.sprite.Sprite):
     def water_bottom_left_convex(self):
         if self.vicinity_matrix[1][0] in PASSABLE_TILES and self.vicinity_matrix[2][1] in PASSABLE_TILES :
             return True
+
     def water_top_left_concave(self):
         if self.vicinity_matrix[0][0] in PASSABLE_TILES :
             if self.vicinity_matrix[1][0] in IMPASSABLE_TILES and self.vicinity_matrix[0][1] in IMPASSABLE_TILES:
@@ -199,6 +252,47 @@ class Tile(pygame.sprite.Sprite):
         if self.vicinity_matrix[2][0] in PASSABLE_TILES :
             if self.vicinity_matrix[1][0] in IMPASSABLE_TILES and self.vicinity_matrix[2][1] in IMPASSABLE_TILES:
                 return True
+
+    ### Walls
+    def wall_bottom_lower_wall_section(self):
+        if self.vicinity_matrix[2][1] in PASSABLE_TILES or self.vicinity_matrix[2][1] is FLOOR_PIT or self.vicinity_matrix[2][1] is WATER:
+            return True
+        return False
+
+    def wall_bottom_middle_wall_section(self):
+        grid_two_squares_south = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]]
+        if (grid_two_squares_south in PASSABLE_TILES or grid_two_squares_south is FLOOR_PIT or grid_two_squares_south is WATER) and (self.vicinity_matrix[0][1] is WALL):
+            return True
+        return False
+
+    def wall_bottom_upper_wall_section(self):
+        grid_three_squares_south = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]]
+        if (grid_three_squares_south in PASSABLE_TILES or grid_three_squares_south is FLOOR_PIT or grid_three_squares_south is WATER) and (self.vicinity_matrix[0][1] is WALL):
+            return True
+        return False
+
+    def get_bottom_lower_wall_section_image(self):
+        if self.vicinity_matrix[1][0] in PASSABLE_TILES or self.vicinity_matrix[1][0] is FLOOR_PIT:
+            return wall_corner_bottom_left_lower
+        elif self.vicinity_matrix[1][2] in PASSABLE_TILES or self.vicinity_matrix[1][2] is FLOOR_PIT:
+            return wall_corner_bottom_right_lower
+        
+        elif self.vicinity_matrix[1][0] is WATER:
+            if self.vicinity_matrix[0][0] in PASSABLE_TILES or self.vicinity_matrix[0][0] is FLOOR_PIT:
+                return None
+            elif self. vicinity_matrix[0][0] is WATER:
+                return None
+        elif self.vicinity_matrix[1][2] is WATER:
+            if self.vicinity_matrix[0][2] in PASSABLE_TILES or self.vicinity_matrix[0][2] is FLOOR_PIT:
+                return None
+            elif self. vicinity_matrix[0][2] is WATER:
+                return None
+
+    def get_bottom_middle_wall_section_image(self):
+        pass
+
+    def get_bottom_upper_wall_section_image(self):
+        pass
 
     def get_cluster_x_y(self):
         if self.TYPE is WATER:
@@ -229,16 +323,3 @@ class Tile(pygame.sprite.Sprite):
 
     def get_index(self):
         return self.tile_index
-
-    def get_convex(self):
-        if self.image_surface_unscaled in blue_water_border_convex_images[0] or self.image_surface_unscaled in blue_water_border_convex_images[1]:
-            return True
-        return False
-
-# LEVEL_EXIT = "N"
-# WALL = "X"
-# WATER = "~"
-# FLOOR = " "
-# FLOOR_PIT = "O"
-# SIMPLE_CRACK = "*"
-# CORNER_CRACK = "`"

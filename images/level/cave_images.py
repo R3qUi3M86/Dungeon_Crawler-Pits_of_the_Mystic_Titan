@@ -5,31 +5,29 @@ empty_tile_image = pygame.image.load("images/level/cave/floors/empty_tile_mask.p
 ###########################################
 ###### Level entrance and exit images #####
 ###########################################
-###Common###
-level_entrance_and_exit_top_left = pygame.image.load("images/level/cave/entrance_and_exit/top_left.png").convert_alpha()
-level_entrance_and_exit_top_mid = pygame.image.load("images/level/cave/entrance_and_exit/top_mid.png").convert_alpha()
-level_entrance_and_exit_top_right = pygame.image.load("images/level/cave/entrance_and_exit/top_right.png").convert_alpha()
+# ###Common###
+# level_entrance_and_exit_top_left = pygame.image.load("images/level/cave/entrance_and_exit/top_left.png").convert_alpha()
+# level_entrance_and_exit_top_mid = pygame.image.load("images/level/cave/entrance_and_exit/top_mid.png").convert_alpha()
+# level_entrance_and_exit_top_right = pygame.image.load("images/level/cave/entrance_and_exit/top_right.png").convert_alpha()
 
 ###Entrance###
-level_entrance_mid_left = pygame.image.load("images/level/cave/entrance_and_exit/level_entrance_mid_left.png").convert_alpha()
-level_entrance_mid_mid = pygame.image.load("images/level/cave/entrance_and_exit/level_entrance_mid_mid.png").convert_alpha()
-level_entrance_mid_right = pygame.image.load("images/level/cave/entrance_and_exit/level_entrance_mid_right.png").convert_alpha()
+level_entrance_top_left = pygame.image.load("images/level/cave/entrance_and_exit/level_entrance_mid_left.png").convert_alpha()
+level_entrance_top_mid = pygame.image.load("images/level/cave/entrance_and_exit/level_entrance_mid_mid.png").convert_alpha()
+level_entrance_top_right = pygame.image.load("images/level/cave/entrance_and_exit/level_entrance_mid_right.png").convert_alpha()
 level_entrance_bottom_left = pygame.image.load("images/level/cave/entrance_and_exit/level_entrance_bottom_left.png").convert_alpha()
 level_entrance_bottom_mid = pygame.image.load("images/level/cave/entrance_and_exit/level_entrance_bottom_mid.png").convert_alpha()
 level_entrance_bottom_right = pygame.image.load("images/level/cave/entrance_and_exit/level_entrance_bottom_right.png").convert_alpha()
-level_entrance_images = [[level_entrance_and_exit_top_left,level_entrance_and_exit_top_mid,level_entrance_and_exit_top_right],
-                         [level_entrance_mid_left,level_entrance_mid_mid,level_entrance_mid_right],
+level_entrance_images = [[level_entrance_top_left,level_entrance_top_mid,level_entrance_top_right],
                          [level_entrance_bottom_left,level_entrance_bottom_mid,level_entrance_bottom_right]]
 
 ###Exit###
-level_exit_mid_left = pygame.image.load("images/level/cave/entrance_and_exit/level_exit_mid_left.png").convert_alpha()
-level_exit_mid_mid = pygame.image.load("images/level/cave/entrance_and_exit/level_exit_mid_mid.png").convert_alpha()
-level_exit_mid_right = pygame.image.load("images/level/cave/entrance_and_exit/level_exit_mid_right.png").convert_alpha()
+level_exit_top_left = pygame.image.load("images/level/cave/entrance_and_exit/level_exit_mid_left.png").convert_alpha()
+level_exit_top_mid = pygame.image.load("images/level/cave/entrance_and_exit/level_exit_mid_mid.png").convert_alpha()
+level_exit_top_right = pygame.image.load("images/level/cave/entrance_and_exit/level_exit_mid_right.png").convert_alpha()
 level_exit_bottom_left = pygame.image.load("images/level/cave/entrance_and_exit/level_exit_bottom_left.png").convert_alpha()
 level_exit_bottom_mid = pygame.image.load("images/level/cave/entrance_and_exit/level_exit_bottom_mid.png").convert_alpha()
 level_exit_bottom_right = pygame.image.load("images/level/cave/entrance_and_exit/level_exit_bottom_right.png").convert_alpha()
-level_exit_images = [[level_entrance_and_exit_top_left,level_entrance_and_exit_top_mid,level_entrance_and_exit_top_right],
-                     [level_exit_mid_left,level_exit_mid_mid,level_exit_mid_right],
+level_exit_images = [[level_exit_top_left,level_exit_top_mid,level_exit_top_right],
                      [level_exit_bottom_left,level_exit_bottom_mid,level_exit_bottom_right]]
 
 ########################
@@ -84,7 +82,12 @@ blue_water_01 = pygame.image.load("images/level/cave/blue_water/blue_water_01.pn
 blue_water_02 = pygame.image.load("images/level/cave/blue_water/blue_water_02.png").convert_alpha()
 blue_water_03 = pygame.image.load("images/level/cave/blue_water/blue_water_03.png").convert_alpha()
 blue_water_04 = pygame.image.load("images/level/cave/blue_water/blue_water_04.png").convert_alpha()
+blue_water_under_wall_01 = pygame.image.load("images/level/cave/blue_water/under_wall/water_under_wall_01.png").convert_alpha()
+blue_water_under_wall_02 = pygame.image.load("images/level/cave/blue_water/under_wall/water_under_wall_02.png").convert_alpha()
+blue_water_under_wall_left = pygame.image.load("images/level/cave/blue_water/under_wall/water_under_wall_left.png").convert_alpha()
+blue_water_under_wall_right = pygame.image.load("images/level/cave/blue_water/under_wall/water_under_wall_right.png").convert_alpha()
 blue_water_images = [blue_water_01,blue_water_02,blue_water_03,blue_water_04]
+blue_water_under_wall_images = [blue_water_under_wall_01,blue_water_under_wall_02]
 
 ###Coastal###
 #Straight
@@ -137,9 +140,58 @@ blue_water_border_concave_colliders = [[blue_water_border_top_left_concave_colli
 #######################
 ##### Wall images #####
 #######################
-### Only floor in vicinity ###
-#Basic
+### Basic ###
 blank = pygame.image.load("images/level/cave/walls/blank.png").convert_alpha()
 
+### Only floor in vicinity ###
+#Bottom wall lower sections
+wall_bottom_lower_01 = pygame.image.load("images/level/cave/walls/floor/bottom_ending/lower/wall_bottom_lower_01.png").convert_alpha()
+wall_bottom_lower_02 = pygame.image.load("images/level/cave/walls/floor/bottom_ending/lower/wall_bottom_lower_02.png").convert_alpha()
+wall_corner_bottom_left_lower = pygame.image.load("images/level/cave/walls/floor/bottom_ending/lower/wall_corner_bottom_left_lower.png").convert_alpha()
+wall_corner_bottom_right_lower = pygame.image.load("images/level/cave/walls/floor/bottom_ending/lower/wall_corner_bottom_right_lower.png").convert_alpha()
+wall_bottom_lower = [wall_bottom_lower_01, wall_bottom_lower_02]
 
+#Bottom wall middle sections
+wall_bottom_middle_01 = pygame.image.load("images/level/cave/walls/floor/bottom_ending/middle/wall_bottom_middle_01.png").convert_alpha()
+wall_bottom_middle_02 = pygame.image.load("images/level/cave/walls/floor/bottom_ending/middle/wall_bottom_middle_02.png").convert_alpha()
+wall_bottom_middle_left = pygame.image.load("images/level/cave/walls/floor/bottom_ending/middle/wall_bottom_middle_left.png").convert_alpha()
+wall_bottom_middle_right = pygame.image.load("images/level/cave/walls/floor/bottom_ending/middle/wall_bottom_middle_right.png").convert_alpha()
+wall_bottom_middle = [wall_bottom_middle_01, wall_bottom_middle_02]
+
+#Bottom wall upper sections
+wall_bottom_upper_01 = pygame.image.load("images/level/cave/walls/floor/bottom_ending/upper/wall_bottom_upper_01.png").convert_alpha()
+wall_bottom_upper_02 = pygame.image.load("images/level/cave/walls/floor/bottom_ending/upper/wall_bottom_upper_02.png").convert_alpha()
+wall_bottom_upper_03 = pygame.image.load("images/level/cave/walls/floor/bottom_ending/upper/wall_bottom_upper_03.png").convert_alpha()
+wall_bottom_upper_04 = pygame.image.load("images/level/cave/walls/floor/bottom_ending/upper/wall_bottom_upper_04.png").convert_alpha()
+wall_bottom_upper_05 = pygame.image.load("images/level/cave/walls/floor/bottom_ending/upper/wall_bottom_upper_05.png").convert_alpha()
+wall_bottom_left_upper = pygame.image.load("images/level/cave/walls/floor/bottom_ending/upper/wall_bottom_left_upper.png").convert_alpha()
+wall_bottom_right_upper = pygame.image.load("images/level/cave/walls/floor/bottom_ending/upper/wall_bottom_right_upper.png").convert_alpha()
+wall_bottom_upper = [wall_bottom_upper_01, wall_bottom_upper_02, wall_bottom_upper_03, wall_bottom_upper_04, wall_bottom_upper_05]
+
+#Top wall sections
+wall_top_01 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_top_01.png").convert_alpha()
+wall_top_02 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_top_02.png").convert_alpha()
+wall_top_left_convex = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_top_left_convex.png").convert_alpha()
+wall_top_right_convex = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_top_right_convex.png").convert_alpha()
+wall_top = [wall_top_01, wall_top_02]
+wall_top_convex = [wall_top_left_convex, wall_top_right_convex]
+
+#Side wall sections
+wall_left_01 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_left_01.png").convert_alpha()
+wall_left_02 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_left_02.png").convert_alpha()
+wall_left_03 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_left_03.png").convert_alpha()
+wall_left_04 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_left_04.png").convert_alpha()
+wall_right_01 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_right_01.png").convert_alpha()
+wall_right_02 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_right_02.png").convert_alpha()
+wall_right_03 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_left_03.png").convert_alpha()
+wall_right_04 = pygame.image.load("images/level/cave/walls/floor/top_and_sides/wall_left_04.png").convert_alpha()
+wall_left = [wall_left_01, wall_left_02, wall_left_03, wall_left_04]
+wall_right = [wall_right_01, wall_right_02, wall_right_03, wall_right_04]
+
+#Concave wall sections
+wall_upper_left_concave = pygame.image.load("images/level/cave/walls/floor/corners/wall_upper_left_concave.png").convert_alpha()
+wall_upper_right_concave = pygame.image.load("images/level/cave/walls/floor/corners/wall_upper_right_concave.png").convert_alpha()
+wall_lower_left_concave = pygame.image.load("images/level/cave/walls/floor/corners/wall_lower_left_concave.png").convert_alpha()
+wall_lower_right_concave = pygame.image.load("images/level/cave/walls/floor/corners/wall_lower_right_concave.png").convert_alpha()
+wall_concave = [[wall_upper_left_concave, wall_upper_right_concave],[wall_lower_left_concave, wall_lower_right_concave]]
 

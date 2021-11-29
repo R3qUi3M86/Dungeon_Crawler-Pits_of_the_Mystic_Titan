@@ -792,7 +792,7 @@ def move_entity_in_all_matrices(entity_id, entity_type, old_tile_index, new_tile
 
 #Monster generation
 def generate_monsters():
-    generate_monster(ETTIN,(4,3))
+    generate_monster(ETTIN,(7,3))
     # generate_monster(ETTIN,(4,2))
     # generate_monster(ETTIN, (4,1))
     # generate_monster(ETTIN, (7,3))
