@@ -24,6 +24,10 @@ FLOOR_PIT = "O"
 SIMPLE_CRACK = "*"
 CORNER_CRACK = "`"
 
+#Tile painting mode
+HIDDEN = "hidden"
+VISIBLE = "visible"
+
 IMPASSABLE_TILES = [ENTRANCE,EXIT,WALL,WATER,FLOOR_PIT]
 
 #Monster names

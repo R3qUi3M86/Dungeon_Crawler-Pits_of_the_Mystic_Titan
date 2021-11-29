@@ -4,6 +4,7 @@ from settings import *
 from entities.level.level import *
 from entities.level.tile import Tile
 from utilities import entity_manager
+from utilities.constants import HIDDEN
 
 TILE_SIZE = 48,48
 level_layout = level_01_map
@@ -39,7 +40,7 @@ def create_all_level_tiles():
             position = get_tile_position(tile_index)
             vicinity_matrix = get_proximity_matrix_for_tile_index(tile_index)
 
-            new_tile_sprite = create_level_tile(type,tile_index,position,TILE_SIZE,vicinity_matrix)
+            new_tile_sprite = create_level_tile(type, tile_index, position, TILE_SIZE, vicinity_matrix, wall_mode=HIDDEN)
             entity_manager.level_sprites_matrix[row_index][col_index] = new_tile_sprite
 
 def create_level_tile(type,tile_index,position,size,vicinity_matrix):

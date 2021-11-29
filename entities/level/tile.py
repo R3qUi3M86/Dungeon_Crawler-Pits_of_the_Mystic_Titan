@@ -8,7 +8,7 @@ from utilities import level_painter
 from utilities import entity_manager
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self,type,tile_index,pos,size,vicinity_matrix):
+    def __init__(self,type,tile_index,pos,size,vicinity_matrix, wall_mode = HIDDEN):
         super().__init__()
         self.TYPE = type
         self.tile_index = tile_index
@@ -25,6 +25,7 @@ class Tile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (self.position))
 
         self.is_convex = False
+        self.wall_mode = wall_mode
 
     def update_position(self):
         self.position = self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0], self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1]
@@ -107,12 +108,22 @@ class Tile(pygame.sprite.Sprite):
                     return blank
             
             elif self.TYPE is WALL:
-                if self.wall_bottom_lower_wall_section():
-                    return self.get_bottom_lower_wall_section_image()
-                elif self.wall_bottom_middle_wall_section():
-                    return self.get_bottom_middle_wall_section_image()
-                elif self.wall_bottom_upper_wall_section():
-                    return self.get_bottom_upper_wall_section_image()
+                if self.wall_mode is VISIBLE:
+                    if self.bottom_lower_wall_section():
+                        return self.get_bottom_lower_wall_section_image()
+                    elif self.bottom_middle_wall_section():
+                        return self.get_bottom_middle_wall_section_image()
+                    elif self.bottom_upper_wall_section():
+                        return self.get_bottom_upper_wall_section_image()
+                    elif self.wall_top_section():
+                        return self.get_top_wall_section_image()
+                if self.wall_mode is HIDDEN:
+                    if self.bottom_lower_wall_section():
+                        return self.get_bottom_lower_wall_hidden_section_image()
+                    elif self.bottom_middle_wall_section() or self.bottom_upper_wall_section() or self.wall_side_section():
+                        return self.get_wall_side_section_image()
+                    elif self.wall_top_section():
+                        return self.get_wall_top_section_image
             else:
                 return blank
 
