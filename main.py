@@ -128,6 +128,7 @@ def order_sprites():
 
 def draw_sprites():
     screen.blit(level_painter.level_surface,(level_painter.get_level_surface_translation_vector()))
+    screen.blit(level_painter.level_walls_primary_surface,(level_painter.get_level_surface_translation_vector()))
     
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
         shadow.draw(screen)
@@ -141,7 +142,7 @@ def draw_ui():
     screen.blit(ui_elements.fog,(0,0),special_flags=pygame.BLEND_MULT)
 
 #Game initialization
-entity_manager.initialize_level_sprites_matrix()
+entity_manager.initialize_level_matrices()
 level_painter.paint_level()
 entity_manager.initialize_player()
 entity_manager.initialize_all_entities_and_shadows_sprite_group_matrix()

@@ -16,7 +16,18 @@ level_entrance_bottom_right_hidden = pygame.image.load("images/level/cave/entran
 level_entrance_images_hidden = [[level_entrance_top_left_hidden,level_entrance_top_mid_hidden,level_entrance_top_right_hidden],
                                 [level_entrance_bottom_left_hidden,level_entrance_bottom_mid_hidden,level_entrance_bottom_right_hidden]]
 
+#Overlay
+level_entrance_top_left_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_entrance_top_left_overlay.png").convert_alpha()
+level_entrance_top_mid_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_entrance_top_mid_overlay.png").convert_alpha()
+level_entrance_top_right_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_entrance_top_right_overlay.png").convert_alpha()
+level_entrance_bottom_left_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_entrance_bottom_left_overlay.png").convert_alpha()
+level_entrance_bottom_mid_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_entrance_bottom_mid_overlay.png").convert_alpha()
+level_entrance_bottom_right_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_entrance_bottom_right_overlay.png").convert_alpha()
+level_entrance_images_overlay = [[level_entrance_top_left_overlay,level_entrance_top_mid_overlay,level_entrance_top_right_overlay],
+                                [level_entrance_bottom_left_overlay,level_entrance_bottom_mid_overlay,level_entrance_bottom_right_overlay]]
+
 ###Exit###
+#Under overlay
 level_exit_top_left_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_exit_top_left_hidden.png").convert_alpha()
 level_exit_top_mid_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_exit_top_mid_hidden.png").convert_alpha()
 level_exit_top_right_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_exit_top_right_hidden.png").convert_alpha()
@@ -25,6 +36,16 @@ level_exit_bottom_mid_hidden = pygame.image.load("images/level/cave/entrance_and
 level_exit_bottom_right_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_exit_bottom_right_hidden.png").convert_alpha()
 level_exit_images_hidden = [[level_exit_top_left_hidden,level_exit_top_mid_hidden,level_exit_top_right_hidden],
                             [level_exit_bottom_left_hidden,level_exit_bottom_mid_hidden,level_exit_bottom_right_hidden]]
+
+#Overlay
+level_exit_top_left_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_exit_top_left_overlay.png").convert_alpha()
+level_exit_top_mid_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_exit_top_mid_overlay.png").convert_alpha()
+level_exit_top_right_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_exit_top_right_overlay.png").convert_alpha()
+level_exit_bottom_left_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_exit_bottom_left_overlay.png").convert_alpha()
+level_exit_bottom_mid_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_exit_bottom_mid_overlay.png").convert_alpha()
+level_exit_bottom_right_overlay = pygame.image.load("images/level/cave/entrance_and_exit/overlay/level_exit_bottom_right_overlay.png").convert_alpha()
+level_exit_images_overlay = [[level_exit_top_left_overlay,level_exit_top_mid_overlay,level_exit_top_right_overlay],
+                            [level_exit_bottom_left_overlay,level_exit_bottom_mid_overlay,level_exit_bottom_right_overlay]]
 
 ########################
 ##### Floor images #####
@@ -176,7 +197,12 @@ wall_bottom_middle_overlay_01 = pygame.image.load("images/level/cave/walls/botto
 wall_bottom_middle_overlay_02 = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_02.png").convert_alpha()
 wall_bottom_middle_left_overlay = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_left.png").convert_alpha()
 wall_bottom_middle_right_overlay = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_right.png").convert_alpha()
+wall_bottom_middle_primary_01 = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_primary_01.png").convert_alpha()
+wall_bottom_middle_primary_02 = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_primary_02.png").convert_alpha()
+wall_bottom_middle_left_primary = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_left_primary.png").convert_alpha()
+wall_bottom_middle_right_primary = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_right_primary.png").convert_alpha()
 wall_bottom_middle_overlay = [wall_bottom_middle_overlay_01, wall_bottom_middle_overlay_02]
+wall_bottom_middle_primary_overlay = [wall_bottom_middle_primary_01, wall_bottom_middle_primary_02]
 
 ### Bottom wall upper sections ###
 #Overlay
@@ -187,7 +213,15 @@ wall_bottom_upper_overlay_04 = pygame.image.load("images/level/cave/walls/bottom
 wall_bottom_upper_overlay_05 = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_upper_05.png").convert_alpha()
 wall_bottom_left_upper_overlay = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_left_upper.png").convert_alpha()
 wall_bottom_right_upper_overlay = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_right_upper.png").convert_alpha()
+wall_bottom_upper_primary_01 = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_upper_primary_01.png").convert_alpha()
+wall_bottom_upper_primary_02 = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_upper_primary_02.png").convert_alpha()
+wall_bottom_upper_primary_03 = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_upper_primary_03.png").convert_alpha()
+wall_bottom_upper_primary_04 = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_upper_primary_04.png").convert_alpha()
+wall_bottom_upper_primary_05 = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_upper_primary_05.png").convert_alpha()
+wall_bottom_left_upper_primary = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_left_upper_primary.png").convert_alpha()
+wall_bottom_right_upper_primary = pygame.image.load("images/level/cave/walls/bottom_ending/upper/overlay/wall_bottom_right_upper_primary.png").convert_alpha()
 wall_bottom_upper_overlay = [wall_bottom_upper_overlay_01, wall_bottom_upper_overlay_02, wall_bottom_upper_overlay_03, wall_bottom_upper_overlay_04, wall_bottom_upper_overlay_05]
+wall_bottom_upper_primary = [wall_bottom_upper_primary_01, wall_bottom_upper_primary_02, wall_bottom_upper_primary_03, wall_bottom_upper_primary_04, wall_bottom_upper_primary_05]
 
 ### Top wall sections ###
 #Under overlay
@@ -240,6 +274,9 @@ wall_right_01 = pygame.image.load("images/level/cave/walls/top_and_side/side/hid
 wall_right_02 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_02.png").convert_alpha()
 wall_right_03 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_03.png").convert_alpha()
 wall_right_04 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_04.png").convert_alpha()
+
+wall_left_primary_01 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_primary_01.png").convert_alpha()
+wall_right_primary_01 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_primary_01.png").convert_alpha()
 
 wall_left_water_01 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_water_01.png").convert_alpha()
 wall_left_water_02 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_water_02.png").convert_alpha()

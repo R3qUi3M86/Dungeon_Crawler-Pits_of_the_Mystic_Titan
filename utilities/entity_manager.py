@@ -20,6 +20,8 @@ hero_sprite_group = pygame.sprite.GroupSingle(hero)
 all_monsters = []
 
 level_sprites_matrix = [[]]
+primary_wall_sprites_matrix = [[]]
+secondary_wall_sprites_matrix = [[]]
 all_entity_and_shadow_sprite_group_matrix = [[[]]]
 
 ### Far proximity ###
@@ -46,10 +48,17 @@ def initialize_player():
     hero.prevous_tile_index = level_painter.player_starting_tile
     hero.map_position = TILE_SIZE[X]//2+(48*hero.tile_index[1])+screen_width//2, TILE_SIZE[Y]//2+(48*hero.tile_index[0]+screen_height//2)
 
-def initialize_level_sprites_matrix():
+def initialize_level_matrices():
+    initialize_level_sprites_matrix(level_sprites_matrix)
+    initialize_level_sprites_matrix(primary_wall_sprites_matrix)
+    initialize_level_sprites_matrix(secondary_wall_sprites_matrix)
+
+def initialize_level_sprites_matrix(matrix):
     global level_sprites_matrix
-    
-    level_sprites_matrix = []
+    global primary_wall_sprites_matrix
+    global secondary_wall_sprites_matrix
+
+    new_level_matrix = []
 
     x = len(level_layout)
     y = len(level_layout[0])
@@ -57,7 +66,14 @@ def initialize_level_sprites_matrix():
         row = []
         for _ in range (y):
             row.append(0)
-        level_sprites_matrix.append(row)  
+        new_level_matrix.append(row)
+
+    if matrix == level_sprites_matrix:
+        level_sprites_matrix = new_level_matrix
+    elif matrix == primary_wall_sprites_matrix:
+        primary_wall_sprites_matrix = new_level_matrix
+    elif matrix == secondary_wall_sprites_matrix:
+        secondary_wall_sprites_matrix = new_level_matrix
 
 def initialize_all_entities_and_shadows_sprite_group_matrix():
     global all_entity_and_shadow_sprite_group_matrix
