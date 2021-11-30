@@ -147,7 +147,7 @@ wall_bottom_lower_water_02_hidden = pygame.image.load("images/level/cave/walls/b
 wall_bottom_lower_left_water_border_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_bottom_lower_left_water_border_hidden.png").convert_alpha()
 wall_bottom_lower_right_water_border_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_bottom_lower_right_water_border_hidden.png").convert_alpha()
 
-wall_corner_bottom_left_lower_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_left_lower_hidden.png").convert_alpha()
+wall_corner_bottom_lower_left_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_left_lower_hidden.png").convert_alpha()
 wall_corner_bottom_lower_left_water_concave_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_lower_left_water_concave_hidden.png").convert_alpha()
 wall_corner_bottom_lower_left_water_convex_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_lower_left_water_convex_hidden.png").convert_alpha()
 wall_corner_bottom_lower_left_water_left_border_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_lower_left_water_left_border_hidden.png").convert_alpha()
@@ -156,7 +156,7 @@ wall_corner_bottom_lower_left_water_top_border_hidden = pygame.image.load("image
 wall_corner_bottom_lower_left_water_bottom_border_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_lower_left_water_bottom_border_hidden.png").convert_alpha()
 wall_corner_bottom_lower_left_floor_convex_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_lower_left_floor_convex_hidden.png").convert_alpha()
 
-wall_corner_bottom_right_lower_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_right_lower_hidden.png").convert_alpha()
+wall_corner_bottom_lower_right_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_right_lower_hidden.png").convert_alpha()
 wall_corner_bottom_lower_right_water_concave_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_lower_right_water_concave_hidden.png").convert_alpha()
 wall_corner_bottom_lower_right_water_convex_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_lower_right_water_convex_hidden.png").convert_alpha()
 wall_corner_bottom_lower_right_water_left_border_hidden = pygame.image.load("images/level/cave/walls/bottom_ending/lower/hidden/wall_corner_bottom_lower_right_water_left_border_hidden.png").convert_alpha()
@@ -167,6 +167,11 @@ wall_corner_bottom_lower_right_floor_convex_hidden = pygame.image.load("images/l
 
 wall_bottom_lower_hidden = [wall_bottom_lower_hidden_01, wall_bottom_lower_hidden_02]
 wall_bottom_lower_water_hidden = [wall_bottom_lower_water_01_hidden, wall_bottom_lower_water_02_hidden]
+wall_corner_bottom_hidden = [wall_corner_bottom_lower_left_hidden, wall_corner_bottom_lower_right_hidden]
+wall_bottom_lower_left_water_borders_hidden = [wall_bottom_lower_left_water_border_hidden, wall_corner_bottom_lower_left_water_left_border_hidden, wall_corner_bottom_lower_right_water_left_border_hidden]
+wall_bottom_lower_right_water_borders_hidden = [wall_bottom_lower_right_water_border_hidden, wall_corner_bottom_lower_left_water_right_border_hidden, wall_corner_bottom_lower_right_water_right_border_hidden]
+wall_corner_bottom_lower_left_gushing_water_hidden = [wall_corner_bottom_lower_left_water_top_border_hidden, wall_corner_bottom_lower_left_water_concave_hidden]
+wall_corner_bottom_lower_right_gushing_water_hidden = [wall_corner_bottom_lower_right_water_top_border_hidden, wall_corner_bottom_lower_right_water_concave_hidden]
 
 #Overlay
 wall_bottom_lower_overlay_01 = pygame.image.load("images/level/cave/walls/bottom_ending/lower/overlay/wall_bottom_lower_01.png").convert_alpha()
@@ -242,13 +247,16 @@ wall_left_03 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidd
 wall_left_04 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_04.png").convert_alpha()
 wall_right_01 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_01.png").convert_alpha()
 wall_right_02 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_02.png").convert_alpha()
-wall_right_03 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_03.png").convert_alpha()
-wall_right_04 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_04.png").convert_alpha()
+wall_right_03 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_03.png").convert_alpha()
+wall_right_04 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_04.png").convert_alpha()
 
 wall_left_water_01 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_water_01.png").convert_alpha()
 wall_left_water_02 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_water_02.png").convert_alpha()
 wall_right_water_01 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_water_01.png").convert_alpha()
 wall_right_water_02 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_water_02.png").convert_alpha()
+
+wall_left_concave_hidden = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_concave_hidden.png").convert_alpha()
+wall_right_concave_hidden = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_concave_hidden.png").convert_alpha()
 
 wall_left_water_border_bottom = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_water_border_bottom.png").convert_alpha()
 wall_left_water_border_top = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_water_border_top.png").convert_alpha()

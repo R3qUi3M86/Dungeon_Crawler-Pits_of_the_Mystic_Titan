@@ -19,18 +19,21 @@ class Tile(pygame.sprite.Sprite):
         self.passable = self.get_passable()
         self.wall_mode = wall_mode
         
-        self.image_surface_unscaled = self.get_tile_image()
-        self.image = pygame.transform.scale(self.image_surface_unscaled, size)
+        self.is_convex = False
+        self.image_unscaled = self.get_tile_image()
+        self.image = pygame.transform.scale(self.image_unscaled, size)
         self.cluster_x_y = self.get_cluster_x_y()
         self.mask = self.get_tile_mask()
         self.rect = self.image.get_rect(center = (self.position))
 
-        self.is_convex = False
 
     def update_position(self):
         self.position = self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0], self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1]
         self.rect = self.image.get_rect(center = (self.position))
 
+    ###############
+    ### Getters ###
+    ###############
     def get_tile_image(self):
         if self.wall_mode is HIDDEN:
             
@@ -71,13 +74,12 @@ class Tile(pygame.sprite.Sprite):
                 elif self.TYPE is WATER:
                     if self.deep_water():
                         return random.choice(blue_water_images)
-                    elif self.water_under_wall():
-                        if self.water_under_wall_middle():
-                            return random.choice(blue_water_under_wall_images)
-                        elif self.water_under_wall_left():
-                            return blue_water_under_wall_left
-                        elif self.water_under_wall_right():
-                            return blue_water_under_wall_right
+                    if self.water_under_wall_middle():
+                        return random.choice(blue_water_under_wall_images)
+                    elif self.water_under_wall_left():
+                        return blue_water_under_wall_left
+                    elif self.water_under_wall_right():
+                        return blue_water_under_wall_right
                     elif self.left_water_border():
                         return blue_water_border_left
                     elif self.right_water_border():
@@ -111,12 +113,13 @@ class Tile(pygame.sprite.Sprite):
                 
                 elif self.TYPE is WALL:
                     if self.bottom_lower_wall_section():
-                        print(self.tile_index)
                         return self.get_bottom_lower_wall_hidden_section_image()
-                    # elif self.side_wall_section():
-                    #     return self.get_side_wall_hidden_section_image()
+                    elif self.side_wall_section():
+                        return self.get_side_wall_hidden_section_image()
                     # elif self.top_wall_section():
                     #     return self.get_top_wall_hidden_section_image()
+                    # elif self.concave_wall_section():
+                    #     return self.get_side_wall_hidden_concave_image()
                     else:
                         return blank
                 else:
@@ -132,24 +135,145 @@ class Tile(pygame.sprite.Sprite):
                 if self.TYPE is FLOOR_PIT:
                     return pygame.mask.from_surface(floor_pit_collider)
                 if self.TYPE is WATER:
-                    if self.image_surface_unscaled is blue_water_border_right:
+                    if self.image_unscaled is blue_water_border_right:
                         return pygame.mask.from_surface(blue_water_border_right_collider)
-                    elif self.image_surface_unscaled is blue_water_border_left:
+                    elif self.image_unscaled is blue_water_border_left:
                         return pygame.mask.from_surface(blue_water_border_left_collider)
-                    elif self.image_surface_unscaled in blue_water_border_top_images:
+                    elif self.image_unscaled in blue_water_border_top_images:
                         return pygame.mask.from_surface(blue_water_border_top_collider)
-                    elif self.image_surface_unscaled in blue_water_border_bottom_images:
+                    elif self.image_unscaled in blue_water_border_bottom_images:
                         return pygame.mask.from_surface(blue_water_border_bottom_collider)
-                    elif self.image_surface_unscaled in blue_water_border_convex_images[0] or self.image_surface_unscaled in blue_water_border_convex_images[1]:
+                    elif self.image_unscaled in blue_water_border_convex_images[0] or self.image_unscaled in blue_water_border_convex_images[1]:
                         return pygame.mask.from_surface(blue_water_border_convex_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]])
-                    elif self.image_surface_unscaled in blue_water_border_concave_images[0] or self.image_surface_unscaled in blue_water_border_concave_images[1]:
+                    elif self.image_unscaled in blue_water_border_concave_images[0] or self.image_unscaled in blue_water_border_concave_images[1]:
                         return pygame.mask.from_surface(blue_water_border_concave_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]])
                 else:         
                     return pygame.mask.from_surface(level_tile_collider)
 
-    ######################
-    ##### CONDITIONS #####
-    ######################
+    def get_bottom_lower_wall_hidden_section_image(self):
+        ### Middle
+        if self.vicinity_matrix[1][0] in WALL_LIKE and self.vicinity_matrix[1][2] in WALL_LIKE:
+            if self.vicinity_matrix[2][1] is not WATER:
+                return random.choice(wall_bottom_lower_hidden)
+            else:
+                if self.vicinity_matrix[2][0] in FLOOR_LIKE:
+                    return wall_bottom_lower_left_water_border_hidden
+                elif self.vicinity_matrix[2][2] in FLOOR_LIKE:
+                    return wall_bottom_lower_right_water_border_hidden
+                else:
+                    return random.choice(wall_bottom_lower_water_hidden)
+        
+        ### Corners
+        #Normal
+        elif self.vicinity_matrix[1][0] in FLOOR_LIKE:
+            return wall_corner_bottom_lower_left_hidden
+        elif self.vicinity_matrix[1][2] in FLOOR_LIKE:
+            return wall_corner_bottom_lower_right_hidden
+        
+        #Water
+        #Lower left corner
+        elif self.vicinity_matrix[1][0] is WATER and self.vicinity_matrix[2][1] is WATER:
+            if self.vicinity_matrix[0][0] is WATER and self.vicinity_matrix[2][2] is WATER:
+                if self.vicinity_matrix[2][0] is WATER or self.vicinity_matrix[2][0] is WALL:
+                    return wall_corner_bottom_lower_left_water_concave_hidden
+                elif self.vicinity_matrix[2][0] in FLOOR_LIKE:
+                    return wall_corner_bottom_lower_left_floor_convex_hidden
+            
+            elif self.vicinity_matrix[0][0] is WATER and self.vicinity_matrix[2][2] in FLOOR_LIKE:
+                return wall_corner_bottom_lower_left_water_right_border_hidden
+            elif (self.vicinity_matrix[2][2] is WATER or self.vicinity_matrix[2][2] in WALL_LIKE) and self.vicinity_matrix[0][0] in FLOOR_LIKE:
+                return wall_corner_bottom_lower_left_water_top_border_hidden
+
+            elif self.vicinity_matrix[0][0] in FLOOR_LIKE and self.vicinity_matrix[2][2] in FLOOR_LIKE:
+                return wall_corner_bottom_lower_left_water_convex_hidden
+        elif self.vicinity_matrix[2][0] in FLOOR_LIKE and self.vicinity_matrix[1][2] is WALL:
+            if self.vicinity_matrix[1][0] is WATER:
+                return wall_corner_bottom_lower_left_water_bottom_border_hidden
+            elif self.vicinity_matrix[2][1] is WATER:
+                return wall_corner_bottom_lower_left_water_left_border_hidden
+
+        #Lower right corner
+        elif self.vicinity_matrix[1][2] is WATER and self.vicinity_matrix[2][1] is WATER:
+            if self.vicinity_matrix[0][2] is WATER and self.vicinity_matrix[2][0] is WATER:
+                if self.vicinity_matrix[2][2] is WATER or self.vicinity_matrix[2][2] is WALL:
+                    return wall_corner_bottom_lower_right_water_concave_hidden
+                elif self.vicinity_matrix[2][2] in FLOOR_LIKE:
+                    return wall_corner_bottom_lower_right_floor_convex_hidden
+            
+            elif self.vicinity_matrix[0][2] is WATER and self.vicinity_matrix[2][0] in FLOOR_LIKE:
+                return wall_corner_bottom_lower_right_water_left_border_hidden
+            elif (self.vicinity_matrix[2][0] is WATER or self.vicinity_matrix[2][0] in WALL_LIKE) and self.vicinity_matrix[0][2] in FLOOR_LIKE:
+                return wall_corner_bottom_lower_right_water_top_border_hidden
+
+            elif self.vicinity_matrix[0][2] in FLOOR_LIKE and self.vicinity_matrix[2][0] in FLOOR_LIKE:
+                return wall_corner_bottom_lower_right_water_convex_hidden
+        elif self.vicinity_matrix[2][2] in FLOOR_LIKE and self.vicinity_matrix[1][0] is WALL:
+            if self.vicinity_matrix[1][2] is WATER:
+                return wall_corner_bottom_lower_right_water_bottom_border_hidden
+            elif self.vicinity_matrix[2][1] is WATER:
+                return wall_corner_bottom_lower_right_water_left_border_hidden
+
+    def get_side_wall_hidden_section_image(self):
+        if self.vicinity_matrix[1][0] in FLOOR_LIKE:
+            return random.choice(wall_left)
+        elif self.vicinity_matrix[1][2] in FLOOR_LIKE:
+            return random.choice(wall_right)
+        elif self.vicinity_matrix[2][0] not in WALL_LIKE and self.vicinity_matrix[1][0] in WALL_LIKE:
+            return wall_left_concave_hidden
+        elif self.vicinity_matrix[2][2] not in WALL_LIKE and self.vicinity_matrix[1][2] in WALL_LIKE:
+            return wall_right_concave_hidden
+        elif self.vicinity_matrix[1][0] is WATER:
+            if self.vicinity_matrix[0][0] in FLOOR_LIKE:
+                return wall_left_water_border_top
+            elif self.vicinity_matrix[2][0] in FLOOR_LIKE:
+                return wall_left_water_border_bottom
+            else:
+                return random.choice(wall_left_water)
+        elif self.vicinity_matrix[1][2] is WATER:
+            if self.vicinity_matrix[0][2] in FLOOR_LIKE:
+                return wall_right_water_border_top
+            elif self.vicinity_matrix[2][2] in FLOOR_LIKE:
+                return wall_right_water_border_bottom
+            else:
+                return random.choice(wall_right_water)
+        else:
+            return blank
+
+    def get_top_wall_hidden_section_image(self):
+        pass
+
+    def get_top_wall_hidden_section_image(self):
+        pass
+
+    def get_cluster_x_y(self):
+        if self.TYPE is WATER:
+            if self.image_unscaled in blue_water_border_convex_images[0] or self.image_unscaled in blue_water_border_convex_images[1]:
+                for i in range(2):
+                    for j in range(2):
+                        if blue_water_border_convex_images[i][j] == self.image_unscaled:
+                            return i,j
+            
+            elif self.image_unscaled in blue_water_border_concave_images[0] or self.image_unscaled in blue_water_border_concave_images[1]:
+                for i in range(2):
+                    for j in range(2):
+                        if blue_water_border_concave_images[i][j] == self.image_unscaled:
+                            return i,j
+        
+        elif self.TYPE is CORNER_CRACK:
+            if self.image_unscaled in corner_crack_images[0] or self.image_unscaled in corner_crack_images[1]:
+                for i in range(2):
+                    for j in range(2):
+                        if corner_crack_images[i][j] == self.image_unscaled:
+                            return i,j
+
+    def get_passable(self):
+        if self.TYPE in IMPASSABLE_TILES:
+            return False
+        return True
+
+    ##################
+    ### CONDITIONS ###
+    ##################
     ### Corner cracks
     def top_left_corner_crack(self):
         if self.vicinity_matrix[1][0] is not CORNER_CRACK and self.vicinity_matrix[0][1] is not CORNER_CRACK:
@@ -173,97 +297,88 @@ class Tile(pygame.sprite.Sprite):
             for cell in row:
                 if cell not in IMPASSABLE_TILES:
                     return False
-        if self.vicinity_matrix[0][1] is WALL:
+        if self.vicinity_matrix[0][1] in WALL_LIKE:
             return False
         return True
 
-    def water_under_wall(self):
-        for row in self.vicinity_matrix:
-            for cell in row:
-                if cell not in IMPASSABLE_TILES:
-                    return False
-        if self.vicinity_matrix[0][1] is WALL:
-            return True
-        return False
-
     def water_under_wall_middle(self):
-        if self.vicinity_matrix[0][0] is WALL and self.vicinity_matrix[0][1] is WALL and self.vicinity_matrix[0][2] is WALL:
+        if entity_manager.level_sprites_matrix[self.tile_index[0]-1][self.tile_index[1]].image_unscaled in wall_bottom_lower_water_hidden:
             return True
         return False
 
     def water_under_wall_left(self):
-        if self.vicinity_matrix[0][0] is WATER:
+        if entity_manager.level_sprites_matrix[self.tile_index[0]-1][self.tile_index[1]].image_unscaled in wall_corner_bottom_lower_left_gushing_water_hidden:
             return True
         return False
     
     def water_under_wall_right(self):
-        if self.vicinity_matrix[0][2] is WATER:
+        if entity_manager.level_sprites_matrix[self.tile_index[0]-1][self.tile_index[1]].image_unscaled in wall_corner_bottom_lower_right_gushing_water_hidden:
             return True
         return False
 
     def left_water_border(self):
-        if self.vicinity_matrix[1][0] in PASSABLE_TILES:
-            if self.vicinity_matrix[0][1] == WATER and self.vicinity_matrix[2][1] == WATER:
+        if self.vicinity_matrix[1][0] in FLOOR_LIKE:
+            if (self.vicinity_matrix[0][1] is WATER or entity_manager.level_sprites_matrix[self.tile_index[0]-1][self.tile_index[1]].image_unscaled in wall_bottom_lower_left_water_borders_hidden) and (self.vicinity_matrix[2][1] is WATER or self.vicinity_matrix[2][1] is WALL):
                 return True
         return False
 
     def right_water_border(self):
-        if self.vicinity_matrix[1][2] in PASSABLE_TILES:
-            if self.vicinity_matrix[0][1] == WATER and self.vicinity_matrix[2][1] == WATER:
+        if self.vicinity_matrix[1][2] in FLOOR_LIKE:
+            if (self.vicinity_matrix[0][1] is WATER or entity_manager.level_sprites_matrix[self.tile_index[0]-1][self.tile_index[1]].image_unscaled in wall_bottom_lower_right_water_borders_hidden) and (self.vicinity_matrix[2][1] is WATER or self.vicinity_matrix[2][1] is WALL):
                 return True
         return False
     
     def top_water_border(self):
-        if self.vicinity_matrix[0][1] in PASSABLE_TILES:
-            if (self.vicinity_matrix[1][0] == WATER or self.vicinity_matrix[1][0] == WALL) and (self.vicinity_matrix[1][2] == WATER or self.vicinity_matrix[1][2] == WALL):
+        if self.vicinity_matrix[0][1] in FLOOR_LIKE or entity_manager.level_sprites_matrix[self.tile_index[0]-1][self.tile_index[1]].image_unscaled in wall_bottom_lower_water_hidden or entity_manager.level_sprites_matrix[self.tile_index[0]-1][self.tile_index[1]].image_unscaled in wall_corner_bottom_hidden:
+            if (self.vicinity_matrix[1][0] is WATER or self.vicinity_matrix[1][0] is WALL) and (self.vicinity_matrix[1][2] is WATER or self.vicinity_matrix[1][2] is WALL):
                 return True
         return False
     
     def bottom_water_border(self):
-        if self.vicinity_matrix[2][1] in PASSABLE_TILES:
-            if (self.vicinity_matrix[1][0] == WATER or self.vicinity_matrix[1][0] == WALL) and (self.vicinity_matrix[1][2] == WATER or self.vicinity_matrix[1][2] == WALL):
+        if self.vicinity_matrix[2][1] in FLOOR_LIKE:
+            if (self.vicinity_matrix[1][0] is WATER or self.vicinity_matrix[1][0] is WALL) and (self.vicinity_matrix[1][2] is WATER or self.vicinity_matrix[1][2] is WALL):
                 return True
         return False
 
     def water_top_left_convex(self):
-        if self.vicinity_matrix[1][0] in PASSABLE_TILES and self.vicinity_matrix[0][1] in PASSABLE_TILES:
+        if self.vicinity_matrix[1][0] in FLOOR_LIKE and self.vicinity_matrix[0][1] in FLOOR_LIKE:
             return True
 
     def water_top_right_convex(self):
-        if self.vicinity_matrix[0][1] in PASSABLE_TILES and self.vicinity_matrix[1][2] in PASSABLE_TILES:
+        if self.vicinity_matrix[0][1] in FLOOR_LIKE and self.vicinity_matrix[1][2] in FLOOR_LIKE:
             return True
     
     def water_bottom_right_convex(self):
-        if self.vicinity_matrix[1][2] in PASSABLE_TILES and self.vicinity_matrix[2][1] in PASSABLE_TILES:
+        if self.vicinity_matrix[1][2] in FLOOR_LIKE and self.vicinity_matrix[2][1] in FLOOR_LIKE:
             return True
 
     def water_bottom_left_convex(self):
-        if self.vicinity_matrix[1][0] in PASSABLE_TILES and self.vicinity_matrix[2][1] in PASSABLE_TILES :
+        if self.vicinity_matrix[1][0] in FLOOR_LIKE and self.vicinity_matrix[2][1] in FLOOR_LIKE :
             return True
 
     def water_top_left_concave(self):
-        if self.vicinity_matrix[0][0] in PASSABLE_TILES :
+        if self.vicinity_matrix[0][0] in FLOOR_LIKE :
             if self.vicinity_matrix[1][0] in IMPASSABLE_TILES and self.vicinity_matrix[0][1] in IMPASSABLE_TILES:
                 return True
 
     def water_top_right_concave(self):
-        if self.vicinity_matrix[0][2] in PASSABLE_TILES :
+        if self.vicinity_matrix[0][2] in FLOOR_LIKE :
             if self.vicinity_matrix[0][1] in IMPASSABLE_TILES and self.vicinity_matrix[1][2] in IMPASSABLE_TILES:
                 return True
     
     def water_bottom_right_concave(self):
-        if self.vicinity_matrix[2][2] in PASSABLE_TILES :
+        if self.vicinity_matrix[2][2] in FLOOR_LIKE :
             if self.vicinity_matrix[1][2] in IMPASSABLE_TILES and self.vicinity_matrix[2][1] in IMPASSABLE_TILES:
                 return True
 
     def water_bottom_left_concave(self):
-        if self.vicinity_matrix[2][0] in PASSABLE_TILES :
+        if self.vicinity_matrix[2][0] in FLOOR_LIKE :
             if self.vicinity_matrix[1][0] in IMPASSABLE_TILES and self.vicinity_matrix[2][1] in IMPASSABLE_TILES:
                 return True
 
     ### Walls
     def bottom_lower_wall_section(self):
-        if self.vicinity_matrix[2][1] is not WALL and self.vicinity_matrix[2][1] is not EXIT and self.vicinity_matrix[2][1] is not ENTRANCE:
+        if self.vicinity_matrix[2][1] not in WALL_LIKE:
             return True
         return False
 
@@ -280,105 +395,11 @@ class Tile(pygame.sprite.Sprite):
         pass
 
     def side_wall_section(self):
-        pass
+        if self.vicinity_matrix[0][1] in WALL_LIKE and self.vicinity_matrix[2][1] in WALL_LIKE:
+            return True
+        return False
 
     def wall_concave_section(self):
         pass
-
-    def get_bottom_lower_wall_hidden_section_image(self):
-        ### Middle
-        if self.vicinity_matrix[1][0] in WALL_LIKE and self.vicinity_matrix[1][2] in WALL_LIKE:
-            if self.vicinity_matrix[2][1] is not WATER:
-                return random.choice(wall_bottom_lower_hidden)
-            else:
-                if self.vicinity_matrix[2][0] in FLOOR_LIKE:
-                    return wall_bottom_lower_left_water_border_hidden
-                elif self.vicinity_matrix[2][2] in FLOOR_LIKE:
-                    return wall_bottom_lower_right_water_border_hidden
-                else:
-                    return random.choice(wall_bottom_lower_water_hidden)
-        
-        ### Corners
-        #Normal
-        elif self.vicinity_matrix[1][0] in FLOOR_LIKE:
-            return wall_corner_bottom_left_lower_hidden
-        elif self.vicinity_matrix[1][2] in FLOOR_LIKE:
-            return wall_corner_bottom_right_lower_hidden
-        
-        #Water
-        #Lower left corner
-        elif self.vicinity_matrix[1][0] is WATER and self.vicinity_matrix[2][1] is WATER:
-            if self.vicinity_matrix[0][0] is WATER and self.vicinity_matrix[2][2] is WATER:
-                if self.vicinity_matrix[2][0] is WATER or self.vicinity_matrix[2][0] is WALL:
-                    return wall_corner_bottom_lower_left_water_concave_hidden
-                elif self.vicinity_matrix[2][0] in FLOOR_LIKE:
-                    return wall_corner_bottom_lower_left_floor_convex_hidden
-            
-            elif self.vicinity_matrix[0][0] is WATER and self.vicinity_matrix[2][2] in FLOOR_LIKE:
-                return wall_corner_bottom_lower_left_water_right_border_hidden
-            elif self.vicinity_matrix[2][2] is WATER and self.vicinity_matrix[0][0] in FLOOR_LIKE:
-                return wall_corner_bottom_lower_left_water_top_border_hidden
-
-            elif self.vicinity_matrix[0][0] in FLOOR_LIKE and self.vicinity_matrix[2][2] in FLOOR_LIKE:
-                return wall_corner_bottom_lower_left_water_convex_hidden
-        elif self.vicinity_matrix[2][0] in FLOOR_LIKE and self.vicinity_matrix[1][2] is WALL:
-            if self.vicinity_matrix[1][0] is WATER:
-                return wall_corner_bottom_lower_left_water_bottom_border_hidden
-            elif self.vicinity_matrix[2][1] is WATER:
-                return wall_corner_bottom_lower_left_water_left_border_hidden
-
-        #Lower right corner
-        elif self.vicinity_matrix[1][2] is WATER and self.vicinity_matrix[2][1] is WATER:
-            if self.vicinity_matrix[0][2] is WATER and self.vicinity_matrix[2][0] is WATER:
-                if self.vicinity_matrix[2][2] is WATER or self.vicinity_matrix[2][2] is WALL:
-                    return wall_corner_bottom_lower_right_water_concave_hidden
-                elif self.vicinity_matrix[2][2] in FLOOR_LIKE:
-                    return wall_corner_bottom_lower_right_floor_convex_hidden
-            
-            elif self.vicinity_matrix[0][2] is WATER and self.vicinity_matrix[2][0] in FLOOR_LIKE:
-                return wall_corner_bottom_lower_right_water_left_border_hidden
-            elif self.vicinity_matrix[2][0] is WATER and self.vicinity_matrix[0][2] in FLOOR_LIKE:
-                return wall_corner_bottom_lower_right_water_top_border_hidden
-
-            elif self.vicinity_matrix[0][2] in FLOOR_LIKE and self.vicinity_matrix[2][0] in FLOOR_LIKE:
-                return wall_corner_bottom_lower_right_water_convex_hidden
-        elif self.vicinity_matrix[2][2] in FLOOR_LIKE and self.vicinity_matrix[1][0] is WALL:
-            if self.vicinity_matrix[1][2] is WATER:
-                return wall_corner_bottom_lower_right_water_bottom_border_hidden
-            elif self.vicinity_matrix[2][1] is WATER:
-                return wall_corner_bottom_lower_right_water_left_border_hidden
-
-
-
-    def get_side_wall_hidden_section_image(self):
-        pass
-
-    def get_top_wall_hidden_section_image(self):
-        pass
-
-    def get_cluster_x_y(self):
-        if self.TYPE is WATER:
-            if self.image_surface_unscaled in blue_water_border_convex_images[0] or self.image_surface_unscaled in blue_water_border_convex_images[1]:
-                for i in range(2):
-                    for j in range(2):
-                        if blue_water_border_convex_images[i][j] == self.image_surface_unscaled:
-                            return i,j
-            
-            elif self.image_surface_unscaled in blue_water_border_concave_images[0] or self.image_surface_unscaled in blue_water_border_concave_images[1]:
-                for i in range(2):
-                    for j in range(2):
-                        if blue_water_border_concave_images[i][j] == self.image_surface_unscaled:
-                            return i,j
-        
-        elif self.TYPE is CORNER_CRACK:
-            if self.image_surface_unscaled in corner_crack_images[0] or self.image_surface_unscaled in corner_crack_images[1]:
-                for i in range(2):
-                    for j in range(2):
-                        if corner_crack_images[i][j] == self.image_surface_unscaled:
-                            return i,j
-
-    def get_passable(self):
-        if self.TYPE in IMPASSABLE_TILES:
-            return False
-        return True
+    
 

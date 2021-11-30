@@ -281,7 +281,7 @@ class Ettin(pygame.sprite.Sprite):
 
     def use_pathfinding_logic(self):
         if self.monster_ai.is_path_finding and not self.monster_ai.is_following_path:
-            self.monster_ai.pathfinder.monster_tile_index = self.tile_index
+            self.monster_ai.pathfinder.monster_tile_index = self.prevous_tile_index
             self.monster_ai.pathfinder.create_path()
             self.monster_ai.next_tile_pos_x = level_painter.get_tile_sprite_by_index((self.monster_ai.pathfinder.path[0][1],self.monster_ai.pathfinder.path[0][0])).map_position[0]
             self.monster_ai.next_tile_pos_y = level_painter.get_tile_sprite_by_index((self.monster_ai.pathfinder.path[0][1],self.monster_ai.pathfinder.path[0][0])).map_position[1]

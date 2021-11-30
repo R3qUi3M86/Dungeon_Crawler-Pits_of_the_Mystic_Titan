@@ -12,7 +12,7 @@ class Ai():
         self.direction_change_decision_timer = 0
         self.direction_change_decision_timer_limit = 300
         
-        self.monster_path_follow_dir_change_timer = 30
+        self.monster_path_follow_dir_change_timer = 0
         self.monster_path_follow_dir_change_timer_limit = 30
 
         self.pathfinding_prepare_timer = 0
@@ -190,7 +190,7 @@ class Ai():
         self.reset_obstacle_avoidance_flags()
         self.is_path_finding = True
         self.path_finding_is_ready = False
-        self.monster_path_follow_dir_change_timer = self.monster_path_follow_dir_change_timer_limit
+        self.monster_path_follow_dir_change_timer = 0
 
     def change_to_next_point_direction(self):
         if self.monster_reached_point_destination():

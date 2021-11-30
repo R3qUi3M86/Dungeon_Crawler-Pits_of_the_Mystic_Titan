@@ -185,9 +185,10 @@ while True:
     debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
     debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
     # debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(0).position}",x = 10, y = 60)
-    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 60)
     # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
-    # debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 75)
+    debug_text(f"mon 0 current_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).current_tile_position}",x = 10, y = 60)
+    debug_text(f"mon 0 prvous_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).previous_tile_position}",x = 10, y = 75)
+    debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 90)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
 
     #util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")
