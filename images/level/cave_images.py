@@ -6,14 +6,15 @@ empty_tile_image = pygame.image.load("images/level/cave/floors/empty_tile_mask.p
 ###### Level entrance and exit images #####
 ###########################################
 ###Entrance###
+#Under overlay
 level_entrance_top_left_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_entrance_top_left_hidden.png").convert_alpha()
 level_entrance_top_mid_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_entrance_top_mid_hidden.png").convert_alpha()
 level_entrance_top_right_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_entrance_top_right_hidden.png").convert_alpha()
 level_entrance_bottom_left_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_entrance_bottom_left_hidden.png").convert_alpha()
 level_entrance_bottom_mid_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_entrance_bottom_mid_hidden.png").convert_alpha()
 level_entrance_bottom_right_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_entrance_bottom_right_hidden.png").convert_alpha()
-level_entrance_images = [[level_entrance_top_left_hidden,level_entrance_top_mid_hidden,level_entrance_top_right_hidden],
-                         [level_entrance_bottom_left_hidden,level_entrance_bottom_mid_hidden,level_entrance_bottom_right_hidden]]
+level_entrance_images_hidden = [[level_entrance_top_left_hidden,level_entrance_top_mid_hidden,level_entrance_top_right_hidden],
+                                [level_entrance_bottom_left_hidden,level_entrance_bottom_mid_hidden,level_entrance_bottom_right_hidden]]
 
 ###Exit###
 level_exit_top_left_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_exit_top_left_hidden.png").convert_alpha()
@@ -22,8 +23,8 @@ level_exit_top_right_hidden = pygame.image.load("images/level/cave/entrance_and_
 level_exit_bottom_left_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_exit_bottom_left_hidden.png").convert_alpha()
 level_exit_bottom_mid_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_exit_bottom_mid_hidden.png").convert_alpha()
 level_exit_bottom_right_hidden = pygame.image.load("images/level/cave/entrance_and_exit/hidden/level_exit_bottom_right_hidden.png").convert_alpha()
-level_exit_images = [[level_exit_top_left_hidden,level_exit_top_mid_hidden,level_exit_top_right_hidden],
-                     [level_exit_bottom_left_hidden,level_exit_bottom_mid_hidden,level_exit_bottom_right_hidden]]
+level_exit_images_hidden = [[level_exit_top_left_hidden,level_exit_top_mid_hidden,level_exit_top_right_hidden],
+                            [level_exit_bottom_left_hidden,level_exit_bottom_mid_hidden,level_exit_bottom_right_hidden]]
 
 ########################
 ##### Floor images #####
@@ -231,6 +232,8 @@ wall_top_right_convex_water_top_border = pygame.image.load("images/level/cave/wa
 
 wall_top = [wall_top_01, wall_top_02]
 wall_top_water = [wall_top_water_01, wall_top_water_02]
+wall_top_water_left_border = [wall_top_water_left_border_01, wall_top_water_left_border_02]
+wall_top_water_right_border = [wall_top_water_right_border_01, wall_top_water_right_border_02]
 
 #Overlay
 wall_top_overlay_01 = pygame.image.load("images/level/cave/walls/top_and_side/top/overlay/wall_top_01.png").convert_alpha()
@@ -255,9 +258,6 @@ wall_left_water_02 = pygame.image.load("images/level/cave/walls/top_and_side/sid
 wall_right_water_01 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_water_01.png").convert_alpha()
 wall_right_water_02 = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_water_02.png").convert_alpha()
 
-wall_left_concave_hidden = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_concave_hidden.png").convert_alpha()
-wall_right_concave_hidden = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_concave_hidden.png").convert_alpha()
-
 wall_left_water_border_bottom = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_water_border_bottom.png").convert_alpha()
 wall_left_water_border_top = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_left_water_border_top.png").convert_alpha()
 wall_right_water_border_bottom = pygame.image.load("images/level/cave/walls/top_and_side/side/hidden/wall_right_water_border_bottom.png").convert_alpha()
@@ -281,9 +281,12 @@ wall_left_overlay = [wall_left_overlay_01, wall_left_overlay_02, wall_left_overl
 wall_right_overlay = [wall_right_overlay_01, wall_right_overlay_02, wall_right_overlay_03, wall_right_overlay_04]
 
 ### Concave wall sections ###
-wall_upper_left_concave = pygame.image.load("images/level/cave/walls/concave/wall_corner_upper_left_concave.png").convert_alpha()
-wall_upper_right_concave = pygame.image.load("images/level/cave/walls/concave/wall_corner_upper_right_concave.png").convert_alpha()
-wall_lower_left_concave = pygame.image.load("images/level/cave/walls/concave/wall_corner_lower_left_concave.png").convert_alpha()
-wall_lower_right_concave = pygame.image.load("images/level/cave/walls/concave/wall_corner_lower_right_concave.png").convert_alpha()
-wall_concave = [[wall_upper_left_concave, wall_upper_right_concave],[wall_lower_left_concave, wall_lower_right_concave]]
+#Under overlay
+wall_top_left_concave_hidden = pygame.image.load("images/level/cave/walls/concave/hidden/wall_top_left_concave_hidden.png").convert_alpha()
+wall_top_right_concave_hidden = pygame.image.load("images/level/cave/walls/concave/hidden/wall_top_right_concave_hidden.png").convert_alpha()
+wall_bottom_left_concave_floor_hidden = pygame.image.load("images/level/cave/walls/concave/hidden/wall_bottom_left_concave_floor_hidden.png").convert_alpha()
+wall_bottom_right_concave_floor_hidden = pygame.image.load("images/level/cave/walls/concave/hidden/wall_bottom_right_concave_floor_hidden.png").convert_alpha()
+wall_bottom_left_concave_water_hidden = pygame.image.load("images/level/cave/walls/concave/hidden/wall_bottom_left_concave_water_hidden.png").convert_alpha()
+wall_bottom_right_concave_water_hidden = pygame.image.load("images/level/cave/walls/concave/hidden/wall_bottom_right_concave_water_hidden.png").convert_alpha()
 
+#Overlay
