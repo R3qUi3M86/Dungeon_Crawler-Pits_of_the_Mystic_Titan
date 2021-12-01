@@ -1,4 +1,5 @@
 import pygame
+from pygame import image
 from sounds.sound_player import *
 from utilities.text_printer import *
 from utilities.constants import *
@@ -152,13 +153,15 @@ def draw_sprites():
     
     if wall_drawing_mode == VISIBLE:
         for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
-            if not tile.is_hiding_player:
-                screen.blit(tile.image,tile.position)
-
-    # screen.blit(entity_manager.hero.wall_hider_collider.image, entity_manager.hero.wall_hider_collider.rect.topleft)
-
+            if tile.is_hiding_player:
+                tile.image.set_alpha(150)
+            else:
+                tile.image.set_alpha(255)
+            screen.blit(tile.image,tile.position)
+                
 def draw_ui():
-    screen.blit(ui_elements.fog,(0,0),special_flags=pygame.BLEND_MULT)
+    screen.blit(ui_elements.central_ligtht,(0,0))
+    ui_elements.draw_health_bar()
 
 #Game initialization
 entity_manager.initialize_level_matrices()
@@ -166,7 +169,7 @@ level_painter.paint_level()
 entity_manager.initialize_player()
 entity_manager.initialize_all_entities_and_shadows_sprite_group_matrix()
 #entity_manager.fill_map_with_monsters(1)
-entity_manager.generate_monsters()
+#entity_manager.generate_monsters()
 entity_manager.generate_items()
 entity_manager.update_far_proximity_matrices_and_lists()
 entity_manager.finish_init()
@@ -211,9 +214,9 @@ while True:
     debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
     # debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(0).position}",x = 10, y = 60)
     # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
-    debug_text(f"mon 0 current_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).current_tile_position}",x = 10, y = 60)
-    debug_text(f"mon 0 prvous_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).previous_tile_position}",x = 10, y = 75)
-    debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 90)
+    # debug_text(f"mon 0 current_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).current_tile_position}",x = 10, y = 60)
+    # debug_text(f"mon 0 prvous_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).previous_tile_position}",x = 10, y = 75)
+    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 90)
     # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
 
     #util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")

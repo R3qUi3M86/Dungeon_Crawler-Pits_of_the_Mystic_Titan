@@ -3,12 +3,22 @@ from utilities import entity_manager
 from utilities import util
 from utilities.level_painter import level_layout
 
+wall_hider_timer = 0
+wall_hider_timer_limit = 15
+
 #Master function
 def detect_all_collisions():
+    global wall_hider_timer
+    
     player_vs_monster_movement_collision()
     entity_vs_level_collision(entity_manager.hero)
+    
     if entity_manager.hero.speed_vector != 0:
-        wall_hider_vs_obscuring_walls_collision()
+        if wall_hider_timer == wall_hider_timer_limit:
+            wall_hider_vs_obscuring_walls_collision()
+            wall_hider_timer = 0
+        else:
+            wall_hider_timer += 1
 
     for character in entity_manager.far_proximity_character_sprites_list:
         monster_vs_monster_collision(character)
@@ -73,8 +83,10 @@ def projectile_collision(projectile_sprite):
     pass
 
 def item_collision(item_sprite):
-    #Item collision logic
-    pass
+    hero = entity_manager.hero
+
+    if util.elipses_intersect(hero.map_position, item_sprite.map_position, hero.size, item_sprite.size):
+        item_sprite.is_picked = True
 
 #Movement vector adjustment
 def slow_down_player(factor=3):
@@ -545,15 +557,13 @@ def all_sector_colliders_collide(collision_matrix):
 def hero_is_above_wall_grid(tile_index):
     hero = entity_manager.hero
     wall_grid_index = None
-    if level_layout[tile_index[0]][tile_index[1]] == WALL:
-        wall_grid_index = tile_index
-    elif level_layout[tile_index[0]+1][tile_index[1]] == WALL:
+
+    if level_layout[tile_index[0]+1][tile_index[1]] == WALL:
         wall_grid_index = tile_index[0]+1, tile_index[1]
     elif level_layout[tile_index[0]+2][tile_index[1]] == WALL:
         wall_grid_index = tile_index[0]+2, tile_index[1]
+    elif level_layout[tile_index[0]][tile_index[1]] == WALL:
+        wall_grid_index = tile_index
 
     if tile_index[0]+2 >= hero.tile_index[0] <= wall_grid_index[0]:
         return True
-
-def hero_is_under_wall_grid(tile_index):
-    return False

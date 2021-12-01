@@ -104,8 +104,10 @@ class Hero(pygame.sprite.Sprite):
         self.can_shoot = False
         self.projectile_type = None
         
-        #Abilities
+        #Abilities and items list
         self.abilities = []
+        self.items = []
+        self.ammo = {EMERALD_CROSSBOW:0}
         
         #Movement
         self.speed = 3

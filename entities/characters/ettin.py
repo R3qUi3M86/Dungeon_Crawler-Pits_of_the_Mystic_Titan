@@ -98,7 +98,7 @@ class Ettin(pygame.sprite.Sprite):
         self.maxhealth = 10
 
         #Combat
-        self.damage = 0
+        self.damage = 1
         self.x_melee_range = 50
         self.y_melee_range = 27
         self.melee_range = self.x_melee_range, self.y_melee_range

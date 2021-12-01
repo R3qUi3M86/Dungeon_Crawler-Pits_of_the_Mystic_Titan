@@ -10,6 +10,7 @@ from utilities.level_painter import TILE_SIZE
 from entities.level.level import WATER
 from entities.characters.ettin import Ettin
 from entities.characters.player import Hero
+from entities.items.item import Item
 
 entities_id = []
 
@@ -259,6 +260,11 @@ def get_entity_sprite_group_by_id_from_matrix_cell(entity_id, tile_index, type=S
         for entity in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
             if entity.sprite.TYPE is PLAYER and entity.sprite.id == entity_id:
                 return entity
+
+    elif type == ITEM:
+        for entity in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
+            if entity.sprite.TYPE is ITEM and entity.sprite.id == entity_id:
+                return entity
     
 def get_direct_proximity_objects_list(matrix, object_type = IMPASSABLE_TILES):
     if object_type == IMPASSABLE_TILES:
@@ -327,6 +333,7 @@ def update_all_objects_position_in_far_proximity():
     if round(hero.speed_scalar[0],2) != 0.00 or round(hero.speed_scalar[1],2) != 0.00:
         hero.update_position(hero.speed_vector)
         update_far_proximity_non_player_entities_position(far_proximity_character_sprites_list)
+        update_far_proximity_non_player_entities_position(far_proximity_item_sprites_list)
         update_far_proximity_level_colliders_position()
         update_far_proximity_primary_walls_position()
         update_far_proximity_secondary_walls_position()
@@ -1016,7 +1023,7 @@ def move_entity_in_all_matrices(entity_id, entity_type, old_tile_index, new_tile
         # far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].append(shadow_sprite_group)
         far_proximity_entity_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].append(entity_sprite_group)
 
-#Monster generation
+#Monster entities
 def generate_monsters():
     generate_monster(ETTIN,(7,3))
     # generate_monster(ETTIN,(4,2))
@@ -1068,9 +1075,41 @@ def generate_monster(monster_type, tile_index):
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster.shadow))
     all_monsters.append(monster)
 
-#Item generation
+#Item entities
 def generate_items():
-    pass
+    generate_item((8,5), EMERALD_CROSSBOW)
+
+def generate_item(tile_index, item_name):
+    global all_entity_and_shadow_sprite_group_matrix
+
+    item = Item(tile_index, item_name)
+
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(item))
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(item.shadow))
+
+def remove_item_from_the_map_and_give_to_player(item):
+    tile_index = item.tile_index
+
+    give_item_to_player(item)
+
+    item_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(item.id, tile_index, type=ITEM)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(item_sprite_group)
+    far_proximity_entity_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(item_sprite_group)
+
+    shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(item.id, tile_index, type=SHADOW)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(shadow_sprite_group)
+
+    far_proximity_shadow_sprite_group_list.remove(shadow_sprite_group)
+    far_proximity_entity_sprites_list.remove(item)
+    far_proximity_item_sprites_list.remove(item)
+
+def give_item_to_player(item):
+    if item.is_weapon:
+        hero.items.append(item)
+        hero.ammo[item.NAME] += item.ammo
+    
+    elif item.is_ammo:
+        hero.ammo[item.ammo_type] += item.ammo
 
 #Misc
 def wake_up_any_sleeping_monsters_in_far_proximity_matrix():

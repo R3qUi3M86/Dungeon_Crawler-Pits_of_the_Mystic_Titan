@@ -23,6 +23,8 @@ class Shadow(pygame.sprite.Sprite):
 
     #Image getters
     def get_image(self):
+        if self.shadow_size == SIZE_TINY:
+            return shadow_tiny
         if self.shadow_size == SIZE_SMALL:
             return shadow_small
         elif self.shadow_size == SIZE_MEDIUM:

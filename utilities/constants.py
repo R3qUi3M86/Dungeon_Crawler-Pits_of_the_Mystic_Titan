@@ -38,11 +38,27 @@ FLOOR_LIKE = [FLOOR, FLOOR_PIT, SIMPLE_CRACK, CORNER_CRACK]
 #Monster names
 ETTIN = "ettin"
 
+#Item names
+EMERALD_CROSSBOW = "emerald_crossbow"
+EMERALD_CROSSBOW_BOLTS = "emerald_crossbow_bolts"
+EMERALD_CROSSBOW_QUIVER = "emerald_crossbow_quiver"
+
+#Weapons
+RANGED = "ranged"
+MELEE = "melee"
+WEAPONS = [EMERALD_CROSSBOW]
+RANGED_WEAPONS = [EMERALD_CROSSBOW]
+
+#Ammunition
+AMMOTYPES = [EMERALD_CROSSBOW_BOLTS,EMERALD_CROSSBOW_QUIVER]
+CROSSBOW_AMMO = [EMERALD_CROSSBOW_BOLTS,EMERALD_CROSSBOW_QUIVER]
+
 #Hit types
 HIT = True
 MISS = False
 
 #Sizes
+SIZE_TINY = "tiny"
 SIZE_SMALL = 'small'
 SIZE_MEDIUM = "medium"
 
