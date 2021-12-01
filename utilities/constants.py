@@ -25,6 +25,7 @@ SIMPLE_CRACK = "*"
 CORNER_CRACK = "`"
 
 #Tile painting mode
+VISIBLE = "visible"
 HIDDEN = "hidden"
 PRIMARY_OVERLAY = "primary_overlay"
 SECONDARY_OVERLAY = "secondary_overlay"

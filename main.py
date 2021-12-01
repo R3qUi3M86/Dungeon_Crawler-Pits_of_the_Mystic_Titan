@@ -15,6 +15,7 @@ clock = pygame.time.Clock()
 sorting_timer = 20
 sorting_timer_limit = 20
 sorted_entity_matrix = None
+wall_drawing_mode = VISIBLE
 set_volume_for_all_sounds(VOLUME)
 pygame.event.set_allowed([pygame.QUIT])
 
@@ -93,6 +94,14 @@ def get_player_mouse_input():
             entity_manager.hero.is_in_pain = False
             entity_manager.hero.is_attacking = True
 
+def toggle_wall_drawing_mode():
+    global wall_drawing_mode
+
+    if wall_drawing_mode is VISIBLE:
+        wall_drawing_mode = HIDDEN
+    else:
+        wall_drawing_mode = VISIBLE
+
 #Visuals drawing and sorting
 def increment_sprite_sorting_timer():
     global sorting_timer
@@ -128,15 +137,10 @@ def order_sprites():
 
 def draw_sprites():
     screen.blit(level_painter.level_surface,(level_painter.get_level_surface_translation_vector()))
-    # screen.blit(level_painter.level_walls_primary_surface,(level_painter.get_level_surface_translation_vector()))
-    #screen.blit(level_painter.level_walls_secondary_surface,(level_painter.get_level_surface_translation_vector()))
     
-    for tile in entity_manager.far_proximity_primary_wall_sprites_list:
-        screen.blit(tile.image,tile.position)
-
-    # for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
-    #     if not tile.is_hiding_entity:
-    #         screen.blit(tile.image,(tile.position))
+    if wall_drawing_mode == VISIBLE:
+        for tile in entity_manager.far_proximity_primary_wall_sprites_list:
+            screen.blit(tile.image,tile.position)
 
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
         shadow.draw(screen)
@@ -146,11 +150,10 @@ def draw_sprites():
         for entity in row:
             entity.draw(screen)
     
-    for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
-        if tile.is_hiding_player:
-            pass
-        else:
-            screen.blit(tile.image,tile.position)
+    if wall_drawing_mode == VISIBLE:
+        for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
+            if not tile.is_hiding_player:
+                screen.blit(tile.image,tile.position)
 
     # screen.blit(entity_manager.hero.wall_hider_collider.image, entity_manager.hero.wall_hider_collider.rect.topleft)
 
@@ -187,6 +190,11 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_TAB:
+                toggle_wall_drawing_mode()
+        
 
     #Drawing
     draw_sprites()
