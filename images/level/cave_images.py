@@ -201,6 +201,11 @@ wall_bottom_middle_primary_01 = pygame.image.load("images/level/cave/walls/botto
 wall_bottom_middle_primary_02 = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_primary_02.png").convert_alpha()
 wall_bottom_middle_left_primary = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_left_primary.png").convert_alpha()
 wall_bottom_middle_right_primary = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_right_primary.png").convert_alpha()
+wall_bottom_middle_secondary_01 = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_secondary_01.png").convert_alpha()
+wall_bottom_middle_secondary_02 = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_secondary_02.png").convert_alpha()
+wall_bottom_middle_left_secondary = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_left_secondary.png").convert_alpha()
+wall_bottom_middle_right_secondary = pygame.image.load("images/level/cave/walls/bottom_ending/middle/overlay/wall_bottom_middle_right_secondary.png").convert_alpha()
+
 wall_bottom_middle_overlay = [wall_bottom_middle_overlay_01, wall_bottom_middle_overlay_02]
 wall_bottom_middle_primary_overlay = [wall_bottom_middle_primary_01, wall_bottom_middle_primary_02]
 

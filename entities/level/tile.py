@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 from entities.level.level import *
 from images.level.cave_images import *
 from images.misc.colliders import *
@@ -20,16 +21,17 @@ class Tile(pygame.sprite.Sprite):
         self.wall_mode = wall_mode
         
         self.is_convex = False
+        self.is_hiding_player = False
         self.image_unscaled = self.get_tile_image()
         self.image = pygame.transform.scale(self.image_unscaled, size)
         self.cluster_x_y = self.get_cluster_x_y()
         self.mask = self.get_tile_mask()
-        self.rect = self.image.get_rect(center = (self.position))
+        self.rect = self.image.get_rect(topleft = (self.position))
 
 
     def update_position(self):
-        self.position = self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0], self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1]
-        self.rect = self.image.get_rect(center = (self.position))
+        self.position = math.floor(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0] - level_painter.TILE_SIZE[X]//2), math.floor(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1] - level_painter.TILE_SIZE[Y]//2)
+        self.rect = self.image.get_rect(topleft = (self.position))
 
     ###############
     ### Getters ###
@@ -197,11 +199,14 @@ class Tile(pygame.sprite.Sprite):
         elif self.wall_mode is SECONDARY_OVERLAY:
             if self.bottom_middle_wall_section() and self.TYPE is not ENTRANCE and self.TYPE is not EXIT:
                 if self.vicinity_matrix[1][0] not in WALL_LIKE or self.vicinity_matrix[2][0] not in WALL_LIKE:
-                    return wall_bottom_middle_left_overlay
-                elif self.vicinity_matrix[1][2] not in WALL or self.vicinity_matrix[2][2] is not WALL_LIKE:
-                    return wall_bottom_middle_right_overlay
+                    return wall_bottom_middle_left_secondary
+                elif self.vicinity_matrix[1][2] not in WALL_LIKE or self.vicinity_matrix[2][2] not in WALL_LIKE:
+                    return wall_bottom_middle_right_secondary
                 else:
-                    return random.choice(wall_bottom_middle_overlay)
+                    if entity_manager.primary_wall_sprites_matrix[self.tile_index[0]][self.tile_index[1]].image_unscaled is wall_bottom_middle_primary_01 or entity_manager.primary_wall_sprites_matrix[self.tile_index[0]][self.tile_index[1]].image_unscaled is wall_bottom_middle_overlay_01:
+                        return wall_bottom_middle_secondary_01
+                    else:
+                        return wall_bottom_middle_secondary_02
 
             elif self.bottom_upper_wall_section():
                 if self.vicinity_matrix[2][1] is WALL:
@@ -514,9 +519,9 @@ class Tile(pygame.sprite.Sprite):
 
     def get_side_wall_hidden_concave_image(self):
         if self.vicinity_matrix[2][0] not in WALL_LIKE and self.vicinity_matrix[1][0] in WALL_LIKE:
-            return wall_top_right_concave_hidden
+            return wall_left_primary_01
         elif self.vicinity_matrix[2][2] not in WALL_LIKE and self.vicinity_matrix[1][2] in WALL_LIKE:
-            return wall_top_left_concave_hidden
+            return wall_right_primary_01
         elif self.vicinity_matrix[0][0] not in WALL_LIKE:
             if self.vicinity_matrix[0][0] in FLOOR_LIKE:
                 return wall_bottom_right_concave_floor_hidden

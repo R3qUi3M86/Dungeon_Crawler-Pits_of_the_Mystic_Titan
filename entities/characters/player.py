@@ -62,6 +62,7 @@ class Hero(pygame.sprite.Sprite):
         self.entity_collider_sw    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_SW)
         self.entity_collider_se    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_SE)
         self.entity_collider_omni  = Collider(player_position, self.id, ENTITY_OMNI)
+        self.wall_hider_collider = Collider(WALL_HIDER_POSITION, self.id, WALL_HIDER)
 
         #Shadow
         self.shadow = Shadow(player_position, self.map_position, PLAYER_ID, SIZE_SMALL)

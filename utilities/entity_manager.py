@@ -28,6 +28,8 @@ all_entity_and_shadow_sprite_group_matrix = [[[]]]
 #Matrices
 far_proximity_index_matrix = [[]] #Only indices
 far_proximity_level_sprite_matrix = [[]]
+far_proximity_primary_wall_sprite_matrix = [[]]
+far_proximity_secondary_wall_sprite_matrix = [[]]
 far_proximity_entity_and_shadow_sprite_group_matrix = [[[]]]
 far_proximity_entity_sprite_group_matrix = [[[]]] #For faster sprite sorting
 
@@ -40,8 +42,8 @@ far_proximity_item_sprites_list = [] #For faster collision type handling
 far_proximity_projectile_sprites_list = [] #For faster collision type handling
 
 far_proximity_level_collider_sprites_list = [] #For faster update_position
-primary_wall_sprites_list = [] #For faster update_position
-secondary_wall_sprites = [] #For faster update_position
+far_proximity_primary_wall_sprites_list = [] #For faster update_position
+far_proximity_secondary_wall_sprites_list = [] #For faster update_position
 far_proximity_level_water_sprites_list = [] #For faster update_position - animation to be implemented
 
 #Initialization
@@ -94,7 +96,11 @@ def initialize_all_entities_and_shadows_sprite_group_matrix():
 def initialize_far_proximity_matrix_and_lists(matrix_type):
     if matrix_type == far_proximity_level_sprite_matrix:
         initialize_far_proximity_level_sprite_matrix()
+        initialize_far_proximity_primary_wall_sprite_matrix()
+        initialize_far_proximity_secondary_wall_sprite_matrix()
         initialize_far_proximity_level_collider_and_water_sprites_list()
+        initialize_far_proximity_primary_wall_sprites_list()
+        initialize_far_proximity_secondary_wall_sprites_list()
     
     elif matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
         initialize_far_proximity_entity_and_shadow_sprite_group_matrix()
@@ -106,15 +112,45 @@ def initialize_far_proximity_level_sprite_matrix():
     
     matrix = []
     for row in far_proximity_index_matrix:
-        new_entities_and_shadows_row = []
+        new_tiles_row = []
         for cell in row:
             if 0 <= cell[0] < len(level_layout) and 0 <= cell[1] < len(level_layout[0]):
                 tile_sprite = level_sprites_matrix[cell[0]][cell[1]]
-                new_entities_and_shadows_row.append(tile_sprite)
-        if len(new_entities_and_shadows_row) > 0:
-            matrix.append(new_entities_and_shadows_row)
+                new_tiles_row.append(tile_sprite)
+        if len(new_tiles_row) > 0:
+            matrix.append(new_tiles_row)
 
     far_proximity_level_sprite_matrix = matrix 
+
+def initialize_far_proximity_primary_wall_sprite_matrix():
+    global far_proximity_primary_wall_sprite_matrix
+    
+    matrix = []
+    for row in far_proximity_index_matrix:
+        new_tiles_row = []
+        for cell in row:
+            if 0 <= cell[0] < len(level_layout) and 0 <= cell[1] < len(level_layout[0]):
+                tile_sprite = primary_wall_sprites_matrix[cell[0]][cell[1]]
+                new_tiles_row.append(tile_sprite)
+        if len(new_tiles_row) > 0:
+            matrix.append(new_tiles_row)
+
+    far_proximity_primary_wall_sprite_matrix = matrix
+
+def initialize_far_proximity_secondary_wall_sprite_matrix():
+    global far_proximity_secondary_wall_sprite_matrix
+    
+    matrix = []
+    for row in far_proximity_index_matrix:
+        new_tiles_row = []
+        for cell in row:
+            if 0 <= cell[0] < len(level_layout) and 0 <= cell[1] < len(level_layout[0]):
+                tile_sprite = secondary_wall_sprites_matrix[cell[0]][cell[1]]
+                new_tiles_row.append(tile_sprite)
+        if len(new_tiles_row) > 0:
+            matrix.append(new_tiles_row)
+
+    far_proximity_secondary_wall_sprite_matrix = matrix
 
 def initialize_far_proximity_entity_and_shadow_sprite_group_matrix():
     global far_proximity_entity_and_shadow_sprite_group_matrix
@@ -161,6 +197,22 @@ def initialize_far_proximity_level_collider_and_water_sprites_list():
                 far_proximity_level_collider_sprites_list.append(tile)
                 if tile.TYPE == WATER:
                     far_proximity_level_water_sprites_list.append(tile)
+
+def initialize_far_proximity_primary_wall_sprites_list():
+    global far_proximity_primary_wall_sprites_list
+
+    for row in far_proximity_primary_wall_sprite_matrix:
+        for tile in row:
+            if tile != 0:
+                far_proximity_primary_wall_sprites_list.append(tile)
+
+def initialize_far_proximity_secondary_wall_sprites_list():
+    global far_proximity_secondary_wall_sprites_list
+
+    for row in far_proximity_secondary_wall_sprite_matrix:
+        for tile in row:
+            if tile != 0:
+                far_proximity_secondary_wall_sprites_list.append(tile)
 
 def initialize_far_proximity_all_entities_and_shadows_sprite_group_lists():
     global far_proximity_shadow_sprite_group_list
@@ -262,6 +314,12 @@ def update_all_objects_in_far_proximity():
     for projectile_sprite in far_proximity_projectile_sprites_list:
         projectile_sprite.update()
 
+    for primary_wall_sprite in far_proximity_primary_wall_sprites_list:
+        primary_wall_sprite.update()
+    
+    for secondary_wall_sprite in far_proximity_secondary_wall_sprites_list:
+        secondary_wall_sprite.update()
+
     for water_sprite in far_proximity_level_water_sprites_list:
         water_sprite.update()
 
@@ -270,6 +328,8 @@ def update_all_objects_position_in_far_proximity():
         hero.update_position(hero.speed_vector)
         update_far_proximity_non_player_entities_position(far_proximity_character_sprites_list)
         update_far_proximity_level_colliders_position()
+        update_far_proximity_primary_walls_position()
+        update_far_proximity_secondary_walls_position()
 
 def update_far_proximity_non_player_entities_position(entities, vector=None):
     for entity in entities:
@@ -278,6 +338,14 @@ def update_far_proximity_non_player_entities_position(entities, vector=None):
 
 def update_far_proximity_level_colliders_position():
     for tile in far_proximity_level_collider_sprites_list:
+        tile.update_position()
+
+def update_far_proximity_primary_walls_position():
+    for tile in far_proximity_primary_wall_sprites_list:
+        tile.update_position()
+
+def update_far_proximity_secondary_walls_position():
+    for tile in far_proximity_secondary_wall_sprites_list:
         tile.update_position()
 
 def update_all_nearby_monsters_and_self_direct_proximity_monsters_lists(direct_proximity_matrix):

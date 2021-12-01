@@ -58,6 +58,7 @@ MELEE_SECTOR = "melee sector"
 ENTITY_OMNI = "movement omni"
 ENTITY_SECTOR = "movement sector"
 SQUARE = "square"
+WALL_HIDER = "wall hider"
 
 #Sector names
 SECTOR_E = 0
@@ -73,3 +74,6 @@ SECTORS = [SECTOR_E,SECTOR_NE,SECTOR_N,SECTOR_NW,SECTOR_W,SECTOR_SW,SECTOR_S,SEC
 #Direction name
 HORIZONTAL = "horizontal"
 VERTICAL = "vertical"
+
+#Wall hider
+WALL_HIDER_POSITION = player_position[0], player_position[1] - 48

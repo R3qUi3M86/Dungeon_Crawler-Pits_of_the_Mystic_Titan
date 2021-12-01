@@ -22,25 +22,7 @@ class Collider(pygame.sprite.Sprite):
 
     #Misc
     def get_image(self):
-        if self.type == MELEE_SECTOR:
-            if self.sector == SECTOR_E:
-                return melee_collider_e
-            elif self.sector == SECTOR_NE:
-                return melee_collider_ne
-            elif self.sector == SECTOR_N:
-                return melee_collider_n
-            elif self.sector == SECTOR_NW:
-                return melee_collider_nw
-            elif self.sector == SECTOR_W:
-                return melee_collider_w
-            elif self.sector == SECTOR_SW:
-                return melee_collider_sw
-            elif self.sector == SECTOR_S:
-                return melee_collider_s
-            elif self.sector == SECTOR_SE:
-                return melee_collider_se
-
-        elif self.type == ENTITY_OMNI:
+        if self.type == ENTITY_OMNI:
             if self.size == SIZE_SMALL:
                 return entity_collider_small
             elif self.size == SIZE_MEDIUM:
@@ -62,4 +44,7 @@ class Collider(pygame.sprite.Sprite):
                 return small_square_collider
             elif self.size == SIZE_MEDIUM:
                 return medium_square_collider
+
+        elif self.type == WALL_HIDER:
+            return wall_hider_coolider
 

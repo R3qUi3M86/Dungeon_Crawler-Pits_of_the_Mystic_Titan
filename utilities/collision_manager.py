@@ -7,6 +7,8 @@ from utilities.level_painter import level_layout
 def detect_all_collisions():
     player_vs_monster_movement_collision()
     entity_vs_level_collision(entity_manager.hero)
+    if entity_manager.hero.speed_vector != 0:
+        wall_hider_vs_obscuring_walls_collision()
 
     for character in entity_manager.far_proximity_character_sprites_list:
         monster_vs_monster_collision(character)
@@ -44,6 +46,17 @@ def entity_vs_level_collision(character):
                  
                 if character.TYPE == MONSTER and character.monster_ai.is_path_finding == False and character.monster_ai.path_finding_is_ready:
                     character.monster_ai.initialize_monster_path_finding()
+
+def wall_hider_vs_obscuring_walls_collision():
+    for secondary_wall_sprite in entity_manager.far_proximity_secondary_wall_sprites_list:
+        if entity_manager.hero.wall_hider_collider.rect.colliderect(secondary_wall_sprite):
+            
+            if hero_is_above_wall_grid(secondary_wall_sprite.tile_index):
+                secondary_wall_sprite.is_hiding_player = True
+            else:
+                secondary_wall_sprite.is_hiding_player = False
+        else:
+            secondary_wall_sprite.is_hiding_player = False
 
 def monster_vs_monster_collision(monster):
     for character in monster.direct_proximity_monsters:
@@ -316,7 +329,9 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
             adjust_player_speed_scalar(original_speed_scalar,speed_correction_vector,15)
             entity_manager.hero.update_position(correction_vector)
             entity_manager.update_far_proximity_non_player_entities_position(entity_manager.far_proximity_entity_sprites_list, correction_vector)
-            entity_manager.update_far_proximity_level_colliders_position()   
+            entity_manager.update_far_proximity_level_colliders_position()
+            entity_manager.update_far_proximity_primary_walls_position()
+            entity_manager.update_far_proximity_secondary_walls_position()
         else:
             current_entity_sprite.update_position((-2*correction_vector[0],-2*correction_vector[1]))
             if entity_manager.level_sprites_matrix[colliding_tile_index[0]][colliding_tile_index[1]].is_convex == False:
@@ -525,4 +540,20 @@ def any_sector_collider_collides(collision_matrix):
 def all_sector_colliders_collide(collision_matrix):
     if collision_matrix[0][0] and collision_matrix[0][1] and collision_matrix[1][0] and collision_matrix[1][1]:
         return True
+    return False
+
+def hero_is_above_wall_grid(tile_index):
+    hero = entity_manager.hero
+    wall_grid_index = None
+    if level_layout[tile_index[0]][tile_index[1]] == WALL:
+        wall_grid_index = tile_index
+    elif level_layout[tile_index[0]+1][tile_index[1]] == WALL:
+        wall_grid_index = tile_index[0]+1, tile_index[1]
+    elif level_layout[tile_index[0]+2][tile_index[1]] == WALL:
+        wall_grid_index = tile_index[0]+2, tile_index[1]
+
+    if tile_index[0]+2 >= hero.tile_index[0] <= wall_grid_index[0]:
+        return True
+
+def hero_is_under_wall_grid(tile_index):
     return False

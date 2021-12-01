@@ -1,11 +1,11 @@
 import pygame
 from copy import deepcopy
 
-from pygame import surface
+import math
 from settings import *
 from entities.level.level import *
 from entities.level.tile import Tile
-from images.level.cave_images import blank
+from images.level.cave_images import empty_tile_image
 from utilities import entity_manager
 from utilities.constants import *
 
@@ -42,13 +42,15 @@ def paint_level():
         for tile in row:
             level_surface.blit(tile.image,(tile.map_position))
 
-    for row in entity_manager.primary_wall_sprites_matrix:
-        for tile in row:
-            level_surface.blit(tile.image,(tile.map_position))
+    # for row in entity_manager.primary_wall_sprites_matrix:
+    #     for tile in row:
+    #         if tile != 0:
+    #             level_surface.blit(tile.image,(tile.map_position))
 
     for row in entity_manager.secondary_wall_sprites_matrix:
         for tile in row:
-            level_walls_secondary_surface.blit(tile.image,(tile.map_position))
+            if tile != 0:
+                level_walls_secondary_surface.blit(tile.image,(tile.map_position))
 
 def create_all_level_tiles():
     set_player_tile_index()
@@ -59,11 +61,15 @@ def create_all_level_tiles():
             vicinity_matrix = get_proximity_matrix_for_tile_index(tile_index)
 
             new_tile_sprite = create_level_tile(type, tile_index, position, TILE_SIZE, vicinity_matrix)
-            new_primary_wall_sprite = create_level_tile(type, tile_index, position, TILE_SIZE, vicinity_matrix, PRIMARY_OVERLAY)
-            new_secondary_wall_sprite = create_level_tile(type, tile_index, position, TILE_SIZE, vicinity_matrix, SECONDARY_OVERLAY)
             entity_manager.level_sprites_matrix[row_index][col_index] = new_tile_sprite
-            entity_manager.primary_wall_sprites_matrix[row_index][col_index] = new_primary_wall_sprite
-            entity_manager.secondary_wall_sprites_matrix[row_index][col_index] = new_secondary_wall_sprite
+            
+            new_primary_wall_sprite = create_level_tile(type, tile_index, position, TILE_SIZE, vicinity_matrix, PRIMARY_OVERLAY)
+            if new_primary_wall_sprite.image_unscaled is not empty_tile_image:
+                entity_manager.primary_wall_sprites_matrix[row_index][col_index] = new_primary_wall_sprite
+            
+            new_secondary_wall_sprite = create_level_tile(type, tile_index, position, TILE_SIZE, vicinity_matrix, SECONDARY_OVERLAY)
+            if new_secondary_wall_sprite.image_unscaled is not empty_tile_image:
+                entity_manager.secondary_wall_sprites_matrix[row_index][col_index] = new_secondary_wall_sprite
 
 def create_level_tile(type,tile_index,position,size,vicinity_matrix, wall_mode=HIDDEN):
     new_tile_sprite = Tile(type,tile_index,position,size,vicinity_matrix, wall_mode)
@@ -90,8 +96,8 @@ def get_tile_position(tile_index):
     distance_x = TILE_SIZE[0]*index_distance_x
     distance_y = TILE_SIZE[1]*index_distance_y
 
-    position_x = player_position[0] + distance_x
-    position_y = player_position[1] + distance_y
+    position_x = player_position[0] + distance_x - TILE_SIZE[X]//2
+    position_y = player_position[1] + distance_y - TILE_SIZE[Y]//2
 
     return position_x,position_y
 
@@ -121,7 +127,7 @@ def get_level_surface(surface_type=HIDDEN):
         return pygame.Surface((((len(level_layout[0])*TILE_SIZE[0])+screen_width,(len(level_layout)*TILE_SIZE[1])+screen_height)), pygame.SRCALPHA, 32)
 
 def get_level_surface_translation_vector():
-    return player_position[0]-entity_manager.hero.map_position[0]-TILE_SIZE[0]/2,player_position[1]-entity_manager.hero.map_position[1]-TILE_SIZE[1]/2
+    return math.floor(player_position[0]-entity_manager.hero.map_position[0]-TILE_SIZE[0]//2),math.floor(player_position[1]-entity_manager.hero.map_position[1]-TILE_SIZE[1]//2)
 
 #Conditions
 def cell_is_starting_position(row_index,col_index,cell):

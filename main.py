@@ -129,8 +129,15 @@ def order_sprites():
 def draw_sprites():
     screen.blit(level_painter.level_surface,(level_painter.get_level_surface_translation_vector()))
     # screen.blit(level_painter.level_walls_primary_surface,(level_painter.get_level_surface_translation_vector()))
-    screen.blit(level_painter.level_walls_secondary_surface,(level_painter.get_level_surface_translation_vector()))
+    #screen.blit(level_painter.level_walls_secondary_surface,(level_painter.get_level_surface_translation_vector()))
     
+    for tile in entity_manager.far_proximity_primary_wall_sprites_list:
+        screen.blit(tile.image,tile.position)
+
+    # for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
+    #     if not tile.is_hiding_entity:
+    #         screen.blit(tile.image,(tile.position))
+
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
         shadow.draw(screen)
 
@@ -138,6 +145,14 @@ def draw_sprites():
     for row in sorted_entity_matrix:
         for entity in row:
             entity.draw(screen)
+    
+    for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
+        if tile.is_hiding_player:
+            pass
+        else:
+            screen.blit(tile.image,tile.position)
+
+    # screen.blit(entity_manager.hero.wall_hider_collider.image, entity_manager.hero.wall_hider_collider.rect.topleft)
 
 def draw_ui():
     screen.blit(ui_elements.fog,(0,0),special_flags=pygame.BLEND_MULT)
