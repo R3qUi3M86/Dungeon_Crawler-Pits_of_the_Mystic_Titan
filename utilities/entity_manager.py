@@ -362,6 +362,8 @@ def update_far_proximity_matrices_and_lists(offset = None):
     
     update_far_proximity_matrix_and_lists(far_proximity_entity_and_shadow_sprite_group_matrix, offset)
     update_far_proximity_matrix_and_lists(far_proximity_level_sprite_matrix, offset)
+    update_far_proximity_matrix_and_lists(far_proximity_primary_wall_sprite_matrix, offset)
+    update_far_proximity_matrix_and_lists(far_proximity_secondary_wall_sprite_matrix, offset)
 
 def update_far_proximity_index_matrix(offset = None):
     global far_proximity_index_matrix
@@ -438,6 +440,8 @@ def remove_first_row_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_entity_and_shadow_sprite_group_matrix
     global far_proximity_entity_sprite_group_matrix
     global far_proximity_level_sprite_matrix
+    global far_proximity_primary_wall_sprite_matrix
+    global far_proximity_secondary_wall_sprite_matrix
 
     global far_proximity_shadow_sprite_group_list
     global far_proximity_character_sprites_list
@@ -445,6 +449,8 @@ def remove_first_row_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_projectile_sprites_list
     global far_proximity_level_collider_sprites_list
     global far_proximity_level_water_sprites_list
+    global far_proximity_primary_wall_sprites_list
+    global far_proximity_secondary_wall_sprites_list
     
     #Entities and shadows (3D MATRIX)
     if far_proximity_index_matrix[0][0][0] > 0: 
@@ -474,13 +480,26 @@ def remove_first_row_from_matrix_and_objects_from_lists(matrix_type):
                     far_proximity_level_collider_sprites_list.remove(tile)
                     if tile.TYPE is WATER:
                         far_proximity_level_water_sprites_list.remove(tile)
-            
             del far_proximity_level_sprite_matrix[0]
+
+        elif matrix_type == far_proximity_primary_wall_sprite_matrix:
+            for tile in far_proximity_primary_wall_sprite_matrix[0]:
+                if tile != 0:
+                    far_proximity_primary_wall_sprites_list.remove(tile)
+            del far_proximity_primary_wall_sprite_matrix[0]
+
+        elif matrix_type == far_proximity_secondary_wall_sprite_matrix:
+            for tile in far_proximity_secondary_wall_sprite_matrix[0]:
+                if tile != 0:
+                    far_proximity_secondary_wall_sprites_list.remove(tile)
+            del far_proximity_secondary_wall_sprite_matrix[0]
 
 def append_last_row_to_matrix_and_objects_to_lists(matrix_type, tile_indices_matrix):
     global far_proximity_entity_and_shadow_sprite_group_matrix
     global far_proximity_entity_sprite_group_matrix
     global far_proximity_level_sprite_matrix
+    global far_proximity_primary_wall_sprite_matrix
+    global far_proximity_secondary_wall_sprite_matrix
 
     global far_proximity_shadow_sprite_group_list
     global far_proximity_entity_sprites_list
@@ -488,7 +507,9 @@ def append_last_row_to_matrix_and_objects_to_lists(matrix_type, tile_indices_mat
     global far_proximity_item_sprites_list
     global far_proximity_projectile_sprites_list
     global far_proximity_level_collider_sprites_list
-    global far_proximity_level_water_sprites_list    
+    global far_proximity_level_water_sprites_list
+    global far_proximity_primary_wall_sprites_list
+    global far_proximity_secondary_wall_sprites_list
     
     if tile_indices_matrix[-1][0][0] < len(level_layout):
 
@@ -524,24 +545,47 @@ def append_last_row_to_matrix_and_objects_to_lists(matrix_type, tile_indices_mat
 
         #Level sprites (2D MATRIX)
         elif matrix_type == far_proximity_level_sprite_matrix:
-            new_entities_and_shadows_row = []
+            new_level_tiles_row = []
             
             for tile_index in tile_indices_matrix[-1]:
                 if 0 <= tile_index[1] < len(level_layout[0]):
                     tile = level_sprites_matrix[tile_index[0]][tile_index[1]]
-                    new_entities_and_shadows_row.append(tile)
+                    new_level_tiles_row.append(tile)
                     if tile.TYPE in IMPASSABLE_TILES:
                         far_proximity_level_collider_sprites_list.append(tile)
                         if tile.TYPE == WATER:
-                            far_proximity_level_water_sprites_list.append(tile)
+                            far_proximity_level_water_sprites_list.append(tile)  
+            far_proximity_level_sprite_matrix.append(new_level_tiles_row)
+
+        elif matrix_type == far_proximity_primary_wall_sprite_matrix:
+            new_level_tiles_row = []
             
-            far_proximity_level_sprite_matrix.append(new_entities_and_shadows_row)
+            for tile_index in tile_indices_matrix[-1]:
+                if 0 <= tile_index[1] < len(level_layout[0]):
+                    tile = primary_wall_sprites_matrix[tile_index[0]][tile_index[1]]
+                    new_level_tiles_row.append(tile)
+                    if tile != 0:
+                        far_proximity_primary_wall_sprites_list.append(tile)
+            far_proximity_primary_wall_sprite_matrix.append(new_level_tiles_row)
+
+        elif matrix_type == far_proximity_secondary_wall_sprite_matrix:
+            new_level_tiles_row = []
+            
+            for tile_index in tile_indices_matrix[-1]:
+                if 0 <= tile_index[1] < len(level_layout[0]):
+                    tile = secondary_wall_sprites_matrix[tile_index[0]][tile_index[1]]
+                    new_level_tiles_row.append(tile)
+                    if tile != 0:
+                        far_proximity_secondary_wall_sprites_list.append(tile)
+            far_proximity_secondary_wall_sprite_matrix.append(new_level_tiles_row)
 
 #X = -1
 def remove_last_row_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_entity_and_shadow_sprite_group_matrix
     global far_proximity_level_sprite_matrix
     global far_proximity_entity_sprite_group_matrix
+    global far_proximity_primary_wall_sprite_matrix
+    global far_proximity_secondary_wall_sprite_matrix
 
     global far_proximity_shadow_sprite_group_list
     global far_proximity_character_sprites_list
@@ -549,7 +593,8 @@ def remove_last_row_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_projectile_sprites_list
     global far_proximity_level_collider_sprites_list
     global far_proximity_level_water_sprites_list
-
+    global far_proximity_primary_wall_sprites_list
+    global far_proximity_secondary_wall_sprites_list
     
     if far_proximity_index_matrix[-1][0][0] < len(level_layout)-1: 
         
@@ -580,12 +625,25 @@ def remove_last_row_from_matrix_and_objects_from_lists(matrix_type):
                     far_proximity_level_collider_sprites_list.remove(tile)
                     if tile.TYPE is WATER:
                         far_proximity_level_water_sprites_list.remove(tile)
-            
             del far_proximity_level_sprite_matrix[-1]
+
+        elif matrix_type == far_proximity_primary_wall_sprite_matrix:
+            for tile in far_proximity_primary_wall_sprite_matrix[-1]:
+                if tile != 0:
+                    far_proximity_primary_wall_sprites_list.remove(tile)
+            del far_proximity_primary_wall_sprite_matrix[-1]
+
+        elif matrix_type == far_proximity_secondary_wall_sprite_matrix:
+            for tile in far_proximity_secondary_wall_sprite_matrix[-1]:
+                if tile != 0:
+                    far_proximity_secondary_wall_sprites_list.remove(tile)
+            del far_proximity_secondary_wall_sprite_matrix[-1]
 
 def insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, tile_indices_matrix):
     global far_proximity_entity_and_shadow_sprite_group_matrix
     global far_proximity_level_sprite_matrix
+    global far_proximity_primary_wall_sprite_matrix
+    global far_proximity_secondary_wall_sprite_matrix
 
     global far_proximity_shadow_sprite_group_list
     global far_proximity_entity_sprites_list
@@ -594,6 +652,8 @@ def insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, tile_ind
     global far_proximity_projectile_sprites_list
     global far_proximity_level_collider_sprites_list
     global far_proximity_level_water_sprites_list
+    global far_proximity_primary_wall_sprites_list
+    global far_proximity_secondary_wall_sprites_list
 
     if tile_indices_matrix[0][0][0] >= 0:
 
@@ -629,24 +689,47 @@ def insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, tile_ind
 
         #Level sprites (2D MATRIX)
         elif matrix_type == far_proximity_level_sprite_matrix:
-            new_entities_and_shadows_row = []
+            new_level_tiles_row = []
             
             for tile_index in tile_indices_matrix[0]:
                 if 0 <= tile_index[1] < len(level_layout[0]):
                     tile = level_sprites_matrix[tile_index[0]][tile_index[1]]
-                    new_entities_and_shadows_row.append(tile)
+                    new_level_tiles_row.append(tile)
                     if tile.TYPE in IMPASSABLE_TILES:
                         far_proximity_level_collider_sprites_list.append(tile)
                         if tile.TYPE == WATER:
                             far_proximity_level_water_sprites_list.append(tile)
+            far_proximity_level_sprite_matrix.insert(0, new_level_tiles_row)
+
+        elif matrix_type == far_proximity_primary_wall_sprite_matrix:
+            new_level_tiles_row = []
             
-            far_proximity_level_sprite_matrix.insert(0, new_entities_and_shadows_row)
+            for tile_index in tile_indices_matrix[0]:
+                if 0 <= tile_index[1] < len(level_layout[0]):
+                    tile = primary_wall_sprites_matrix[tile_index[0]][tile_index[1]]
+                    new_level_tiles_row.append(tile)
+                    if tile != 0:
+                        far_proximity_primary_wall_sprites_list.append(tile)
+            far_proximity_primary_wall_sprite_matrix.insert(0, new_level_tiles_row)
+
+        elif matrix_type == far_proximity_secondary_wall_sprite_matrix:
+            new_level_tiles_row = []
+            
+            for tile_index in tile_indices_matrix[0]:
+                if 0 <= tile_index[1] < len(level_layout[0]):
+                    tile = secondary_wall_sprites_matrix[tile_index[0]][tile_index[1]]
+                    new_level_tiles_row.append(tile)
+                    if tile != 0:
+                        far_proximity_secondary_wall_sprites_list.append(tile)
+            far_proximity_secondary_wall_sprite_matrix.insert(0, new_level_tiles_row)
 
 ### Y MATRIX OFFSET ###
 #Y = +1
 def remove_first_col_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_entity_and_shadow_sprite_group_matrix
     global far_proximity_level_sprite_matrix
+    global far_proximity_primary_wall_sprite_matrix
+    global far_proximity_secondary_wall_sprite_matrix
 
     global far_proximity_shadow_sprite_group_list
     global far_proximity_character_sprites_list
@@ -654,7 +737,8 @@ def remove_first_col_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_projectile_sprites_list
     global far_proximity_level_collider_sprites_list
     global far_proximity_level_water_sprites_list
-
+    global far_proximity_primary_wall_sprites_list
+    global far_proximity_secondary_wall_sprites_list
     
     if far_proximity_index_matrix[0][0][1] > 0:
 
@@ -678,20 +762,32 @@ def remove_first_col_from_matrix_and_objects_from_lists(matrix_type):
                 del far_proximity_entity_sprite_group_matrix[i][0]
 
         #Level sprites (2D MATRIX)
-        if matrix_type == far_proximity_level_sprite_matrix:
+        elif matrix_type == far_proximity_level_sprite_matrix:
             for i, tile_row in enumerate(far_proximity_level_sprite_matrix):
-
                 if tile_row[0].TYPE in IMPASSABLE_TILES:
                     far_proximity_level_collider_sprites_list.remove(tile_row[0])
                     if tile_row[0].TYPE == WATER:
                         far_proximity_level_water_sprites_list.remove(tile_row[0])
-                
                 del far_proximity_level_sprite_matrix[i][0]
+
+        elif matrix_type == far_proximity_primary_wall_sprite_matrix:
+            for i, tile_row in enumerate(far_proximity_primary_wall_sprite_matrix):
+                if tile_row[0] != 0:
+                    far_proximity_primary_wall_sprites_list.remove(tile_row[0])      
+                del far_proximity_primary_wall_sprite_matrix[i][0]
+
+        elif matrix_type == far_proximity_secondary_wall_sprite_matrix:
+            for i, tile_row in enumerate(far_proximity_secondary_wall_sprite_matrix):
+                if tile_row[0] != 0:
+                    far_proximity_secondary_wall_sprites_list.remove(tile_row[0])      
+                del far_proximity_secondary_wall_sprite_matrix[i][0]
                 
 def append_last_col_to_matrix_and_objects_to_lists(matrix_type):
     global far_proximity_entity_and_shadow_sprite_group_matrix
     global far_proximity_entity_sprite_group_matrix
     global far_proximity_level_sprite_matrix
+    global far_proximity_primary_wall_sprite_matrix
+    global far_proximity_secondary_wall_sprite_matrix
 
     global far_proximity_shadow_sprite_group_list
     global far_proximity_entity_sprites_list
@@ -700,6 +796,8 @@ def append_last_col_to_matrix_and_objects_to_lists(matrix_type):
     global far_proximity_projectile_sprites_list
     global far_proximity_level_collider_sprites_list
     global far_proximity_level_water_sprites_list
+    global far_proximity_primary_wall_sprites_list
+    global far_proximity_secondary_wall_sprites_list
 
     i = 0
     for row_indices in far_proximity_index_matrix:
@@ -735,6 +833,18 @@ def append_last_col_to_matrix_and_objects_to_lists(matrix_type):
                     far_proximity_level_collider_sprites_list.append(tile)
                     if tile.TYPE is WATER:
                         far_proximity_level_water_sprites_list.append(tile)
+
+            elif matrix_type == far_proximity_primary_wall_sprite_matrix:
+                tile = primary_wall_sprites_matrix[row_indices[-1][0]][row_indices[-1][1]]
+                far_proximity_primary_wall_sprite_matrix[i].append(tile)
+                if tile != 0:
+                    far_proximity_primary_wall_sprites_list.append(tile)
+
+            elif matrix_type == far_proximity_secondary_wall_sprite_matrix:
+                tile = secondary_wall_sprites_matrix[row_indices[-1][0]][row_indices[-1][1]]
+                far_proximity_secondary_wall_sprite_matrix[i].append(tile)
+                if tile != 0:
+                    far_proximity_secondary_wall_sprites_list.append(tile)
             i += 1
 
 #Y = -1
@@ -742,6 +852,8 @@ def remove_last_col_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_entity_and_shadow_sprite_group_matrix
     global far_proximity_entity_sprite_group_matrix
     global far_proximity_level_sprite_matrix
+    global far_proximity_primary_wall_sprite_matrix
+    global far_proximity_secondary_wall_sprite_matrix
 
     global far_proximity_shadow_sprite_group_list
     global far_proximity_character_sprites_list
@@ -749,7 +861,9 @@ def remove_last_col_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_projectile_sprites_list
     global far_proximity_level_collider_sprites_list
     global far_proximity_level_water_sprites_list
-    
+    global far_proximity_primary_wall_sprites_list
+    global far_proximity_secondary_wall_sprites_list
+
     if far_proximity_index_matrix[0][-1][1] < len(level_layout[0])-1:
         
         #Entities and shadows (3D MATRIX)
@@ -774,18 +888,30 @@ def remove_last_col_from_matrix_and_objects_from_lists(matrix_type):
         #Level sprites (2D MATRIX)
         elif matrix_type == far_proximity_level_sprite_matrix:
             for i, tile_row in enumerate(far_proximity_level_sprite_matrix):
-                    
                 if tile_row[-1].TYPE in IMPASSABLE_TILES:
                     far_proximity_level_collider_sprites_list.remove(tile_row[-1])
                     if tile_row[-1].TYPE is WATER:
                         far_proximity_level_water_sprites_list.remove(tile_row[-1])
-
                 del far_proximity_level_sprite_matrix[i][-1]
+
+        elif matrix_type == far_proximity_primary_wall_sprite_matrix:
+            for i, tile_row in enumerate(far_proximity_primary_wall_sprite_matrix):
+                if tile_row[-1] != 0:
+                    far_proximity_primary_wall_sprites_list.remove(tile_row[-1])      
+                del far_proximity_primary_wall_sprite_matrix[i][-1]
+
+        elif matrix_type == far_proximity_secondary_wall_sprite_matrix:
+            for i, tile_row in enumerate(far_proximity_secondary_wall_sprite_matrix):
+                if tile_row[-1] != 0:
+                    far_proximity_secondary_wall_sprites_list.remove(tile_row[-1])      
+                del far_proximity_secondary_wall_sprite_matrix[i][-1]
                     
 def insert_first_col_in_matrix_and_append_objects_to_lists(matrix_type):
     global far_proximity_entity_and_shadow_sprite_group_matrix
     global far_proximity_entity_sprite_group_matrix
     global far_proximity_level_sprite_matrix
+    global far_proximity_primary_wall_sprite_matrix
+    global far_proximity_secondary_wall_sprite_matrix
 
     global far_proximity_shadow_sprite_group_list
     global far_proximity_entity_sprites_list
@@ -794,7 +920,9 @@ def insert_first_col_in_matrix_and_append_objects_to_lists(matrix_type):
     global far_proximity_projectile_sprites_list
     global far_proximity_level_collider_sprites_list
     global far_proximity_level_water_sprites_list
-    
+    global far_proximity_primary_wall_sprites_list
+    global far_proximity_secondary_wall_sprites_list
+
     i = 0
     for row_indices in far_proximity_index_matrix:
         if 0 <= row_indices[0][0] < len(level_layout) and 0 <= row_indices[0][1]:
@@ -829,6 +957,18 @@ def insert_first_col_in_matrix_and_append_objects_to_lists(matrix_type):
                     far_proximity_level_collider_sprites_list.append(tile)
                     if tile.TYPE is WATER:
                         far_proximity_level_water_sprites_list.append(tile)
+
+            elif matrix_type == far_proximity_primary_wall_sprite_matrix:
+                tile = primary_wall_sprites_matrix[row_indices[0][0]][row_indices[0][1]]
+                far_proximity_primary_wall_sprite_matrix[i].insert(0, tile)
+                if tile != 0:
+                    far_proximity_primary_wall_sprites_list.append(tile)
+
+            elif matrix_type == far_proximity_secondary_wall_sprite_matrix:
+                tile = secondary_wall_sprites_matrix[row_indices[0][0]][row_indices[0][1]]
+                far_proximity_secondary_wall_sprite_matrix[i].insert(0, tile)
+                if tile != 0:
+                    far_proximity_secondary_wall_sprites_list.append(tile)
             i += 1
 
 def get_diagonal_corrected_far_proximity_index_matrix(y_offset):
