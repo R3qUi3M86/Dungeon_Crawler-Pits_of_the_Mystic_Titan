@@ -131,7 +131,7 @@ class Tile(pygame.sprite.Sprite):
                     return self.get_level_exit_hidden_image()
                 
                 else:
-                    return empty_tile_image
+                    return blank
         
         elif self.wall_mode is PRIMARY_OVERLAY:
             if self.TYPE is WALL:
@@ -195,7 +195,93 @@ class Tile(pygame.sprite.Sprite):
                 return empty_tile_image
         
         elif self.wall_mode is SECONDARY_OVERLAY:
-            if True:
+            if self.bottom_middle_wall_section() and self.TYPE is not ENTRANCE and self.TYPE is not EXIT:
+                if self.vicinity_matrix[1][0] not in WALL_LIKE or self.vicinity_matrix[2][0] not in WALL_LIKE:
+                    return wall_bottom_middle_left_overlay
+                elif self.vicinity_matrix[1][2] not in WALL or self.vicinity_matrix[2][2] is not WALL_LIKE:
+                    return wall_bottom_middle_right_overlay
+                else:
+                    return random.choice(wall_bottom_middle_overlay)
+
+            elif self.bottom_upper_wall_section():
+                if self.vicinity_matrix[2][1] is WALL:
+                    if self.bottom_upper_left_corner_section():
+                            return wall_bottom_left_upper_overlay
+                    elif self.bottom_upper_right_corner_section():
+                        return wall_bottom_right_upper_overlay
+                    else:
+                        return random.choice(wall_bottom_upper_overlay)
+                else:
+                    return empty_tile_image
+            
+            elif self.top_wall_section_overlay():
+                grid_two_squares_south_left = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]-1]
+                grid_two_squares_south_right = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]+1]
+                if grid_two_squares_south_left not in WALL_LIKE:
+                    return wall_top_left_convex_overlay
+                elif grid_two_squares_south_right not in WALL_LIKE:
+                    return wall_top_right_convex_overlay
+                else:
+                    return random.choice(wall_top_overlay)
+
+            elif self.top_wall_bottom_concave_section_overlay():
+                if self.vicinity_matrix[2][0] is not WALL:
+                    return wall_corner_lower_right_concave_overlay
+                elif self.vicinity_matrix[2][2] is not WALL:
+                    return wall_corner_lower_left_concave_overlay
+
+            elif self.upper_wall_top_concave_section_overlay():
+                if self.tile_index[1] == 0:
+                    grid_three_squares_south_right = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]+1]
+                    if grid_three_squares_south_right not in WALL_LIKE:
+                        return wall_top_left_concave_hidden
+
+                elif self.tile_index[1] == len(level_painter.level_layout[0])-1:
+                    grid_three_squares_south_left = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]-1]
+                    if grid_three_squares_south_left not in WALL_LIKE:
+                        return wall_top_right_concave_hidden
+
+                else:
+                    grid_three_squares_south_right = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]+1]
+                    grid_three_squares_south_left = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]-1]
+                    if grid_three_squares_south_left not in WALL_LIKE:
+                        return wall_top_right_concave_hidden
+                    elif grid_three_squares_south_right not in WALL_LIKE:
+                        return wall_top_left_concave_hidden
+            
+            elif self.side_wall_overlay() and (self.TYPE is WALL or self.TYPE in PASSABLE_TILES or self.TYPE is WATER):
+                if self.tile_index[1] == 0:
+                    grid_two_squares_south_right = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]+1]
+                    grid_three_squares_south_right = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]+1]
+                    if self.vicinity_matrix[2][2] not in WALL_LIKE or grid_two_squares_south_right not in WALL_LIKE or grid_three_squares_south_right not in WALL_LIKE:
+                        return random.choice(wall_right)
+                    else:
+                        return blank
+
+                elif self.tile_index[1] == len(level_painter.level_layout[0])-1:
+                    grid_two_squares_south_left = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]-1]
+                    grid_three_squares_south_left = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]-1]
+                    if self.vicinity_matrix[2][0] not in WALL_LIKE or grid_two_squares_south_left not in WALL_LIKE or grid_three_squares_south_left not in WALL_LIKE:
+                        return random.choice(wall_left)
+                    else:
+                        return blank
+                else:
+                    grid_three_squares_south_right = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]+1]
+                    grid_three_squares_south_left = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]-1]
+                    grid_two_squares_south_right = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]+1]
+                    grid_two_squares_south_left = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]-1]
+                    
+                    if self.vicinity_matrix[2][2] not in WALL_LIKE or grid_two_squares_south_right not in WALL_LIKE or grid_three_squares_south_right not in WALL_LIKE:
+                        return random.choice(wall_right)
+                    elif self.vicinity_matrix[2][0] not in WALL_LIKE or grid_two_squares_south_left not in WALL_LIKE or grid_three_squares_south_left not in WALL_LIKE:
+                        return random.choice(wall_left)
+                    else:
+                        return blank    
+            
+            elif self.full_wall_overlay():
+                return blank
+
+            else:
                 return empty_tile_image
         
         else:
@@ -741,6 +827,11 @@ class Tile(pygame.sprite.Sprite):
             return True
         return False
 
+    def top_wall_section_overlay(self):
+        if self.vicinity_matrix[2][1] not in WALL_LIKE and level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]] in WALL_LIKE:
+            return True
+        return False
+
     def side_wall_hidden_section(self):
         if self.vicinity_matrix[0][1] in WALL_LIKE and self.vicinity_matrix[2][1] in WALL_LIKE:
             return True
@@ -803,3 +894,64 @@ class Tile(pygame.sprite.Sprite):
                         grid_three_squares_south_right = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]+1]
                         if grid_three_squares_south_left not in WALL_LIKE or grid_three_squares_south_right not in WALL_LIKE:
                             return True
+    
+    def top_wall_bottom_concave_section_overlay(self):
+        if self.vicinity_matrix[2][1] is WALL:
+            if self.vicinity_matrix[2][0] is not WALL and level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]-1] is WALL:
+                return True
+            elif self.vicinity_matrix[2][2] is not WALL and level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]+1] is WALL:
+                return True
+        return False
+
+    def upper_wall_top_concave_section_overlay(self):
+        if self.tile_index[0]+3 < len(level_painter.level_layout) and self.vicinity_matrix[2][1] is WALL:
+            if self.tile_index[1] == 0:
+                grid_three_squares_south_right = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]+1]
+                grid_two_squares_south_right = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]+1]
+                if grid_three_squares_south_right not in WALL_LIKE and grid_two_squares_south_right in WALL_LIKE and self.vicinity_matrix[2][2] in WALL_LIKE:
+                    return True
+
+            elif self.tile_index[1] == len(level_painter.level_layout[0])-1:
+                grid_three_squares_south_left = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]-1]
+                grid_two_squares_south_left = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]-1]
+                if grid_three_squares_south_left not in WALL_LIKE and grid_two_squares_south_left in WALL_LIKE  and self.vicinity_matrix[2][0] in WALL_LIKE:
+                    return True
+
+            else:
+                grid_three_squares_south_right = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]+1]
+                grid_two_squares_south_right = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]+1]
+                grid_three_squares_south_left = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]-1]
+                grid_two_squares_south_left = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]-1]
+                if (grid_three_squares_south_left not in WALL_LIKE and self.vicinity_matrix[2][0] in WALL_LIKE and grid_two_squares_south_left in WALL_LIKE) or (grid_three_squares_south_right not in WALL_LIKE and self.vicinity_matrix[2][2] in WALL_LIKE and grid_two_squares_south_right in WALL_LIKE):
+                    return True
+        return False
+
+    def side_wall_overlay(self):
+        if self.tile_index[0]+3 < len(level_painter.level_layout) and self.vicinity_matrix[2][1] is WALL:
+            grid_two_squares_south = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]]
+            grid_three_squares_south = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]]
+            if self.vicinity_matrix[2][1] is WALL and grid_two_squares_south is WALL and grid_three_squares_south is WALL:
+                return True
+
+    def full_wall_overlay(self):
+        if self.vicinity_matrix[2][0] is WALL and self.vicinity_matrix[2][1] is WALL and self.vicinity_matrix[2][2] is WALL:
+            if self.tile_index[0]+3 < len(level_painter.level_layout)-1:
+                print("tru")
+                grid_two_squares_south = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]]
+                grid_three_squares_south = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]]
+                if grid_two_squares_south in WALL_LIKE and grid_three_squares_south in WALL_LIKE:
+                    return True
+            elif self.tile_index[0]+3 == len(level_painter.level_layout)-1:
+                # grid_two_squares_south = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]]
+                # if grid_two_squares_south in WALL_LIKE:
+                    return True
+            elif self.tile_index[0]+2 == len(level_painter.level_layout)-1:
+                # grid_two_squares_south = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]]
+                # if grid_two_squares_south in WALL_LIKE:
+                    return True
+            elif self.tile_index[0]+1 == len(level_painter.level_layout)-1:
+                return True
+            elif self.tile_index[0] == len(level_painter.level_layout)-1:
+                return True
+
+        return False

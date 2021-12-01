@@ -40,6 +40,8 @@ far_proximity_item_sprites_list = [] #For faster collision type handling
 far_proximity_projectile_sprites_list = [] #For faster collision type handling
 
 far_proximity_level_collider_sprites_list = [] #For faster update_position
+primary_wall_sprites_list = [] #For faster update_position
+secondary_wall_sprites = [] #For faster update_position
 far_proximity_level_water_sprites_list = [] #For faster update_position - animation to be implemented
 
 #Initialization

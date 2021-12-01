@@ -128,7 +128,8 @@ def order_sprites():
 
 def draw_sprites():
     screen.blit(level_painter.level_surface,(level_painter.get_level_surface_translation_vector()))
-    screen.blit(level_painter.level_walls_primary_surface,(level_painter.get_level_surface_translation_vector()))
+    # screen.blit(level_painter.level_walls_primary_surface,(level_painter.get_level_surface_translation_vector()))
+    screen.blit(level_painter.level_walls_secondary_surface,(level_painter.get_level_surface_translation_vector()))
     
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
         shadow.draw(screen)

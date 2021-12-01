@@ -44,7 +44,11 @@ def paint_level():
 
     for row in entity_manager.primary_wall_sprites_matrix:
         for tile in row:
-            level_walls_primary_surface.blit(tile.image,(tile.map_position))
+            level_surface.blit(tile.image,(tile.map_position))
+
+    for row in entity_manager.secondary_wall_sprites_matrix:
+        for tile in row:
+            level_walls_secondary_surface.blit(tile.image,(tile.map_position))
 
 def create_all_level_tiles():
     set_player_tile_index()

@@ -315,4 +315,5 @@ wall_bottom_left_concave_water_hidden = pygame.image.load("images/level/cave/wal
 wall_bottom_right_concave_water_hidden = pygame.image.load("images/level/cave/walls/concave/hidden/wall_bottom_right_concave_water_hidden.png").convert_alpha()
 
 #Overlay
-
+wall_corner_lower_right_concave_overlay = pygame.image.load("images/level/cave/walls/concave/overlay/wall_corner_lower_right_concave.png").convert_alpha()
+wall_corner_lower_left_concave_overlay = pygame.image.load("images/level/cave/walls/concave/overlay/wall_corner_lower_left_concave.png").convert_alpha()

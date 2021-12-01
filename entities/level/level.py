@@ -65,6 +65,7 @@ level_01_map = [
 "XNNNX        XXXX~~~          ~~~~X",
 "X            XXXX~~~            ~~X",
 "XXXXXXXXXXXXXXXXX~~~~          ~~~X",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
 
 # Legend
