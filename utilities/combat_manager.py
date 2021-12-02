@@ -14,35 +14,28 @@ def attack_monster_with_melee_attack(weapon, damage_modifer):
             hit_monsters.append(character_sprite)
 
     if hit_monsters:
-        play_melee_attack_sound(PLAYER, HIT)
+        sound_player.play_melee_attack_sound(PLAYER, HIT)
         
         for monster in hit_monsters:
             monster.take_damage(damage)
     else:
-        play_melee_attack_sound(PLAYER, MISS)
+        sound_player.play_melee_attack_sound(PLAYER, MISS)
 
     entity_manager.wake_up_any_sleeping_monsters_in_far_proximity_matrix()
 
-def attack_with_ranged_weapon(weapon, damage_modifer):
-    pass
+def attack_monsters_with_ranged_weapon(weapon, damage_modifer):
+    cursor_location = pygame.mouse.get_pos()
+    angle = util.get_total_angle(player_position, cursor_location)
+    launch_projectile(entity_manager.hero.map_position, angle, weapon, PLAYER, damage_modifer)
 
 def attack_player_with_melee_attack(monster, damage):
     hero = entity_manager.hero
     
     if monster.facing_direction == util.get_facing_direction(monster.map_position,hero.map_position) and util.elipses_intersect(monster.map_position,hero.map_position,monster.melee_range,hero.size):
-        play_melee_attack_sound(monster.NAME, HIT)
+        sound_player.play_melee_attack_sound(monster.NAME, HIT)
         hero.take_damage(damage)
     else:
-        play_melee_attack_sound(monster.NAME, MISS)
+        sound_player.play_melee_attack_sound(monster.NAME, MISS)
 
-def play_melee_attack_sound(attacking_entity, hit):
-    if hit:
-        if attacking_entity == PLAYER:
-            sound_player.hero_melee_hit_sound.play()
-        elif attacking_entity == ETTIN:
-            sound_player.monster_melee_hit_sound.play()
-    else:
-        if attacking_entity == PLAYER:
-            sound_player.hero_melee_miss_sound.play()
-        elif attacking_entity == ETTIN:
-            sound_player.monster_melee_miss_sound.play()
+def launch_projectile(launching_map_pos, angle, weapon, launching_entity_type, damage_modifer):
+    pass

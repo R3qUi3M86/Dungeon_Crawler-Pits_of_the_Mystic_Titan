@@ -1,4 +1,5 @@
 import pygame
+from utilities.constants import *
 
 VOLUME = 0.1
 
@@ -36,3 +37,15 @@ def play_item_picked_sound(self):
 def set_volume_for_all_sounds(volume):
     for sound in all_sounds:
         sound.set_volume(volume)
+
+def play_melee_attack_sound(attacking_entity, hit):
+    if hit:
+        if attacking_entity == PLAYER:
+            hero_melee_hit_sound.play()
+        elif attacking_entity == ETTIN:
+            monster_melee_hit_sound.play()
+    else:
+        if attacking_entity == PLAYER:
+            hero_melee_miss_sound.play()
+        elif attacking_entity == ETTIN:
+            monster_melee_miss_sound.play()
