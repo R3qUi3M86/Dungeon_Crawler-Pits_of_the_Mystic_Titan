@@ -1,4 +1,3 @@
-from numpy import mat
 import pygame
 import math
 import random
@@ -13,6 +12,7 @@ from entities.characters.player import Hero
 from entities.items.item import Item
 
 entities_id = []
+picked_up_item_names = []
 
 ##### Entities #####
 ### Whole level ###
@@ -52,6 +52,7 @@ def initialize_player():
     hero.tile_index = level_painter.player_starting_tile
     hero.prevous_tile_index = level_painter.player_starting_tile
     hero.map_position = TILE_SIZE[X]//2+(48*hero.tile_index[1])+screen_width//2, TILE_SIZE[Y]//2+(48*hero.tile_index[0]+screen_height//2)
+    give_item_to_player(Item((0,0),SWORD))
 
 def initialize_level_matrices():
     initialize_level_sprites_matrix(level_sprites_matrix)
@@ -1091,6 +1092,7 @@ def remove_item_from_the_map_and_give_to_player(item):
     tile_index = item.tile_index
 
     give_item_to_player(item)
+    picked_up_item_names.append(item.NAME)
 
     item_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(item.id, tile_index, type=ITEM)
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(item_sprite_group)

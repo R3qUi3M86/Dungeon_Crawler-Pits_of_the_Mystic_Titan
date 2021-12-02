@@ -41,11 +41,11 @@ ETTIN = "ettin"
 ###Item names###
 #Weapons
 SWORD = "sword"
-EMERALD_CROSSBOW = "emerald_crossbow"
+EMERALD_CROSSBOW = "Emerald Crossbow"
 
 #Ammo
-EMERALD_CROSSBOW_BOLTS = "emerald_crossbow_bolts"
-EMERALD_CROSSBOW_QUIVER = "emerald_crossbow_quiver"
+EMERALD_CROSSBOW_BOLTS = "emerald crossbow bolts"
+EMERALD_CROSSBOW_QUIVER = "emerald crossbow quiver"
 
 #Weapons
 RANGED = "ranged"

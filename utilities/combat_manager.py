@@ -3,7 +3,8 @@ from utilities import entity_manager
 from utilities.constants import *
 from utilities import util
 
-def attack_monster_with_melee_attack(damage):
+def attack_monster_with_melee_attack(weapon, damage_modifer):
+    damage = weapon.damage + damage_modifer
     hit_monsters = []
     
     for character_sprite in entity_manager.far_proximity_character_sprites_list:
@@ -21,7 +22,10 @@ def attack_monster_with_melee_attack(damage):
         play_melee_attack_sound(PLAYER, MISS)
 
     entity_manager.wake_up_any_sleeping_monsters_in_far_proximity_matrix()
-        
+
+def attack_with_ranged_weapon(weapon, damage_modifer):
+    pass
+
 def attack_player_with_melee_attack(monster, damage):
     hero = entity_manager.hero
     

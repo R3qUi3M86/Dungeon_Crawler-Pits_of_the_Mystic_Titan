@@ -103,6 +103,11 @@ def toggle_wall_drawing_mode():
     else:
         wall_drawing_mode = VISIBLE
 
+def switch_weapon(weapon_index):
+    weapon_name = WEAPONS[weapon_index]
+    if entity_manager.hero.weapons[weapon_name] == True and entity_manager.hero.is_attacking == False:
+        entity_manager.hero.selected_weapon = WEAPONS[weapon_index]
+
 #Visuals drawing and sorting
 def increment_sprite_sorting_timer():
     global sorting_timer
@@ -164,6 +169,9 @@ def draw_ui():
     ui_elements.draw_health_bar()
     ui_elements.draw_weapon_ammo_counter()
 
+    if len(entity_manager.picked_up_item_names) != 0:
+        ui_elements.display_pickup_text()
+
 #Game initialization
 entity_manager.initialize_level_matrices()
 level_painter.paint_level()
@@ -198,7 +206,10 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_TAB:
                 toggle_wall_drawing_mode()
-        
+            elif event.key == pygame.K_1:
+                switch_weapon(0)
+            elif event.key == pygame.K_2:
+                switch_weapon(1)
 
     #Drawing
     draw_sprites()

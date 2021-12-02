@@ -3,6 +3,9 @@ import pygame
 ########################
 ### Weapons and ammo ###
 ########################
+### Sword
+sword = pygame.image.load("images/ui/ammo_counter/sword.png").convert_alpha()
+
 ### Emerald crossbow
 emerald_crossbow = pygame.image.load("images/items/weapons_and_ammo/emerald_crossbow/crossbow.png").convert_alpha()
 crossbow_quiver_01 = pygame.image.load("images/items/weapons_and_ammo/emerald_crossbow/crossbow_quiver_01.png").convert_alpha()

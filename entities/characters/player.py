@@ -11,6 +11,7 @@ from utilities import entity_manager
 from images.characters.fighter_images import *
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
+from entities.items.item import Item
 
 class Hero(pygame.sprite.Sprite):
     def __init__(self,position):
@@ -93,7 +94,8 @@ class Hero(pygame.sprite.Sprite):
         self.maxhealth = 20
 
         #Combat
-        self.damage = 4
+        self.melee_damage_modifier = 2
+        self.ranged_damage_modifier = 1
         self.x_melee_range = 58
         self.y_melee_range = 32
         self.melee_range = self.x_melee_range, self.y_melee_range
@@ -101,15 +103,13 @@ class Hero(pygame.sprite.Sprite):
         self.y_size = 11
         self.size = self.x_size, self.y_size
         self.attack_can_be_interrupted = False
-        self.can_shoot = False
-        self.projectile_type = None
         self.selected_weapon = WEAPONS[0]
         
         #Abilities and items list
         self.abilities = []
         self.items = []
-        self.weapons = {SWORD:True, EMERALD_CROSSBOW:False}
-        self.ammo = {SWORD:-1, EMERALD_CROSSBOW:0}
+        self.weapons = {SWORD:False, EMERALD_CROSSBOW:False}
+        self.ammo = {SWORD:0, EMERALD_CROSSBOW:0}
         
         #Movement
         self.speed = 3
@@ -153,6 +153,12 @@ class Hero(pygame.sprite.Sprite):
 
             elif self.is_overkilled == True:
                 self.character_overkill_animation()
+
+    #Getters
+    def get_item_by_name(self, item_name):
+        for item in self.items:
+            if item.NAME is item_name:
+                return item
 
     #Animations
     def walking_animation(self):
@@ -219,7 +225,13 @@ class Hero(pygame.sprite.Sprite):
     def character_attack_animation(self):
         self.character_attack_index[1] += 0.05
         if round(self.character_attack_index[1],2) == 1.00:
-            combat_manager.attack_monster_with_melee_attack(self.damage)
+            
+            weapon = self.get_item_by_name(self.selected_weapon)
+            if  weapon.attack_type is MELEE:
+                combat_manager.attack_monster_with_melee_attack(weapon, self.melee_damage_modifier)
+            elif weapon.attack_type is RANGED:
+                combat_manager.attack_with_ranged_weapon(weapon, self.ranged_damage_modifier)
+        
         if int(self.character_attack_index[1]) == 2:
             self.is_attacking = False
             self.character_attack_index[1] = 0

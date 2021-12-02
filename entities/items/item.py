@@ -52,6 +52,7 @@ class Item(pygame.sprite.Sprite):
 
         ###Item properties###
         #General
+        self.damage = self.get_weapon_damage()
         self.size = self.get_item_size()
 
         self.ammo_type = self.get_ammo_type()
@@ -83,11 +84,13 @@ class Item(pygame.sprite.Sprite):
         return False
 
     def get_item_static_image(self):
-        if self.NAME is EMERALD_CROSSBOW:
+        if self.NAME is SWORD:
+            return sword
+        elif self.NAME is EMERALD_CROSSBOW:
             return emerald_crossbow
 
     def get_image(self):
-        if self.NAME is EMERALD_CROSSBOW:
+        if self.NAME in WEAPONS:
             return self.item_static_image
 
     def get_is_weapon(self):
@@ -102,8 +105,11 @@ class Item(pygame.sprite.Sprite):
 
     def get_ammo(self):
         if self.is_weapon:
-            return 3
-        
+            if self.NAME is not SWORD:
+                return 3
+            else:
+                return -1
+
         elif self.is_ammo:
             if self.NAME is EMERALD_CROSSBOW_BOLTS:
                 return 5
@@ -127,3 +133,10 @@ class Item(pygame.sprite.Sprite):
     def get_item_size(self):
         if self.is_pickable or self.is_weapon:
             return 15, 8
+
+    def get_weapon_damage(self):
+        if self.is_weapon:
+            if self.NAME is SWORD:
+                return 2
+            elif self.NAME is EMERALD_CROSSBOW:
+                return 2

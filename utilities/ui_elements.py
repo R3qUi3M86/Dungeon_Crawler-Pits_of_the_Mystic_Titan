@@ -2,8 +2,15 @@ import pygame
 from settings import *
 from images.ui import ui
 from utilities.constants import *
+from utilities import entity_manager
 from utilities.entity_manager import hero
 from utilities.text_printer import *
+
+pickup_text_display_timer = 0
+pickup_text_display_timer_limit = 210
+
+PALE_WHITE_COLOR = (180,200,200)
+PALE_ORANGE_COLOR = (210,200,150)
 
 HEALTH_BAR_POS = 273,740
 HEALTH_BAR_SIZE = 654,35
@@ -18,6 +25,9 @@ AMMO_WEAP_IMAGE_POS = AMMO_COUNTER_BOX_POS[0] + AMMO_WEAP_IMAGE_OFFSET[0], AMMO_
 AMMO_NUMBER_OFFSET = 31, 0
 AMMO_NUMBER_POS = AMMO_WEAP_IMAGE_POS[0] + AMMO_NUMBER_OFFSET[0], AMMO_WEAP_IMAGE_POS[1] + AMMO_NUMBER_OFFSET[1]
 AMMO_INF_POS = AMMO_NUMBER_POS[0], AMMO_NUMBER_POS[1]+13
+
+PICKUP_TEXT_POS = screen_width//2, HEALTH_BAR_POS[1] - 25
+PICKUP_TEXT = "You have found "
 
 # DARK_COLOR = (30,30,30)
 # fog = pygame.Surface((screen_width,screen_height))
@@ -58,9 +68,27 @@ def draw_weapon_ammo_counter():
     ammo = hero.ammo[hero.selected_weapon]
     ammo_text = format_ammo_text(ammo)
     if ammo_text != "INF":
-        display_runic1_text(ammo_text,(180,200,200),AMMO_NUMBER_POS[0], AMMO_NUMBER_POS[1])
+        display_ammo_runic_text(ammo_text, PALE_WHITE_COLOR, AMMO_NUMBER_POS[0], AMMO_NUMBER_POS[1])
     else:
         screen.blit(ui.infinity_sign, AMMO_INF_POS)
+
+def display_pickup_text():
+    global pickup_text_display_timer
+
+    item_name = entity_manager.picked_up_item_names[0]
+    displayed_text = PICKUP_TEXT + item_name
+    if item_name in WEAPONS:
+        displayed_text += "!"
+    else:
+        displayed_text += "."
+
+    if pickup_text_display_timer < pickup_text_display_timer_limit:
+        display_pickup_runic_text(displayed_text, PALE_ORANGE_COLOR, PICKUP_TEXT_POS[0], PICKUP_TEXT_POS[1])
+        pickup_text_display_timer += 1
+    
+    else:
+        pickup_text_display_timer = 0
+        del entity_manager.picked_up_item_names[0]
     
 
 def get_selected_weapon_image():
