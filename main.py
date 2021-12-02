@@ -162,6 +162,7 @@ def draw_sprites():
 def draw_ui():
     screen.blit(ui_elements.central_ligtht,(0,0))
     ui_elements.draw_health_bar()
+    ui_elements.draw_weapon_ammo_counter()
 
 #Game initialization
 entity_manager.initialize_level_matrices()

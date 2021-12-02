@@ -103,11 +103,13 @@ class Hero(pygame.sprite.Sprite):
         self.attack_can_be_interrupted = False
         self.can_shoot = False
         self.projectile_type = None
+        self.selected_weapon = WEAPONS[0]
         
         #Abilities and items list
         self.abilities = []
         self.items = []
-        self.ammo = {EMERALD_CROSSBOW:0}
+        self.weapons = {SWORD:True, EMERALD_CROSSBOW:False}
+        self.ammo = {SWORD:-1, EMERALD_CROSSBOW:0}
         
         #Movement
         self.speed = 3

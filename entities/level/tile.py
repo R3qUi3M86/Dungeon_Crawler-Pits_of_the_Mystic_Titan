@@ -941,7 +941,6 @@ class Tile(pygame.sprite.Sprite):
     def full_wall_overlay(self):
         if self.vicinity_matrix[2][0] is WALL and self.vicinity_matrix[2][1] is WALL and self.vicinity_matrix[2][2] is WALL:
             if self.tile_index[0]+3 < len(level_painter.level_layout)-1:
-                print("tru")
                 grid_two_squares_south = level_painter.level_layout[self.tile_index[0]+2][self.tile_index[1]]
                 grid_three_squares_south = level_painter.level_layout[self.tile_index[0]+3][self.tile_index[1]]
                 if grid_two_squares_south in WALL_LIKE and grid_three_squares_south in WALL_LIKE:

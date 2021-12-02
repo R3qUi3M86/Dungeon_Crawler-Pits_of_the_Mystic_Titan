@@ -38,15 +38,19 @@ FLOOR_LIKE = [FLOOR, FLOOR_PIT, SIMPLE_CRACK, CORNER_CRACK]
 #Monster names
 ETTIN = "ettin"
 
-#Item names
+###Item names###
+#Weapons
+SWORD = "sword"
 EMERALD_CROSSBOW = "emerald_crossbow"
+
+#Ammo
 EMERALD_CROSSBOW_BOLTS = "emerald_crossbow_bolts"
 EMERALD_CROSSBOW_QUIVER = "emerald_crossbow_quiver"
 
 #Weapons
 RANGED = "ranged"
 MELEE = "melee"
-WEAPONS = [EMERALD_CROSSBOW]
+WEAPONS = [SWORD,EMERALD_CROSSBOW]
 RANGED_WEAPONS = [EMERALD_CROSSBOW]
 
 #Ammunition
