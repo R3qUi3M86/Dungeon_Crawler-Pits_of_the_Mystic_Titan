@@ -230,7 +230,7 @@ class Hero(pygame.sprite.Sprite):
             if  weapon.attack_type is MELEE:
                 combat_manager.attack_monster_with_melee_attack(weapon, self.melee_damage_modifier)
             elif weapon.attack_type is RANGED:
-                combat_manager.attack_with_ranged_weapon(weapon, self.ranged_damage_modifier)
+                combat_manager.attack_monsters_with_ranged_weapon(weapon, self.ranged_damage_modifier)
         
         if int(self.character_attack_index[1]) == 2:
             self.is_attacking = False
