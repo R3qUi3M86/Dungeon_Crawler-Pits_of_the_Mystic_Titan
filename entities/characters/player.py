@@ -4,7 +4,6 @@ from settings import *
 from sounds import sound_player
 from utilities import combat_manager
 from utilities import util
-from utilities.level_painter import TILE_SIZE
 from utilities.text_printer import *
 from utilities.constants import *
 from utilities import entity_manager
@@ -109,7 +108,7 @@ class Hero(pygame.sprite.Sprite):
         self.abilities = []
         self.items = []
         self.weapons = {SWORD:False, EMERALD_CROSSBOW:False}
-        self.ammo = {SWORD:0, EMERALD_CROSSBOW:0}
+        self.ammo = {SWORD:0, EMERALD_CROSSBOW:50}
         
         #Movement
         self.speed = 3
@@ -142,8 +141,13 @@ class Hero(pygame.sprite.Sprite):
                 self.walking_animation()
                 self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
-                if self.is_attacking == True:             
-                    self.character_attack_animation()
+                if self.is_attacking == True:
+                    if self.selected_weapon in MELEE_WEAPONS:             
+                        self.character_melee_attack_animation()
+                    elif self.selected_weapon in RANGED_WEAPONS and self.ammo[self.selected_weapon] > 0:
+                        self.character_ranged_attack_animation()
+                    else:
+                        self.is_attacking = False
 
                 elif self.is_in_pain == True:
                     self.character_pain_animation()
@@ -222,19 +226,30 @@ class Hero(pygame.sprite.Sprite):
                 self.character_walk_index[1] = 0
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
-    def character_attack_animation(self):
+    def character_melee_attack_animation(self):
         self.character_attack_index[1] += 0.05
+        
         if round(self.character_attack_index[1],2) == 1.00:
-            
             weapon = self.get_item_by_name(self.selected_weapon)
-            if  weapon.attack_type is MELEE:
-                combat_manager.attack_monster_with_melee_attack(weapon, self.melee_damage_modifier)
-            elif weapon.attack_type is RANGED:
-                combat_manager.attack_monsters_with_ranged_weapon(weapon, self.ranged_damage_modifier)
+            combat_manager.attack_monster_with_melee_attack(weapon, self.melee_damage_modifier)
         
         if int(self.character_attack_index[1]) == 2:
             self.is_attacking = False
             self.character_attack_index[1] = 0
+        self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
+
+    def character_ranged_attack_animation(self):
+        weapon = self.get_item_by_name(self.selected_weapon)
+        
+        if round(self.character_attack_index[1],2) == 1:
+            self.character_attack_index[1] = 1
+            self.ammo[weapon.NAME] -= 1
+            combat_manager.attack_monsters_with_ranged_weapon(weapon, self.ranged_damage_modifier)
+        
+        self.character_attack_index[1] += 0.025*weapon.attack_speed
+        if int(self.character_attack_index[1]) == 2:
+            self.is_attacking = False
+            self.character_attack_index[1] = 1
         self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
 
     def set_character_animation_direction_indices(self):

@@ -266,6 +266,11 @@ def get_entity_sprite_group_by_id_from_matrix_cell(entity_id, tile_index, type=S
         for entity in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
             if entity.sprite.TYPE is ITEM and entity.sprite.id == entity_id:
                 return entity
+
+    elif type == PROJECTILE:
+        for entity in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
+            if entity.sprite.TYPE is PROJECTILE and entity.sprite.id == entity_id:
+                return entity
     
 def get_direct_proximity_objects_list(matrix, object_type = IMPASSABLE_TILES):
     if object_type == IMPASSABLE_TILES:
@@ -274,8 +279,17 @@ def get_direct_proximity_objects_list(matrix, object_type = IMPASSABLE_TILES):
             for tile_index in row:
                 if level_sprites_matrix[tile_index[0]][tile_index[1]].passable == False:
                     direct_proximity_impassable_tile_sprites.append(level_sprites_matrix[tile_index[0]][tile_index[1]])
-                
+        
         return direct_proximity_impassable_tile_sprites
+
+    elif object_type == WALL_LIKE:
+        direct_proximity_wall_like_tile_sprites = []
+        for row in matrix:
+            for tile_index in row:
+                if level_sprites_matrix[tile_index[0]][tile_index[1]].TYPE in WALL_LIKE:
+                    direct_proximity_wall_like_tile_sprites.append(level_sprites_matrix[tile_index[0]][tile_index[1]])
+                
+        return direct_proximity_wall_like_tile_sprites
     
     elif object_type == MONSTER:
         direct_proximity_monster_sprites = []
@@ -335,6 +349,7 @@ def update_all_objects_position_in_far_proximity():
         hero.update_position(hero.speed_vector)
         update_far_proximity_non_player_entities_position(far_proximity_character_sprites_list)
         update_far_proximity_non_player_entities_position(far_proximity_item_sprites_list)
+        update_far_proximity_non_player_entities_position(far_proximity_projectile_sprites_list)
         update_far_proximity_level_colliders_position()
         update_far_proximity_primary_walls_position()
         update_far_proximity_secondary_walls_position()
@@ -1114,6 +1129,41 @@ def give_item_to_player(item):
     
     elif item.is_ammo:
         hero.ammo[item.ammo_type] += item.ammo
+
+#Projectiles
+def put_projectile_in_matrices_and_lists(new_projectile):
+    tile_index = new_projectile.tile_index
+    far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
+
+    projectile_sprite_group = pygame.sprite.GroupSingle(new_projectile)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(projectile_sprite_group)
+    far_proximity_entity_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].append(projectile_sprite_group)
+    #far_proximity_entity_and_shadow_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].append(projectile_sprite_group)
+
+    shadow_sprite_group = pygame.sprite.GroupSingle(new_projectile.shadow)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(shadow_sprite_group)
+    #far_proximity_entity_and_shadow_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].append(shadow_sprite_group)
+
+    far_proximity_shadow_sprite_group_list.append(shadow_sprite_group)
+    far_proximity_entity_sprites_list.append(new_projectile)
+    far_proximity_projectile_sprites_list.append(new_projectile)
+
+def remove_projectile_from_the_map(projectile):
+    tile_index = projectile.tile_index
+    far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
+
+    projectile_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(projectile.id, tile_index, type=PROJECTILE)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(projectile_sprite_group)
+    # far_proximity_entity_and_shadow_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].remove(projectile_sprite_group)
+    far_proximity_entity_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].remove(projectile_sprite_group)
+
+    shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(projectile.id, tile_index, type=SHADOW)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(shadow_sprite_group)
+    # far_proximity_entity_and_shadow_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].remove(shadow_sprite_group)
+
+    far_proximity_shadow_sprite_group_list.remove(shadow_sprite_group)
+    far_proximity_entity_sprites_list.remove(projectile)
+    far_proximity_projectile_sprites_list.remove(projectile)
 
 #Misc
 def wake_up_any_sleeping_monsters_in_far_proximity_matrix():

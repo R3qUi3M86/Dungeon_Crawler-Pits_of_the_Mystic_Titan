@@ -1,5 +1,4 @@
 import pygame
-from pygame import image
 from sounds.sound_player import *
 from utilities.text_printer import *
 from utilities.constants import *
@@ -107,6 +106,10 @@ def switch_weapon(weapon_index):
     weapon_name = WEAPONS[weapon_index]
     if entity_manager.hero.weapons[weapon_name] == True and entity_manager.hero.is_attacking == False:
         entity_manager.hero.selected_weapon = WEAPONS[weapon_index]
+        if weapon_name in MELEE_WEAPONS:
+            entity_manager.hero.character_attack_index[1] = 0
+        else:
+            entity_manager.hero.character_attack_index[1] = 1
 
 #Visuals drawing and sorting
 def increment_sprite_sorting_timer():

@@ -11,7 +11,7 @@ def detect_all_collisions():
     global wall_hider_timer
     
     player_vs_monster_movement_collision()
-    entity_vs_level_collision(entity_manager.hero)
+    character_vs_level_collision(entity_manager.hero)
     
     if entity_manager.hero.speed_vector != 0:
         if wall_hider_timer == wall_hider_timer_limit:
@@ -22,11 +22,11 @@ def detect_all_collisions():
 
     for character in entity_manager.far_proximity_character_sprites_list:
         monster_vs_monster_collision(character)
-        entity_vs_level_collision(character)
+        character_vs_level_collision(character)
 
     for projectile in entity_manager.far_proximity_projectile_sprites_list:   
-        projectile_collision(projectile)
-        entity_vs_level_collision(projectile)
+        projectile_vs_entity_collision(projectile)
+        projectile_vs_level_collision(projectile)
 
     for item in entity_manager.far_proximity_item_sprites_list:
         item_collision(item)
@@ -45,7 +45,7 @@ def player_vs_monster_movement_collision():
                 if monster.monster_ai.is_idle:
                     monster.monster_ai.is_waking_up = True
                 
-def entity_vs_level_collision(character):
+def character_vs_level_collision(character):
     for level_collision_sprite in character.direct_proximity_collision_tiles:
         
         if character.can_collide and character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
@@ -78,15 +78,25 @@ def monster_vs_monster_collision(monster):
                 if any_sector_collider_collides(collision_matrix):
                     adjust_monster_movement_vector(monster, collision_matrix)
 
-def projectile_collision(projectile_sprite):
-    #Projectile collision logic
-    pass
+def projectile_vs_level_collision(projectile_sprite):
+    for wall_like_tile in projectile_sprite.direct_proximity_wall_like_tiles:
+        if wall_like_tile.rect.colliderect(projectile_sprite.entity_small_square_collider.rect):
+            if pygame.sprite.collide_mask(projectile_sprite.entity_small_square_collider,wall_like_tile) and not projectile_sprite.is_disintegrating:
+                projectile_sprite.has_impacted = True
+
+def projectile_vs_entity_collision(projectile_sprite):
+    for character in projectile_sprite.direct_proximity_characters:
+        if character.rect.colliderect(projectile_sprite.entity_small_square_collider.rect):
+            if util.elipses_intersect(character.map_position, projectile_sprite.map_position, character.size, projectile_sprite.size) and not projectile_sprite.is_disintegrating and not character.is_dead and not character.is_overkilled:
+                projectile_sprite.has_impacted = True
+                character.take_damage(projectile_sprite.damage)
 
 def item_collision(item_sprite):
     hero = entity_manager.hero
 
     if util.elipses_intersect(hero.map_position, item_sprite.map_position, hero.size, item_sprite.size):
-        item_sprite.is_picked = True
+        if item_sprite.is_pickable:
+            item_sprite.is_picked = True
 
 #Movement vector adjustment
 def slow_down_player(factor=3):

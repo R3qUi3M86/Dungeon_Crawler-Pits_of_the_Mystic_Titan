@@ -58,6 +58,7 @@ class Item(pygame.sprite.Sprite):
         self.ammo_type = self.get_ammo_type()
         self.ammo = self.get_ammo()
         self.attack_type = self.get_attack_type()
+        self.attack_speed = self.get_attack_speed()
 
     #Updates
     def update(self):
@@ -140,3 +141,10 @@ class Item(pygame.sprite.Sprite):
                 return 2
             elif self.NAME is EMERALD_CROSSBOW:
                 return 2
+
+    def get_attack_speed(self):
+        if self.is_weapon:
+            if self.NAME is SWORD:
+                return 1
+            elif self.NAME is EMERALD_CROSSBOW:
+                return 0.8

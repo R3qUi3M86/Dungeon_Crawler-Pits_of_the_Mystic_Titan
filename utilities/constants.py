@@ -43,19 +43,23 @@ ETTIN = "ettin"
 SWORD = "sword"
 EMERALD_CROSSBOW = "Emerald Crossbow"
 
-#Ammo
-EMERALD_CROSSBOW_BOLTS = "emerald crossbow bolts"
-EMERALD_CROSSBOW_QUIVER = "emerald crossbow quiver"
-
-#Weapons
 RANGED = "ranged"
 MELEE = "melee"
 WEAPONS = [SWORD,EMERALD_CROSSBOW]
 RANGED_WEAPONS = [EMERALD_CROSSBOW]
+MELEE_WEAPONS = [SWORD]
 
-#Ammunition
+#Ammo
+EMERALD_CROSSBOW_BOLTS = "emerald crossbow bolts"
+EMERALD_CROSSBOW_QUIVER = "emerald crossbow quiver"
+
 AMMOTYPES = [EMERALD_CROSSBOW_BOLTS,EMERALD_CROSSBOW_QUIVER]
 CROSSBOW_AMMO = [EMERALD_CROSSBOW_BOLTS,EMERALD_CROSSBOW_QUIVER]
+
+###Projectile
+CROSSBOW_BOLT = "crossbow bolt"
+
+PROJECTILE_DICT = {EMERALD_CROSSBOW:CROSSBOW_BOLT}
 
 #Hit types
 HIT = True

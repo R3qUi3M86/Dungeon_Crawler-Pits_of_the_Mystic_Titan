@@ -1,4 +1,5 @@
 from sounds import sound_player
+from entities.projectiles.projectile import Projectile
 from utilities import entity_manager
 from utilities.constants import *
 from utilities import util
@@ -26,7 +27,8 @@ def attack_monster_with_melee_attack(weapon, damage_modifer):
 def attack_monsters_with_ranged_weapon(weapon, damage_modifer):
     cursor_location = pygame.mouse.get_pos()
     angle = util.get_total_angle(player_position, cursor_location)
-    launch_projectile(entity_manager.hero.map_position, angle, weapon, PLAYER, damage_modifer)
+    launch_projectile(entity_manager.hero.tile_index, player_position, entity_manager.hero.map_position, angle, weapon, PLAYER, damage_modifer)
+    sound_player.play_ranged_attack_sound(weapon.NAME)
 
 def attack_player_with_melee_attack(monster, damage):
     hero = entity_manager.hero
@@ -37,5 +39,8 @@ def attack_player_with_melee_attack(monster, damage):
     else:
         sound_player.play_melee_attack_sound(monster.NAME, MISS)
 
-def launch_projectile(launching_map_pos, angle, weapon, launching_entity_type, damage_modifer):
-    pass
+def launch_projectile(launching_tile_index, entity_pos, launching_map_pos, angle, weapon, launching_entity_type, damage_modifer):
+    projectile_name = PROJECTILE_DICT[weapon.NAME]
+    damage = weapon.damage + damage_modifer
+    new_projectile = Projectile(launching_tile_index, entity_pos, launching_map_pos, damage, angle, projectile_name, launching_entity_type)
+    entity_manager.put_projectile_in_matrices_and_lists(new_projectile)
