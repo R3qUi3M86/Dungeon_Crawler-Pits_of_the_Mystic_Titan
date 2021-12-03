@@ -80,13 +80,13 @@ def monster_vs_monster_collision(monster):
 
 def projectile_vs_level_collision(projectile_sprite):
     for wall_like_tile in projectile_sprite.direct_proximity_wall_like_tiles:
-        if wall_like_tile.rect.colliderect(projectile_sprite.entity_small_square_collider.rect):
-            if pygame.sprite.collide_mask(projectile_sprite.entity_small_square_collider,wall_like_tile) and not projectile_sprite.is_disintegrating:
+        if wall_like_tile.rect.colliderect(projectile_sprite.projectile_collider.rect):
+            if pygame.sprite.collide_mask(projectile_sprite.projectile_collider,wall_like_tile) and not projectile_sprite.is_disintegrating:
                 projectile_sprite.has_impacted = True
 
 def projectile_vs_entity_collision(projectile_sprite):
     for character in projectile_sprite.direct_proximity_characters:
-        if character.rect.colliderect(projectile_sprite.entity_small_square_collider.rect):
+        if character.rect.colliderect(projectile_sprite.projectile_collider.rect):
             if util.elipses_intersect(character.map_position, projectile_sprite.map_position, character.size, projectile_sprite.size) and not projectile_sprite.is_disintegrating and not character.is_dead and not character.is_overkilled:
                 projectile_sprite.has_impacted = True
                 character.take_damage(projectile_sprite.damage)

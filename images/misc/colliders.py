@@ -3,6 +3,7 @@ import pygame
 ###################
 ###### Entity #####
 ###################
+###Characters
 entity_collider_small = pygame.image.load("images/misc/colliders/entity_collider_omni_small.png").convert_alpha()
 entity_collider_medium = pygame.image.load("images/misc/colliders/entity_collider_medium.png").convert_alpha()
 entity_collider_sector_nw = pygame.image.load("images/misc/colliders/entity_collider_small_nw.png").convert_alpha()
@@ -10,6 +11,10 @@ entity_collider_sector_ne = pygame.image.load("images/misc/colliders/entity_coll
 entity_collider_sector_sw = pygame.image.load("images/misc/colliders/entity_collider_small_sw.png").convert_alpha()
 entity_collider_sector_se = pygame.image.load("images/misc/colliders/entity_collider_small_se.png").convert_alpha()
 
+###Projectiles
+bolt_collider = pygame.image.load("images/misc/colliders/bolt_collider.png").convert_alpha()
+
+###Misc
 wall_hider_coolider = pygame.image.load("images/misc/colliders/wall_hider_coolider.png").convert_alpha()
 small_square_collider = pygame.image.load("images/misc/colliders/small_square.png").convert_alpha()
 medium_square_collider = pygame.image.load("images/misc/colliders/medium_square.png").convert_alpha()

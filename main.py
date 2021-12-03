@@ -96,7 +96,7 @@ def get_player_mouse_input():
 
 def toggle_wall_drawing_mode():
     global wall_drawing_mode
-    
+
     if wall_drawing_mode is VISIBLE:
         wall_drawing_mode = HIDDEN
     else:
@@ -158,6 +158,9 @@ def draw_sprites():
     for row in sorted_entity_matrix:
         for entity in row:
             entity.draw(screen)
+            # if entity.sprite.TYPE is PROJECTILE:
+            #     img = entity.sprite.projectile_collider.image
+            #     screen.blit(img, entity.sprite.projectile_collider.rect)
     
     if wall_drawing_mode == VISIBLE:
         for tile in entity_manager.far_proximity_secondary_wall_sprites_list:

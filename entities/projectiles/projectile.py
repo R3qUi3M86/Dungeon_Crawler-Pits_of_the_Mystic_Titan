@@ -6,9 +6,12 @@ from entities.colliders.collider import Collider
 from utilities.constants import *
 from utilities import util
 from utilities import level_painter
+from utilities import collision_manager
 from utilities.level_painter import TILE_SIZE
 from utilities import entity_manager
 from sounds import sound_player
+
+PROJECTILE_SPEED_DICT = {CROSSBOW_BOLT:13}
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, tile_index, position, map_pos, damage, angle, name, launched_by):
@@ -42,13 +45,13 @@ class Projectile(pygame.sprite.Sprite):
 
         ###Owned sprites###
         #Colliders
-        self.entity_small_square_collider  = Collider(self.position, self.id, SQUARE, size=SIZE_SMALL)
+        self.projectile_collider = Collider(self.position, self.id, self.NAME)
 
         #Shadow
         self.shadow = Shadow(self.position, self.map_position, self.id, SIZE_TINY, self.tile_index)
 
         #Sprite lists
-        self.entity_auxilary_sprites = [self.entity_small_square_collider, self.shadow]
+        self.entity_auxilary_sprites = [self.projectile_collider, self.shadow]
 
         #####General variables#####
         ###Status flags###
@@ -60,10 +63,10 @@ class Projectile(pygame.sprite.Sprite):
         #General
         self.angle = angle
         self.damage = damage
-        self.speed = self.get_projectile_speed()
+        self.speed = PROJECTILE_SPEED_DICT[self.NAME]
         self.size = self.get_projectile_size()
         self.travel_speed = self.get_travel_speed()
-        self.image = self.get_image()
+        self.image = self.get_image_and_set_collider_image()
         self.rect = self.image.get_rect(midbottom = (self.image_position))
         self.effects = []
 
@@ -83,22 +86,49 @@ class Projectile(pygame.sprite.Sprite):
              self.disintegration_animation()
         
         else:
-            self.map_position = round((self.map_position[0] + self.travel_speed[0]),2), round((self.map_position[1] + self.travel_speed[1]),2)
-            self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
-            self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
-            self.rect = self.image.get_rect(midbottom = (self.image_position))
-            self.update_owned_sprites_position()
-            self.tile_index = util.get_tile_index(self.map_position)
+            #Relative speed projectile
+            if self.speed != -1:
+                self.map_position = round((self.map_position[0] + self.travel_speed[0]),2), round((self.map_position[1] + self.travel_speed[1]),2)
+                self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
+                self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
+                self.rect = self.image.get_rect(midbottom = (self.image_position))
+                self.update_owned_sprites_position()
+                self.tile_index = util.get_tile_index(self.map_position)
 
-            if self.is_outside_of_map():
-                self.has_impacted = True
+                if self.is_outside_of_map():
+                    self.has_impacted = True
 
-            if self.tile_index != self.prevous_tile_index:
-                self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-                self.direct_proximity_wall_like_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, WALL_LIKE)
-                self.direct_proximity_characters = self.get_direct_proximity_characters_list()
-                entity_manager.move_entity_in_all_matrices(self.id, PROJECTILE, self.prevous_tile_index, self.tile_index)
-                self.prevous_tile_index = self.tile_index
+                if self.tile_index != self.prevous_tile_index:
+                    self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+                    self.direct_proximity_wall_like_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, WALL_LIKE)
+                    self.direct_proximity_characters = self.get_direct_proximity_characters_list()
+                    entity_manager.move_entity_in_all_matrices(self.id, PROJECTILE, self.prevous_tile_index, self.tile_index)
+                    self.prevous_tile_index = self.tile_index
+            
+            #Light speed projectile
+            else:
+                while not self.has_impacted:
+                    self.map_position = round((self.map_position[0] + self.travel_speed[0]),2), round((self.map_position[1] + self.travel_speed[1]),2)
+                    self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
+                    self.update_owned_sprites_position()
+                    self.tile_index = util.get_tile_index(self.map_position)
+
+                    if self.tile_index != self.prevous_tile_index:
+                        self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+                        self.direct_proximity_wall_like_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, WALL_LIKE)
+                        self.direct_proximity_characters = self.get_direct_proximity_characters_list()
+                        entity_manager.move_entity_in_all_matrices(self.id, PROJECTILE, self.prevous_tile_index, self.tile_index)
+                        self.prevous_tile_index = self.tile_index
+                
+                    self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
+                    self.rect = self.image.get_rect(midbottom = (self.image_position))
+                    collision_manager.projectile_vs_entity_collision(self)
+                    collision_manager.projectile_vs_level_collision(self)
+                    if self.leaving_far_proximity_matrix_margin():
+                        self.has_impacted = True
+                        entity_manager.remove_projectile_from_from_matrices_and_lists(self)
+
+                self.image = self.projectile_destuction_image_list[int(self.projectile_destruction_index)]
 
     def update_position(self, vector=None):
         self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
@@ -119,7 +149,7 @@ class Projectile(pygame.sprite.Sprite):
         if self.NAME is CROSSBOW_BOLT:
             return emerald_crossbow_bolt_destruct
 
-    def get_image(self):
+    def get_image_and_set_collider_image(self):
         total_travel_speed = math.sqrt((self.travel_speed[0]*self.travel_speed[0])+(self.travel_speed[1]*self.travel_speed[1]))
         scaling_factor = total_travel_speed/self.speed
         
@@ -129,11 +159,15 @@ class Projectile(pygame.sprite.Sprite):
         
         final_image = pygame.transform.rotate(scaled_image,self.angle)
 
+        self.set_collider_image_and_mask(scaling_factor)
+
         return final_image
 
-    def get_projectile_speed(self):
-        if self.NAME is CROSSBOW_BOLT:
-            return 13
+    def set_collider_image_and_mask(self, scaling_factor):
+        self.projectile_collider.image = pygame.transform.scale(self.projectile_collider.image, (self.projectile_collider.image.get_width()*scaling_factor,self.projectile_collider.image.get_height()))
+        self.projectile_collider.image = pygame.transform.rotate(self.projectile_collider.image, self.angle)
+        self.projectile_collider.mask = pygame.mask.from_surface(self.projectile_collider.image)
+        self.projectile_collider.rect = self.projectile_collider.image.get_rect(center = (self.position))
 
     def get_projectile_size(self):
         if self.NAME is CROSSBOW_BOLT:
@@ -153,7 +187,7 @@ class Projectile(pygame.sprite.Sprite):
 
         travel_speed = x_factor_travel*total_factored_speed, -y_factor_travel*total_factored_speed
 
-        return travel_speed   
+        return travel_speed
 
     def get_direct_proximity_characters_list(self):
         if self.launched_by is PLAYER:
