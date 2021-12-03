@@ -91,8 +91,8 @@ class Hero(pygame.sprite.Sprite):
 
         ###Character properties###
         #General
-        self.health = 20
         self.maxhealth = 20
+        self.health = self.maxhealth
 
         #Combat
         self.melee_damage_modifier = 2

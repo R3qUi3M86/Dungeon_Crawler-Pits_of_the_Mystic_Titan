@@ -4,6 +4,8 @@ from utilities import entity_manager
 from utilities.constants import *
 from utilities import util
 
+melee_hit_angle_margin = 30
+
 def attack_monster_with_melee_attack(weapon, damage_modifer):
     damage = weapon.damage + damage_modifer
     hit_monsters = []
@@ -11,8 +13,21 @@ def attack_monster_with_melee_attack(weapon, damage_modifer):
     for character_sprite in entity_manager.far_proximity_character_sprites_list:
         hero = entity_manager.hero
         
-        if character_sprite != hero and not (character_sprite.is_dead or character_sprite.is_overkilled) and hero.facing_direction == util.get_facing_direction(hero.map_position, character_sprite.map_position) and util.elipses_intersect(hero.map_position,character_sprite.map_position,hero.melee_range,character_sprite.size):
-            hit_monsters.append(character_sprite)
+        if not (character_sprite.is_dead or character_sprite.is_overkilled):
+            enemy_angle = util.get_total_angle(hero.map_position, character_sprite.map_position)
+            mouse_angle = util.get_total_angle(player_position, pygame.mouse.get_pos())   
+            left_margin_angle = enemy_angle + melee_hit_angle_margin
+            right_margin_angle = enemy_angle - melee_hit_angle_margin
+
+            if mouse_angle > 360 - melee_hit_angle_margin and enemy_angle < melee_hit_angle_margin:
+                left_margin_angle += 360
+                right_margin_angle += 360
+            elif mouse_angle < melee_hit_angle_margin and enemy_angle > 360 - melee_hit_angle_margin:
+                left_margin_angle -= 360
+                right_margin_angle -= 360
+
+            if left_margin_angle > mouse_angle > right_margin_angle and util.elipses_intersect(hero.map_position,character_sprite.map_position,hero.melee_range,character_sprite.size):
+                hit_monsters.append(character_sprite)
 
     if hit_monsters:
         sound_player.play_melee_attack_sound(PLAYER, HIT)
