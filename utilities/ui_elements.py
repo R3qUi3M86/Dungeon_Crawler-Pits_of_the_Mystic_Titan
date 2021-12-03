@@ -2,12 +2,13 @@ import pygame
 from settings import *
 from images.ui import ui
 from utilities.constants import *
-from utilities import entity_manager
+from utilities.entity_manager import picked_up_item_names
 from utilities.entity_manager import hero
 from utilities.text_printer import *
 
 pickup_text_display_timer = 0
 pickup_text_display_timer_limit = 210
+
 
 PALE_WHITE_COLOR = (180,200,200)
 PALE_ORANGE_COLOR = (210,200,150)
@@ -75,7 +76,7 @@ def draw_weapon_ammo_counter():
 def display_pickup_text():
     global pickup_text_display_timer
 
-    item_name = entity_manager.picked_up_item_names[0]
+    item_name = picked_up_item_names[0]
     displayed_text = PICKUP_TEXT + item_name
     if item_name in WEAPONS:
         displayed_text += "!"
@@ -88,7 +89,7 @@ def display_pickup_text():
     
     else:
         pickup_text_display_timer = 0
-        del entity_manager.picked_up_item_names[0]
+        del picked_up_item_names[0]
     
 
 def get_selected_weapon_image():

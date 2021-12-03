@@ -1094,9 +1094,8 @@ def remove_item_from_the_map_and_give_to_player(item):
 def give_item_to_player(item):
     if item.is_weapon:
         hero.ammo[item.NAME] += item.ammo
-        if hero.weapons[item.NAME] == False:
-            hero.items.append(item)
-            hero.weapons[item.NAME] = True
+        if not hero.weapons[item.NAME]:
+            hero.weapons[item.NAME] = item
     
     elif item.is_ammo:
         hero.ammo[item.ammo_type] += item.ammo

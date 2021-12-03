@@ -109,8 +109,9 @@ class Hero(pygame.sprite.Sprite):
         #Abilities and items list
         self.abilities = []
         self.items = []
-        self.weapons = {SWORD:False, EMERALD_CROSSBOW:False}
-        self.ammo = {SWORD:0, EMERALD_CROSSBOW:0}
+        self.consumables = []
+        self.weapons = {SWORD:None, EMERALD_CROSSBOW:None}
+        self.ammo = {SWORD:0, EMERALD_CROSSBOW:30}
         
         #Movement
         self.speed = 3
@@ -120,6 +121,7 @@ class Hero(pygame.sprite.Sprite):
 
     #Update functions
     def update(self):
+        self.increment_all_items_cooldown()
         self.update_animation()
         self.rect = self.image.get_rect(midbottom = (self.image_position))
 
@@ -144,10 +146,11 @@ class Hero(pygame.sprite.Sprite):
                 self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
                 if self.is_attacking == True:
-                    if self.selected_weapon in MELEE_WEAPONS:             
-                        self.character_melee_attack_animation()
-                    elif self.selected_weapon in RANGED_WEAPONS and self.ammo[self.selected_weapon] > 0:
-                        self.character_ranged_attack_animation()
+                    if self.weapons[self.selected_weapon].is_ready_to_use and (self.ammo[self.selected_weapon] > 0 or self.ammo[self.selected_weapon] == -1):
+                        if self.selected_weapon in MELEE_WEAPONS:             
+                            self.character_melee_attack_animation()
+                        elif self.selected_weapon in RANGED_WEAPONS:
+                            self.character_ranged_attack_animation()
                     else:
                         self.is_attacking = False
 
@@ -162,6 +165,11 @@ class Hero(pygame.sprite.Sprite):
 
     #Getters
     def get_item_by_name(self, item_name):
+        for item in self.items:
+            if item.NAME is item_name:
+                return item
+
+    def get_weapon_by_name(self, item_name):
         for item in self.items:
             if item.NAME is item_name:
                 return item
@@ -229,30 +237,37 @@ class Hero(pygame.sprite.Sprite):
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_melee_attack_animation(self):
+        weapon = self.weapons[self.selected_weapon]
         self.character_attack_index[1] += 0.05
         
         if round(self.character_attack_index[1],2) == 1.00:
-            weapon = self.get_item_by_name(self.selected_weapon)
             combat_manager.attack_monster_with_melee_attack(weapon, self.melee_damage_modifier)
         
         if int(self.character_attack_index[1]) == 2:
             self.is_attacking = False
             self.character_attack_index[1] = 0
+            self.weapons[self.selected_weapon].is_ready_to_use = False
+            if self.ammo[weapon.NAME] != -1:
+                self.ammo[weapon.NAME] -= 1
+        
         if self.character_attack_index[1] != 0 or pygame.mouse.get_pressed()[0]:
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
 
     def character_ranged_attack_animation(self):
-        weapon = self.get_item_by_name(self.selected_weapon)
-        
-        if round(self.character_attack_index[1],2) == 1:
+        weapon = self.weapons[self.selected_weapon]
+
+        if round(self.character_attack_index[1],3) == 1:
             self.character_attack_index[1] = 1
-            self.ammo[weapon.NAME] -= 1
             combat_manager.attack_monsters_with_ranged_weapon(weapon, self.ranged_damage_modifier)
         
         self.character_attack_index[1] += 0.025*weapon.attack_speed
         if int(self.character_attack_index[1]) == 2:
             self.is_attacking = False
             self.character_attack_index[1] = 1
+            self.weapons[self.selected_weapon].is_ready_to_use = False
+            if self.ammo[weapon.NAME] != -1:
+                self.ammo[weapon.NAME] -= 1
+
         self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
 
     def set_character_animation_direction_indices(self):
@@ -283,6 +298,17 @@ class Hero(pygame.sprite.Sprite):
                 self.is_living = False
                 self.is_dying = False
                 self.is_overkilled = True
+
+    def increment_all_items_cooldown(self):
+        for weapon_name in self.weapons:
+            weapon = self.weapons[weapon_name]
+            if weapon and not weapon.is_ready_to_use:
+                weapon.increment_item_cooldown_timer()
+
+        for consumable in self.consumables:
+            if not consumable.is_ready_to_use:
+                consumable.increment_item_cooldown_timer()
+
 
     #Conditions
     def facing_southwards(self):

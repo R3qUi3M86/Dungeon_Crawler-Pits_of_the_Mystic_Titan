@@ -10,7 +10,9 @@ from sounds import sound_player
 
 STATIC_IMAGE_DICT = {SWORD:sword, ETTIN_MACE:sword, EMERALD_CROSSBOW:emerald_crossbow}
 WEAPON_DAMAGE_DICT = {SWORD:2,ETTIN_MACE:1,EMERALD_CROSSBOW:2}
-WEAPON_ATTACK_SPEED_DICT = {SWORD:1,ETTIN_MACE:1,EMERALD_CROSSBOW:0.8}
+WEAPON_ATTACK_SPEED_DICT = {SWORD:1,ETTIN_MACE:1,EMERALD_CROSSBOW:3}
+WEAPON_ATTACK_COOLDOWN_DICT = {SWORD:0,ETTIN_MACE:1,EMERALD_CROSSBOW:1.2}
+CONSUMABLE_COOLDOWN_DICT = {CRYSTAL_VIAL:5}
 
 class Item(pygame.sprite.Sprite):
     def __init__(self, tile_index, name):
@@ -52,17 +54,22 @@ class Item(pygame.sprite.Sprite):
         self.is_picked = False
         self.is_weapon = self.get_is_weapon()
         self.is_ammo = self.get_is_ammo()
+        self.is_consumable = self.get_is_consumable()
         self.is_pickable = self.get_pickable()
 
         ###Item properties###
         #General
-        self.damage = WEAPON_DAMAGE_DICT[name]
+        self.damage = self.get_weapon_damage()
         self.size = self.get_item_size()
 
         self.ammo_type = self.get_ammo_type()
         self.ammo = self.get_ammo()
         self.attack_type = self.get_attack_type()
         self.attack_speed = self.get_attack_speed()
+        self.is_ready_to_use = True
+        self.use_cooldown = 0
+        self.use_cooldown_limit = self.get_use_cooldown_limit()
+        self.consumable_quantity = 1
 
     #Updates
     def update(self):
@@ -102,6 +109,11 @@ class Item(pygame.sprite.Sprite):
             return True
         return False
 
+    def get_is_consumable(self):
+        if self.NAME in CONSUMABLES:
+            return True
+        return False
+
     def get_ammo(self):
         if self.is_weapon:
             if self.NAME is not SWORD:
@@ -136,3 +148,29 @@ class Item(pygame.sprite.Sprite):
     def get_attack_speed(self):
         if self.is_weapon:
             return WEAPON_ATTACK_SPEED_DICT[self.NAME]
+
+    def get_weapon_damage(self):
+        if self.is_weapon:
+            return WEAPON_DAMAGE_DICT[self.NAME]
+
+    def get_use_cooldown_limit(self):
+        if self.is_weapon:
+            return WEAPON_ATTACK_COOLDOWN_DICT[self.NAME]
+
+        elif self.is_consumable:
+            return CONSUMABLE_COOLDOWN_DICT[self.NAME]
+
+    def increment_item_cooldown_timer(self):
+        if not self.is_ready_to_use:
+            if self.is_weapon:
+                if self.attack_type is MELEE:
+                    self.use_cooldown += 0.05
+                elif self.attack_type is RANGED:
+                    self.use_cooldown += 0.025
+            
+            elif self.is_consumable:
+                self.use_cooldown += 0.01667
+        
+        if self.use_cooldown >= self.use_cooldown_limit:
+            self.is_ready_to_use = True
+            self.use_cooldown = 0

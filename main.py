@@ -104,7 +104,7 @@ def toggle_wall_drawing_mode():
 
 def switch_weapon(weapon_index):
     weapon_name = HERO_WEAPONS[weapon_index]
-    if entity_manager.hero.weapons[weapon_name] == True and entity_manager.hero.is_attacking == False:
+    if entity_manager.hero.weapons[weapon_name] and entity_manager.hero.is_attacking == False:
         entity_manager.hero.selected_weapon = HERO_WEAPONS[weapon_index]
         if weapon_name in MELEE_WEAPONS:
             entity_manager.hero.character_attack_index[1] = 0
@@ -172,7 +172,7 @@ def draw_ui():
     ui_elements.draw_health_bar()
     ui_elements.draw_weapon_ammo_counter()
 
-    if len(entity_manager.picked_up_item_names) != 0:
+    if len(ui_elements.picked_up_item_names) != 0:
         ui_elements.display_pickup_text()
 
 #Game initialization
