@@ -44,16 +44,16 @@ def set_volume_for_all_sounds(volume):
     for sound in all_sounds:
         sound.set_volume(volume)
 
-def play_melee_attack_sound(attacking_entity, hit):
+def play_melee_attack_sound(attacking_entity_name, hit):
     if hit:
-        if attacking_entity == PLAYER:
+        if attacking_entity_name == PLAYER:
             hero_melee_hit_sound.play()
-        elif attacking_entity == ETTIN:
+        elif attacking_entity_name == ETTIN:
             monster_melee_hit_sound.play()
     else:
-        if attacking_entity == PLAYER:
+        if attacking_entity_name == PLAYER:
             hero_melee_miss_sound.play()
-        elif attacking_entity == ETTIN:
+        elif attacking_entity_name == ETTIN:
             monster_melee_miss_sound.play()
 
 def play_ranged_attack_sound(weapon_name):

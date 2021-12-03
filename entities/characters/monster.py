@@ -12,13 +12,30 @@ from utilities.level_painter import TILE_SIZE
 from images.characters.ettin_images import *
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
+from entities.items.item import Item
 
-class Ettin(pygame.sprite.Sprite):
-    def __init__(self,tile_index, facing_direction=SECTOR_S):
+MAX_HEALTH_DICT = {ETTIN:10}
+BASE_DAMAGE_DICT = {ETTIN:2}
+X_MELEE_RANGE_DICT = {ETTIN:50}
+Y_MELEE_RANGE_DICT = {ETTIN:27}
+X_SIZE_DICT = {ETTIN:20}
+Y_SIZE_DICT = {ETTIN:11}
+INTERRUPT_CHANCE_DICT = {ETTIN:50}
+
+SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE}
+WEAPONS_DICT = {ETTIN:[ETTIN_MACE]}
+
+ABILITIES_DICT = {ETTIN:[None]}
+
+SPEED_DICT = {ETTIN:1.4}
+
+
+class Monster(pygame.sprite.Sprite):
+    def __init__(self,tile_index, name, facing_direction=SECTOR_S):
         super().__init__()
         ###Constants###
-        self.IMAGE_DISPLAY_CORRECTION = 12
-        self.NAME = ETTIN
+        self.IMAGE_DISPLAY_CORRECTION = MONSTER_IMAGE_DISPLAY_CORRECTION[name]
+        self.NAME = name
         self.TYPE = MONSTER
 
         ###Position variables###
@@ -38,23 +55,23 @@ class Ettin(pygame.sprite.Sprite):
 
         ###Animations###
         #Walk assets
-        self.character_walk = character_walk
+        self.character_walk = monster_walk[name]
         self.character_walk_index = [6,0]
         
         #Attack assets
-        self.character_attack = character_attack
+        self.character_attack = monster_attack[name]
         self.character_attack_index = [6,0]
 
         #Death assets
-        self.character_death = character_death
+        self.character_death = monster_death[name]
         self.character_death_index = 0
 
         #Overkill assets
-        self.character_overkill = character_overkill
+        self.character_overkill = monster_overkill[name]
         self.character_overkill_index = 0
 
         #Pain assets
-        self.character_pain = character_pain
+        self.character_pain = monster_pain[name]
         self.character_pain_index = 0
         self.character_pain_timer = 0
 
@@ -94,28 +111,29 @@ class Ettin(pygame.sprite.Sprite):
         
         ###Character properties###
         #General
-        self.health = 10
-        self.maxhealth = 10
+        self.maxhealth = MAX_HEALTH_DICT[name]
+        self.health = self.maxhealth
+
 
         #Combat
-        self.damage = 1
-        self.x_melee_range = 50
-        self.y_melee_range = 27
+        self.base_damage = BASE_DAMAGE_DICT[name]
+        self.x_melee_range = X_MELEE_RANGE_DICT[name]
+        self.y_melee_range = Y_MELEE_RANGE_DICT[name]
         self.melee_range = self.x_melee_range, self.y_melee_range
-        self.x_size = 20
-        self.y_size = 11
+        self.x_size = X_SIZE_DICT[name]
+        self.y_size = Y_SIZE_DICT[name]
         self.size = self.x_size, self.y_size
-        self.attack_interruption_chance = 50
+        self.attack_interruption_chance = INTERRUPT_CHANCE_DICT[name]
         self.attack_can_be_interrupted = True
-        self.can_shoot = False
-        self.projectile_type = None
+        self.selected_weapon = SELECTED_WEAPON_DICT[name]
 
-        #Abilities
-        self.abilities = []
+        #Abilities and weapons list
+        self.abilities = self.get_abilities_list()
+        self.weapons = self.get_weapons_list()
 
         #Movement
         self.facing_direction = facing_direction
-        self.speed = 1.4,1
+        self.speed = SPEED_DICT[name]
         self.speed_vector = 0,0
 
     #Update functions
@@ -221,13 +239,41 @@ class Ettin(pygame.sprite.Sprite):
                 auxilary_sprite.tile_index = self.tile_index
                 auxilary_sprite.update_position(self.position)
     
+    #Getters
+    def get_item_by_name(self, item_name):
+        for item in self.items:
+            if item.NAME is item_name:
+                return item
+
+
+    def get_weapons_list(self):
+        weapon_names_list = WEAPONS_DICT[self.NAME]
+        weapons_list = []
+
+        for weapon_name in weapon_names_list:
+            weapon = Item(self.tile_index, weapon_name)
+            weapons_list.append(weapon)
+
+        return weapons_list
+
+    def get_abilities_list(self):
+        ability_names_list = ABILITIES_DICT[self.NAME]
+        abilities_list = []
+
+        for ability_name in ability_names_list:
+            if ability_name:
+                ability = 1
+                abilities_list.append(ability)
+
+        return abilities_list
+
     #Animations
     def character_pain_animation(self):
         self.character_pain_timer += 0.05
         if int(self.character_pain_timer) >= 1:
             self.is_in_pain = False
             self.character_pain_timer = 0
-        self.image = character_pain[self.character_pain_index]
+        self.image = self.character_pain[self.character_pain_index]
 
     def character_death_animation(self):
         self.character_death_index += 0.1
@@ -260,7 +306,7 @@ class Ettin(pygame.sprite.Sprite):
         else:
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]    
             if round(self.character_attack_index[1],2) == 2.00:
-                combat_manager.attack_player_with_melee_attack(self, self.damage)
+                combat_manager.attack_player_with_melee_attack(self, self.base_damage)
 
     def set_character_animation_direction_indices(self):
         for sector in SECTORS:
@@ -294,21 +340,21 @@ class Ettin(pygame.sprite.Sprite):
     def set_speed_vector(self):
         if self.is_living and not self.is_preparing_attack and not self.is_attacking:
             if self.facing_direction == SECTOR_E:
-                self.speed_vector = 1.4,0
+                self.speed_vector = self.speed,0
             elif self.facing_direction == SECTOR_NE:
-                self.speed_vector = 0.99,-0.58
+                self.speed_vector = 0.7*self.speed,-0.41*self.speed
             elif self.facing_direction == SECTOR_N:
-                self.speed_vector = 0,-0.77
+                self.speed_vector = 0,-0.55*self.speed
             elif self.facing_direction == SECTOR_NW:
-                self.speed_vector = -0.99,-0.58
+                self.speed_vector = -0.7*self.speed,-0.41*self.speed
             elif self.facing_direction == SECTOR_W:
-                self.speed_vector = -1.4,0
+                self.speed_vector = -self.speed,0
             elif self.facing_direction == SECTOR_SW:
-                self.speed_vector = -0.99,0.58
+                self.speed_vector = -0.7*self.speed,0.41*self.speed
             elif self.facing_direction == SECTOR_S:
-                self.speed_vector = 0,0.77
+                self.speed_vector = 0,0.55*self.speed
             elif self.facing_direction == SECTOR_SE:
-                self.speed_vector = 0.99,0.58
+                self.speed_vector = 0.7*self.speed,0.41*self.speed
             
     #Combat functions
     def initialize_attack_sequence(self):

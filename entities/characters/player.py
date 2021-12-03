@@ -108,7 +108,7 @@ class Hero(pygame.sprite.Sprite):
         self.abilities = []
         self.items = []
         self.weapons = {SWORD:False, EMERALD_CROSSBOW:False}
-        self.ammo = {SWORD:0, EMERALD_CROSSBOW:50}
+        self.ammo = {SWORD:0, EMERALD_CROSSBOW:0}
         
         #Movement
         self.speed = 3
@@ -236,7 +236,8 @@ class Hero(pygame.sprite.Sprite):
         if int(self.character_attack_index[1]) == 2:
             self.is_attacking = False
             self.character_attack_index[1] = 0
-        self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
+        if self.character_attack_index[1] != 0 or pygame.mouse.get_pressed()[0]:
+            self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
 
     def character_ranged_attack_animation(self):
         weapon = self.get_item_by_name(self.selected_weapon)

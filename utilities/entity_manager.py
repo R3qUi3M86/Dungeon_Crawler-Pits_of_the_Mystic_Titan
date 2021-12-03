@@ -7,7 +7,7 @@ from utilities import level_painter
 from utilities.level_painter import level_layout
 from utilities.level_painter import TILE_SIZE
 from entities.level.level import WATER
-from entities.characters.ettin import Ettin
+from entities.characters.monster import Monster
 from entities.characters.player import Hero
 from entities.items.item import Item
 
@@ -1042,34 +1042,6 @@ def move_entity_in_all_matrices(entity_id, entity_type, old_tile_index, new_tile
 #Monster entities
 def generate_monsters():
     generate_monster(ETTIN,(7,3))
-    # generate_monster(ETTIN,(4,2))
-    # generate_monster(ETTIN, (4,1))
-    # generate_monster(ETTIN, (7,3))
-    # generate_monster(ETTIN, (7,8))
-    # generate_monster(ETTIN, (6,7))
-    # generate_monster(ETTIN,(11,22))
-    # generate_monster(ETTIN, (11,23))
-    # generate_monster(ETTIN, (11,24))
-    # generate_monster(ETTIN, (10,22))
-    # generate_monster(ETTIN, (10,23))
-    # generate_monster(ETTIN, (10,24))
-    # generate_monster(ETTIN, (10,25))
-    # generate_monster(ETTIN, (3,25))
-    # generate_monster(ETTIN, (3,26))
-    # generate_monster(ETTIN, (3,24))
-    # generate_monster(ETTIN, (3,23))
-    # generate_monster(ETTIN, (4,25))
-    # generate_monster(ETTIN, (4,26))
-    # generate_monster(ETTIN, (4,24))
-    # generate_monster(ETTIN, (4,23))
-    # generate_monster(ETTIN, (4,25))
-    # generate_monster(ETTIN, (4,26))
-    # generate_monster(ETTIN, (2,24))
-    # generate_monster(ETTIN, (2,23))
-    # generate_monster(ETTIN, (2,25))
-    # generate_monster(ETTIN, (2,26))
-    # generate_monster(ETTIN, (2,27))
-    # generate_monster(ETTIN, (4,22))
     pass
 
 def fill_map_with_monsters(density):
@@ -1084,8 +1056,7 @@ def generate_monster(monster_type, tile_index):
     global all_entity_and_shadow_sprite_group_matrix
     global all_monsters
 
-    if monster_type == ETTIN:
-        monster = Ettin(tile_index)
+    monster = Monster(tile_index, monster_type)
 
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster))
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster.shadow))
@@ -1148,22 +1119,22 @@ def put_projectile_in_matrices_and_lists(new_projectile):
     far_proximity_entity_sprites_list.append(new_projectile)
     far_proximity_projectile_sprites_list.append(new_projectile)
 
-def remove_projectile_from_the_map(projectile):
+def remove_projectile_from_from_matrices_and_lists(projectile):
     tile_index = projectile.tile_index
     far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
 
     projectile_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(projectile.id, tile_index, type=PROJECTILE)
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(projectile_sprite_group)
-    # far_proximity_entity_and_shadow_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].remove(projectile_sprite_group)
     far_proximity_entity_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].remove(projectile_sprite_group)
 
-    shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(projectile.id, tile_index, type=SHADOW)
-    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(shadow_sprite_group)
-    # far_proximity_entity_and_shadow_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].remove(shadow_sprite_group)
-
-    far_proximity_shadow_sprite_group_list.remove(shadow_sprite_group)
     far_proximity_entity_sprites_list.remove(projectile)
     far_proximity_projectile_sprites_list.remove(projectile)
+
+def remove_projectile_shadow_from_matrix_and_list(projectile):
+    tile_index = projectile.tile_index
+    shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(projectile.id, tile_index, type=SHADOW)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(shadow_sprite_group)
+    far_proximity_shadow_sprite_group_list.remove(shadow_sprite_group)
 
 #Misc
 def wake_up_any_sleeping_monsters_in_far_proximity_matrix():
@@ -1177,7 +1148,7 @@ def fix_all_dead_objects_to_pixel_accuracy():
             character.map_position = math.ceil(character.map_position[0]), math.ceil(character.map_position[1])
 
 def fix_player_position_to_pixel_accuracy():
-    hero.map_position = math.floor(hero.map_position[0]), math.floor(hero.map_position[1])
+    hero.map_position = math.ceil(hero.map_position[0]), math.ceil(hero.map_position[1])
 
 def set_entity_screen_position(entity):
     position_x = player_position[0] + entity.sprite.map_position[0] - hero.map_position[0]

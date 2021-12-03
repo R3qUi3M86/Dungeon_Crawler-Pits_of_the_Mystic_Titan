@@ -8,6 +8,10 @@ from utilities import level_painter
 from utilities import entity_manager
 from sounds import sound_player
 
+STATIC_IMAGE_DICT = {SWORD:sword, ETTIN_MACE:sword, EMERALD_CROSSBOW:emerald_crossbow}
+WEAPON_DAMAGE_DICT = {SWORD:2,ETTIN_MACE:1,EMERALD_CROSSBOW:2}
+WEAPON_ATTACK_SPEED_DICT = {SWORD:1,ETTIN_MACE:1,EMERALD_CROSSBOW:0.8}
+
 class Item(pygame.sprite.Sprite):
     def __init__(self, tile_index, name):
         super().__init__()
@@ -27,7 +31,7 @@ class Item(pygame.sprite.Sprite):
         
         ###Animations###
         #Static image assets
-        self.item_static_image = self.get_item_static_image()
+        self.item_static_image = STATIC_IMAGE_DICT[name]
 
         ###Owned sprites###
         #Colliders
@@ -52,7 +56,7 @@ class Item(pygame.sprite.Sprite):
 
         ###Item properties###
         #General
-        self.damage = self.get_weapon_damage()
+        self.damage = WEAPON_DAMAGE_DICT[name]
         self.size = self.get_item_size()
 
         self.ammo_type = self.get_ammo_type()
@@ -83,12 +87,6 @@ class Item(pygame.sprite.Sprite):
         elif self.is_ammo:
             return True
         return False
-
-    def get_item_static_image(self):
-        if self.NAME is SWORD:
-            return sword
-        elif self.NAME is EMERALD_CROSSBOW:
-            return emerald_crossbow
 
     def get_image(self):
         if self.NAME in WEAPONS:
@@ -135,16 +133,6 @@ class Item(pygame.sprite.Sprite):
         if self.is_pickable or self.is_weapon:
             return 15, 8
 
-    def get_weapon_damage(self):
-        if self.is_weapon:
-            if self.NAME is SWORD:
-                return 2
-            elif self.NAME is EMERALD_CROSSBOW:
-                return 2
-
     def get_attack_speed(self):
         if self.is_weapon:
-            if self.NAME is SWORD:
-                return 1
-            elif self.NAME is EMERALD_CROSSBOW:
-                return 0.8
+            return WEAPON_ATTACK_SPEED_DICT[self.NAME]

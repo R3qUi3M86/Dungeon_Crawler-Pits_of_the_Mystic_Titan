@@ -69,12 +69,13 @@ class Projectile(pygame.sprite.Sprite):
     #Updates
     def update(self):
         if self.leaving_far_proximity_matrix_margin() or self.is_destroyed:
-            entity_manager.remove_projectile_from_the_map(self)
+            entity_manager.remove_projectile_from_from_matrices_and_lists(self)
         
         elif self.has_impacted:
             self.has_impacted = False
             self.is_disintegrating = True
             self.travel_speed = 0,0
+            entity_manager.remove_projectile_shadow_from_matrix_and_list(self)
             sound_player.play_projectile_impact_sound(self.NAME)
         
         elif self.is_disintegrating:

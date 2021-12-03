@@ -103,9 +103,9 @@ def toggle_wall_drawing_mode():
         wall_drawing_mode = VISIBLE
 
 def switch_weapon(weapon_index):
-    weapon_name = WEAPONS[weapon_index]
+    weapon_name = HERO_WEAPONS[weapon_index]
     if entity_manager.hero.weapons[weapon_name] == True and entity_manager.hero.is_attacking == False:
-        entity_manager.hero.selected_weapon = WEAPONS[weapon_index]
+        entity_manager.hero.selected_weapon = HERO_WEAPONS[weapon_index]
         if weapon_name in MELEE_WEAPONS:
             entity_manager.hero.character_attack_index[1] = 0
         else:

@@ -93,7 +93,7 @@ def display_pickup_text():
 
 def get_selected_weapon_image():
     weapon = hero.selected_weapon
-    return ui.inventory_weapons[WEAPONS.index(weapon)]
+    return ui.inventory_weapons[HERO_WEAPONS.index(weapon)]
 
 def format_ammo_text(ammo):
     if ammo != -1:
