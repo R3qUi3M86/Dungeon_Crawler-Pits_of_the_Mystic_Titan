@@ -5,6 +5,7 @@ from entities.shadow import Shadow
 from entities.colliders.collider import Collider
 from utilities.constants import *
 from utilities import util
+from utilities import level_painter
 from utilities.level_painter import TILE_SIZE
 from utilities import entity_manager
 from sounds import sound_player
@@ -89,6 +90,9 @@ class Projectile(pygame.sprite.Sprite):
             self.update_owned_sprites_position()
             self.tile_index = util.get_tile_index(self.map_position)
 
+            if self.is_outside_of_map():
+                self.has_impacted = True
+
             if self.tile_index != self.prevous_tile_index:
                 self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
                 self.direct_proximity_wall_like_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, WALL_LIKE)
@@ -129,7 +133,7 @@ class Projectile(pygame.sprite.Sprite):
 
     def get_projectile_speed(self):
         if self.NAME is CROSSBOW_BOLT:
-            return 12
+            return 13
 
     def get_projectile_size(self):
         if self.NAME is CROSSBOW_BOLT:
@@ -175,3 +179,7 @@ class Projectile(pygame.sprite.Sprite):
         if abs(self.tile_index[0]-hero_tile_index[0]) > tile_row_offset or abs(self.tile_index[1]-hero_tile_index[1]) > tile_col_offset:
             return True
         return False
+
+    def is_outside_of_map(self):
+        if self.tile_index[0] < 0 or self.tile_index[0]+1 >= len(level_painter.level_layout) or self.tile_index[1] < 0 or self.tile_index[1]+1 > len(level_painter.level_layout[0]):
+            return True

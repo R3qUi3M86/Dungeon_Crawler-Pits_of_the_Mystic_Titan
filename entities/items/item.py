@@ -9,9 +9,11 @@ from utilities import entity_manager
 from sounds import sound_player
 
 STATIC_IMAGE_DICT = {SWORD:sword, ETTIN_MACE:sword, EMERALD_CROSSBOW:emerald_crossbow}
-WEAPON_DAMAGE_DICT = {SWORD:2,ETTIN_MACE:1,EMERALD_CROSSBOW:2}
-WEAPON_ATTACK_SPEED_DICT = {SWORD:1,ETTIN_MACE:1,EMERALD_CROSSBOW:3}
-WEAPON_ATTACK_COOLDOWN_DICT = {SWORD:0,ETTIN_MACE:0,EMERALD_CROSSBOW:1.2}
+WEAPON_DAMAGE_DICT = {SWORD:2, ETTIN_MACE:1, EMERALD_CROSSBOW:2}
+WEAPON_CHAINFIRE_DICT = {SWORD:1, ETTIN_MACE:1, EMERALD_CROSSBOW:1}
+WEAPON_CHAINFIRE_COOLDOWN_LIMIT_DICT = {SWORD:0, ETTIN_MACE:0, EMERALD_CROSSBOW:0}
+WEAPON_ATTACK_SPEED_DICT = {SWORD:1, ETTIN_MACE:1, EMERALD_CROSSBOW:3}
+WEAPON_ATTACK_COOLDOWN_DICT = {SWORD:0, ETTIN_MACE:0, EMERALD_CROSSBOW:1.2}
 CONSUMABLE_COOLDOWN_DICT = {CRYSTAL_VIAL:5}
 
 class Item(pygame.sprite.Sprite):
@@ -60,6 +62,9 @@ class Item(pygame.sprite.Sprite):
         ###Item properties###
         #General
         self.damage = self.get_weapon_damage()
+        self.chainfire = self.get_chainfire()
+        self.chainfire_cooldown_limit = self.get_chainfire_cooldown()
+        self.chainfire_cooldown = self.chainfire_cooldown_limit
         self.size = self.get_item_size()
 
         self.ammo_type = self.get_ammo_type()
@@ -153,6 +158,14 @@ class Item(pygame.sprite.Sprite):
         if self.is_weapon:
             return WEAPON_DAMAGE_DICT[self.NAME]
 
+    def get_chainfire(self):
+        if self.is_weapon:
+            return WEAPON_CHAINFIRE_DICT[self.NAME]
+
+    def get_chainfire_cooldown(self):
+        if self.is_weapon:
+            return WEAPON_CHAINFIRE_COOLDOWN_LIMIT_DICT[self.NAME]
+
     def get_use_cooldown_limit(self):
         if self.is_weapon:
             return WEAPON_ATTACK_COOLDOWN_DICT[self.NAME]
@@ -174,3 +187,9 @@ class Item(pygame.sprite.Sprite):
         if self.use_cooldown >= self.use_cooldown_limit:
             self.is_ready_to_use = True
             self.use_cooldown = 0
+            if self.is_weapon:
+                self.chainfire_cooldown = self.chainfire_cooldown_limit
+                self.chainfire = WEAPON_CHAINFIRE_DICT[self.NAME]
+
+    def increment_chainfire_cooldown(self):
+        self.chainfire_cooldown += 0.0167

@@ -308,8 +308,18 @@ class Monster(pygame.sprite.Sprite):
             self.weapons[self.selected_weapon].is_ready_to_use = False        
         else:
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]    
-            if round(self.character_attack_index[1],2) == 2.00:
-                combat_manager.attack_player_with_melee_attack(self, self.base_damage)
+            if round(self.character_attack_index[1],2) >= 2.00 and weapon.chainfire > 0:
+                if weapon.chainfire_cooldown >= weapon.chainfire_cooldown_limit:
+                    if self.weapons[self.selected_weapon].attack_type is MELEE:
+                        combat_manager.attack_player_with_melee_attack(self, weapon, self.base_damage)
+                    elif self.weapons[self.selected_weapon].attack_type is RANGED:
+                        combat_manager.attack_player_with_ranged_attack(self, weapon, self.base_damage)
+                    weapon.chainfire_cooldown = 0
+                    weapon.chainfire -= 1
+                else:
+                    weapon.increment_chainfire_cooldown()
+                
+                self.character_attack_index[1] = 2
 
     def set_character_animation_direction_indices(self):
         for sector in SECTORS:

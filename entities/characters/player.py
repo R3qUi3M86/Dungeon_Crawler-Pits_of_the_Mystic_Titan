@@ -258,15 +258,21 @@ class Hero(pygame.sprite.Sprite):
 
         if round(self.character_attack_index[1],3) == 1:
             self.character_attack_index[1] = 1
-            combat_manager.attack_monsters_with_ranged_weapon(weapon, self.ranged_damage_modifier)
-        
-        self.character_attack_index[1] += 0.025*weapon.attack_speed
-        if int(self.character_attack_index[1]) == 2:
-            self.is_attacking = False
-            self.character_attack_index[1] = 1
-            self.weapons[self.selected_weapon].is_ready_to_use = False
-            if self.ammo[weapon.NAME] != -1:
-                self.ammo[weapon.NAME] -= 1
+            if weapon.chainfire_cooldown >= weapon.chainfire_cooldown_limit:
+                combat_manager.attack_monsters_with_ranged_weapon(weapon, self.ranged_damage_modifier)
+                weapon.chainfire_cooldown = 0
+                weapon.chainfire -= 1
+            else:
+                weapon.increment_chainfire_cooldown()
+
+        if weapon.chainfire == 0:
+            self.character_attack_index[1] += 0.025*weapon.attack_speed
+            if int(self.character_attack_index[1]) == 2:
+                self.is_attacking = False
+                self.character_attack_index[1] = 1
+                self.weapons[self.selected_weapon].is_ready_to_use = False
+                if self.ammo[weapon.NAME] != -1:
+                    self.ammo[weapon.NAME] -= 1
 
         self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]
 

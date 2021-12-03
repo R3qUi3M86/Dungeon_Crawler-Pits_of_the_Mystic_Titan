@@ -96,7 +96,7 @@ def get_player_mouse_input():
 
 def toggle_wall_drawing_mode():
     global wall_drawing_mode
-
+    
     if wall_drawing_mode is VISIBLE:
         wall_drawing_mode = HIDDEN
     else:

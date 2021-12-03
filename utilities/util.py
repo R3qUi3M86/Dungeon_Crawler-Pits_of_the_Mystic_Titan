@@ -94,20 +94,20 @@ def get_vicinity_matrix_indices_for_index(index_x_y, size=(3,3)):
     vicinity_matrix = []
     
     tile_index = index_x_y
-    if tile_index[0] == 0:
-        tile_index[0] = 1
-    elif tile_index[0] == len(level_painter.level_layout)-1:
-        tile_index[0] = len(level_painter.level_layout)-2
+    if tile_index[0] <= 0:
+        tile_index = 1, tile_index[1]
+    elif tile_index[0] >= len(level_painter.level_layout)-1:
+        tile_index = len(level_painter.level_layout)-2, tile_index[1]
 
-    if tile_index[1] == 0:
-        tile_index[1] = 1
-    elif tile_index[1] == len(level_painter.level_layout[0])-1:
-        tile_index[1] = len(level_painter.level_layout[0])-2
+    if tile_index[1] <= 0:
+        tile_index = tile_index[0], 1
+    elif tile_index[1] >= len(level_painter.level_layout[0])-1:
+        tile_index = tile_index[0], len(level_painter.level_layout[0])-2
 
     for i in range(size[0]):
         vicinity_matrix_row = []
         for j in range(size[1]):
-            vicinity_matrix_row.append((index_x_y[0]+i-size[0]//2,index_x_y[1]+j-size[1]//2))
+            vicinity_matrix_row.append((tile_index[0]+i-size[0]//2,tile_index[1]+j-size[1]//2))
         
         vicinity_matrix.append(deepcopy(vicinity_matrix_row))
 
