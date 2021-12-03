@@ -19,7 +19,7 @@ class Ai():
         self.pathfinding_prepare_timer_limit = 200
 
         self.attack_decision_timer = 0
-        self.attack_decision_timer_limit = 30
+        self.attack_decision_timer_limit = 0.5
 
         self.los_emision_timer = 0
         self.los_emision_timer_limit = 120
@@ -231,14 +231,14 @@ class Ai():
                 melee_range = self.monster.melee_range
                 hero_size = entity_manager.hero.size
             
-            if util.elipses_intersect(monster_map_pos,hero_map_pos,melee_range,hero_size):
-                    return True
+                if util.elipses_intersect(monster_map_pos,hero_map_pos,melee_range,hero_size):
+                        return True
         return False
 
     #Combat decisions timer
     def increment_attack_decision_timer(self):
-        self.attack_decision_timer += 1
-        if self.attack_decision_timer == self.attack_decision_timer_limit:
+        self.attack_decision_timer += 0.0167*self.monster.reflex
+        if self.attack_decision_timer >= self.attack_decision_timer_limit:
             self.monster.is_preparing_attack = False
             self.monster.is_attacking = True
             self.monster.attack_can_be_interrupted = True

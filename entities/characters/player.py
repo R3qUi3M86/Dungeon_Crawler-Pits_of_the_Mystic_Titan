@@ -238,7 +238,7 @@ class Hero(pygame.sprite.Sprite):
 
     def character_melee_attack_animation(self):
         weapon = self.weapons[self.selected_weapon]
-        self.character_attack_index[1] += 0.05
+        self.character_attack_index[1] += 0.05*weapon.attack_speed
         
         if round(self.character_attack_index[1],2) == 1.00:
             combat_manager.attack_monster_with_melee_attack(weapon, self.melee_damage_modifier)

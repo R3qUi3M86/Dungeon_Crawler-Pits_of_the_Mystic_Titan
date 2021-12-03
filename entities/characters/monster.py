@@ -23,9 +23,10 @@ X_SIZE_DICT = {ETTIN:20}
 Y_SIZE_DICT = {ETTIN:11}
 INTERRUPT_CHANCE_DICT = {ETTIN:50}
 SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE}
-WEAPONS_DICT = {ETTIN:[ETTIN_MACE]}
+WEAPON_NAMES_DICT = {ETTIN:[ETTIN_MACE]}
 ABILITIES_DICT = {ETTIN:[None]}
 SPEED_DICT = {ETTIN:1.4}
+REFLEX_DICT = {ETTIN:1.2}
 
 class Monster(pygame.sprite.Sprite):
     def __init__(self,tile_index, name, facing_direction=SECTOR_S):
@@ -113,6 +114,7 @@ class Monster(pygame.sprite.Sprite):
 
 
         #Combat
+        self.reflex = REFLEX_DICT[name]
         self.base_damage = BASE_DAMAGE_DICT[name]
         self.x_melee_range = X_MELEE_RANGE_DICT[name]
         self.y_melee_range = Y_MELEE_RANGE_DICT[name]
@@ -126,7 +128,7 @@ class Monster(pygame.sprite.Sprite):
 
         #Abilities and weapons list
         self.abilities = self.get_abilities_list()
-        self.weapons = self.get_weapons_list()
+        self.weapons = self.get_weapons_dict()
 
         #Movement
         self.facing_direction = facing_direction
@@ -137,6 +139,7 @@ class Monster(pygame.sprite.Sprite):
     def update(self):
         if not self.leaving_far_proximity_matrix_margin():
             self.activate()
+            self.increment_all_weapons_cooldown()
 
             if not self.is_dead:
                 self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
@@ -195,7 +198,7 @@ class Monster(pygame.sprite.Sprite):
                 self.monster_ai.reset_obstacle_avoidance_flags()
                 self.monster_ai.end_pathfinding()
 
-            elif self.monster_ai.monster_can_melee_attack_player():
+            elif self.monster_ai.monster_can_melee_attack_player() and self.weapons[self.selected_weapon].is_ready_to_use:
                 self.initialize_attack_sequence()
             
             else:
@@ -243,15 +246,15 @@ class Monster(pygame.sprite.Sprite):
                 return item
 
 
-    def get_weapons_list(self):
-        weapon_names_list = WEAPONS_DICT[self.NAME]
-        weapons_list = []
+    def get_weapons_dict(self):
+        weapon_names_list = WEAPON_NAMES_DICT[self.NAME]
+        weapons_dict = {}
 
         for weapon_name in weapon_names_list:
             weapon = Item(self.tile_index, weapon_name)
-            weapons_list.append(weapon)
+            weapons_dict[weapon_name] = weapon
 
-        return weapons_list
+        return weapons_dict
 
     def get_abilities_list(self):
         ability_names_list = ABILITIES_DICT[self.NAME]
@@ -296,10 +299,13 @@ class Monster(pygame.sprite.Sprite):
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_attack_animation(self):
-        self.character_attack_index[1] += 0.1
+        weapon = self.weapons[self.selected_weapon]
+        self.character_attack_index[1] += 0.1*weapon.attack_speed
+
         if int(self.character_attack_index[1]) == 3:
             self.interrupt_attack()
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
+            self.weapons[self.selected_weapon].is_ready_to_use = False        
         else:
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]    
             if round(self.character_attack_index[1],2) == 2.00:
@@ -434,6 +440,12 @@ class Monster(pygame.sprite.Sprite):
         if not self.monster_ai.is_idle:
             self.monster_ai.end_pathfinding()
             self.monster_ai.reset_obstacle_avoidance_flags()
+
+    def increment_all_weapons_cooldown(self):
+        for weapon_name in self.weapons:
+            weapon = self.weapons[weapon_name]
+            if weapon and not weapon.is_ready_to_use:
+                weapon.increment_item_cooldown_timer()
 
     #Conditions
     def leaving_far_proximity_matrix_margin(self):
