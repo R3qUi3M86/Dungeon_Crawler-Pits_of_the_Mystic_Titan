@@ -12,11 +12,13 @@ from entities.shadow import Shadow
 from entities.colliders.collider import Collider
 from entities.items.item import Item
 
+IMAGE_DISPLAY_CORRECTION = 8
+
 class Hero(pygame.sprite.Sprite):
     def __init__(self,position):
         super().__init__()
         ###Constants###
-        self.IMAGE_DISPLAY_CORRECTION = 8
+        self.IMAGE_DISPLAY_CORRECTION = IMAGE_DISPLAY_CORRECTION
         self.NAME = PLAYER
         self.TYPE = PLAYER
 

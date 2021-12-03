@@ -14,6 +14,7 @@ from entities.shadow import Shadow
 from entities.colliders.collider import Collider
 from entities.items.item import Item
 
+MONSTER_IMAGE_DISPLAY_CORRECTION = {ETTIN:12}
 MAX_HEALTH_DICT = {ETTIN:10}
 BASE_DAMAGE_DICT = {ETTIN:2}
 X_MELEE_RANGE_DICT = {ETTIN:50}
@@ -21,14 +22,10 @@ Y_MELEE_RANGE_DICT = {ETTIN:27}
 X_SIZE_DICT = {ETTIN:20}
 Y_SIZE_DICT = {ETTIN:11}
 INTERRUPT_CHANCE_DICT = {ETTIN:50}
-
 SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE}
 WEAPONS_DICT = {ETTIN:[ETTIN_MACE]}
-
 ABILITIES_DICT = {ETTIN:[None]}
-
 SPEED_DICT = {ETTIN:1.4}
-
 
 class Monster(pygame.sprite.Sprite):
     def __init__(self,tile_index, name, facing_direction=SECTOR_S):
