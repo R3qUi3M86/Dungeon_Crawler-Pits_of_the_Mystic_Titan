@@ -16,6 +16,8 @@ PROJECTILE_SIZE_DICT = {CROSSBOW_BOLT:(15, 8), MAGIC_MISSILE:(13, 7)}
 PROJECTILE_STATIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot[0], MAGIC_MISSILE:bishop_magic_missile_shot[0]}
 PROJECTILE_DYNAMIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot, MAGIC_MISSILE:bishop_magic_missile_shot}
 PROJECTILE_DESTRUCT_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_destruct, MAGIC_MISSILE:bishop_magic_missile_destruct}
+PROJECTILE_GLOW_DICT = {CROSSBOW_BOLT:GREEN_GLOW, MAGIC_MISSILE:GREEN_GLOW}
+PROJECTILE_SHADOW_SIZE_DICT = {CROSSBOW_BOLT:SIZE_SMALL, MAGIC_MISSILE:SIZE_MEDIUM}
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, tile_index, position, map_pos, damage, angle, name, launched_by):
@@ -56,7 +58,7 @@ class Projectile(pygame.sprite.Sprite):
         self.projectile_collider = Collider(self.position, self.id, PROJECTILE)
 
         #Shadow
-        self.shadow = Shadow(self.position, self.map_position, self.id, SIZE_TINY, self.tile_index)
+        self.shadow = Shadow(self.position, self.map_position, self.id, PROJECTILE_SHADOW_SIZE_DICT[name], self.tile_index, PROJECTILE_GLOW_DICT[name])
 
         #Sprite lists
         self.entity_auxilary_sprites = [self.projectile_collider, self.shadow]

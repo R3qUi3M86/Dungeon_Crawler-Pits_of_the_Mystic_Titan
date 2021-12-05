@@ -22,6 +22,9 @@ SIZE_TINY = "tiny"
 SIZE_SMALL = 'small'
 SIZE_MEDIUM = "medium"
 
+#Glow types
+GREEN_GLOW = "green glow"
+
 #Collider types
 ENTITY_OMNI = "movement omni"
 ENTITY_SECTOR = "movement sector"
