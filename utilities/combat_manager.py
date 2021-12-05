@@ -45,16 +45,18 @@ def attack_monsters_with_ranged_weapon(weapon, damage_modifer):
     launch_projectile(entity_manager.hero.tile_index, player_position, entity_manager.hero.map_position, angle, weapon, PLAYER, damage_modifer)
     sound_player.play_ranged_attack_sound(weapon.NAME)
 
-def attack_player_with_melee_attack(monster, weapon, damage_modifier):
+def attack_player_with_melee_attack(monster, weapon):
     hero = entity_manager.hero
     if monster.facing_direction == util.get_facing_direction(monster.map_position,hero.map_position) and util.elipses_intersect(monster.map_position,hero.map_position,monster.melee_range,hero.size):
         sound_player.play_melee_attack_sound(monster.NAME, HIT)
-        hero.take_damage(weapon.damage + damage_modifier)
+        hero.take_damage(weapon.damage + monster.base_damage)
     else:
         sound_player.play_melee_attack_sound(monster.NAME, MISS)
 
-def attack_player_with_ranged_attack(self, weapon, damage_modifier):
-    pass
+def attack_player_with_ranged_attack(monster, weapon):
+    angle = util.get_total_angle(monster.map_position, entity_manager.hero.map_position)
+    launch_projectile(monster.tile_index, monster.position, monster.map_position, angle, weapon, MONSTER, monster.base_damage)
+    sound_player.play_ranged_attack_sound(weapon.NAME)
 
 def launch_projectile(launching_tile_index, entity_pos, launching_map_pos, angle, weapon, launching_entity_type, damage_modifer):
     projectile_name = PROJECTILE_DICT[weapon.NAME]

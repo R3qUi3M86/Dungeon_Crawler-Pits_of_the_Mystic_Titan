@@ -220,7 +220,7 @@ class Ai():
 
     #Combat decisions
     def monster_can_melee_attack_player(self):
-        if entity_manager.hero.is_living == True:
+        if entity_manager.hero.is_living == True and self.monster.weapons[self.monster.selected_weapon].attack_type is MELEE:
             
             if self.monster.is_preparing_attack or self.monster.is_attacking:
                 return True
@@ -234,6 +234,17 @@ class Ai():
                 if util.elipses_intersect(monster_map_pos,hero_map_pos,melee_range,hero_size):
                         return True
         return False
+
+    def monster_can_range_attack_player(self):
+        if entity_manager.hero.is_living == True and self.monster.weapons[self.monster.selected_weapon].attack_type is RANGED:
+            
+            if self.monster.is_preparing_attack or self.monster.is_attacking:
+                return True
+            
+            else:
+                if util.monster_has_line_of_sight(self.monster.map_position):
+                    return True
+        return False        
 
     #Combat decisions timer
     def increment_attack_decision_timer(self):

@@ -10,6 +10,7 @@ from sounds import sound_player
 
 STATIC_IMAGE_DICT = {SWORD:sword, ETTIN_MACE:sword, EMERALD_CROSSBOW:emerald_crossbow}
 WEAPON_DAMAGE_DICT = {SWORD:2, ETTIN_MACE:1, EMERALD_CROSSBOW:2}
+WEAPON_RANGE_DICT = {EMERALD_CROSSBOW:20}
 WEAPON_CHAINFIRE_DICT = {SWORD:1, ETTIN_MACE:1, EMERALD_CROSSBOW:1}
 WEAPON_CHAINFIRE_COOLDOWN_LIMIT_DICT = {SWORD:0, ETTIN_MACE:0, EMERALD_CROSSBOW:0}
 WEAPON_ATTACK_SPEED_DICT = {SWORD:1, ETTIN_MACE:1, EMERALD_CROSSBOW:3}
@@ -71,6 +72,7 @@ class Item(pygame.sprite.Sprite):
         self.ammo = self.get_ammo()
         self.attack_type = self.get_attack_type()
         self.attack_speed = self.get_attack_speed()
+        self.range = self.get_weapon_range()
         self.is_ready_to_use = True
         self.use_cooldown = 0
         self.use_cooldown_limit = self.get_use_cooldown_limit()
@@ -157,6 +159,10 @@ class Item(pygame.sprite.Sprite):
     def get_weapon_damage(self):
         if self.is_weapon:
             return WEAPON_DAMAGE_DICT[self.NAME]
+
+    def get_weapon_range(self):
+        if self.is_weapon and self.attack_type is RANGED:
+            return WEAPON_RANGE_DICT[self.NAME]
 
     def get_chainfire(self):
         if self.is_weapon:

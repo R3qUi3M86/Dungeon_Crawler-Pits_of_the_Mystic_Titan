@@ -198,7 +198,7 @@ class Monster(pygame.sprite.Sprite):
                 self.monster_ai.reset_obstacle_avoidance_flags()
                 self.monster_ai.end_pathfinding()
 
-            elif self.monster_ai.monster_can_melee_attack_player() and self.weapons[self.selected_weapon].is_ready_to_use:
+            elif self.weapons[self.selected_weapon].is_ready_to_use and (self.monster_ai.monster_can_melee_attack_player() or self.monster_ai.monster_can_range_attack_player()):
                 self.initialize_attack_sequence()
             
             else:
@@ -311,9 +311,9 @@ class Monster(pygame.sprite.Sprite):
             if round(self.character_attack_index[1],2) >= 2.00 and weapon.chainfire > 0:
                 if weapon.chainfire_cooldown >= weapon.chainfire_cooldown_limit:
                     if self.weapons[self.selected_weapon].attack_type is MELEE:
-                        combat_manager.attack_player_with_melee_attack(self, weapon, self.base_damage)
+                        combat_manager.attack_player_with_melee_attack(self, weapon)
                     elif self.weapons[self.selected_weapon].attack_type is RANGED:
-                        combat_manager.attack_player_with_ranged_attack(self, weapon, self.base_damage)
+                        combat_manager.attack_player_with_ranged_attack(self, weapon)
                     weapon.chainfire_cooldown = 0
                     weapon.chainfire -= 1
                 else:
