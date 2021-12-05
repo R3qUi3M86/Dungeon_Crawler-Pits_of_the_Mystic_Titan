@@ -10,23 +10,31 @@ from utilities import monster_ai
 from utilities.constants import *
 from utilities.level_painter import TILE_SIZE
 from images.characters.ettin_images import *
+from images.characters.dark_bishop_images import *
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
 from entities.items.item import Item
 
-MONSTER_IMAGE_DISPLAY_CORRECTION = {ETTIN:12}
-MAX_HEALTH_DICT = {ETTIN:10}
-BASE_DAMAGE_DICT = {ETTIN:2}
-X_MELEE_RANGE_DICT = {ETTIN:50}
-Y_MELEE_RANGE_DICT = {ETTIN:27}
-X_SIZE_DICT = {ETTIN:20}
-Y_SIZE_DICT = {ETTIN:11}
-INTERRUPT_CHANCE_DICT = {ETTIN:50}
-SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE}
-WEAPON_NAMES_DICT = {ETTIN:[ETTIN_MACE]}
-ABILITIES_DICT = {ETTIN:[None]}
-SPEED_DICT = {ETTIN:1.4}
-REFLEX_DICT = {ETTIN:1.2}
+MONSTER_IMAGE_DISPLAY_CORRECTION = {ETTIN:12, DARK_BISHOP:0}
+MONSTER_SHADOW_SIZE = {ETTIN:SIZE_MEDIUM, DARK_BISHOP:SIZE_SMALL}
+MAX_HEALTH_DICT = {ETTIN:10, DARK_BISHOP:10}
+BASE_DAMAGE_DICT = {ETTIN:2, DARK_BISHOP:0}
+X_MELEE_RANGE_DICT = {ETTIN:50, DARK_BISHOP:50}
+Y_MELEE_RANGE_DICT = {ETTIN:27, DARK_BISHOP:27}
+X_SIZE_DICT = {ETTIN:20, DARK_BISHOP:20}
+Y_SIZE_DICT = {ETTIN:11, DARK_BISHOP:11}
+INTERRUPT_CHANCE_DICT = {ETTIN:50, DARK_BISHOP:70}
+SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE, DARK_BISHOP:BISHOP_MAGIC_MISSILE}
+WEAPON_NAMES_DICT = {ETTIN:[ETTIN_MACE], DARK_BISHOP:[BISHOP_MAGIC_MISSILE]}
+ABILITIES_DICT = {ETTIN:[None], DARK_BISHOP:[TELEPORT_BLUR]}
+SPEED_DICT = {ETTIN:1.4, DARK_BISHOP:1.3}
+REFLEX_DICT = {ETTIN:1.2, DARK_BISHOP:1.6}
+
+monster_walk = {ETTIN:ettin_walk, DARK_BISHOP:dark_bishop_walk}
+monster_attack = {ETTIN:ettin_attack, DARK_BISHOP:dark_bishop_attack}
+monster_death = {ETTIN:ettin_death, DARK_BISHOP:dark_bishop_death}
+monster_overkill = {ETTIN:ettin_overkill, DARK_BISHOP:dark_bishop_overkill}
+monster_pain = {ETTIN:ettin_pain, DARK_BISHOP:dark_bishop_pain}
 
 class Monster(pygame.sprite.Sprite):
     def __init__(self,tile_index, name, facing_direction=SECTOR_S):
@@ -82,7 +90,7 @@ class Monster(pygame.sprite.Sprite):
         self.entity_collider_omni  = Collider(player_position, self.id, ENTITY_OMNI)
 
         #Shadow
-        self.shadow = Shadow(self.position, self.map_position, self.id, SIZE_MEDIUM, self.tile_index)
+        self.shadow = Shadow(self.position, self.map_position, self.id, MONSTER_SHADOW_SIZE[name], self.tile_index)
         
         #Sprite lists
         self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se]
@@ -134,6 +142,8 @@ class Monster(pygame.sprite.Sprite):
         self.facing_direction = facing_direction
         self.speed = SPEED_DICT[name]
         self.speed_vector = 0,0
+        self.noise_timer = 0
+        self.noise_timer_limit = 3
 
     #Update functions
     def update(self):
@@ -162,8 +172,11 @@ class Monster(pygame.sprite.Sprite):
 
             elif not self.is_corpse:
                 self.is_corpse = True
-                entity_manager.fix_all_dead_objects_to_pixel_accuracy()
-                entity_manager.fix_player_position_to_pixel_accuracy()
+                if self.NAME is DARK_BISHOP and self.is_overkilled:
+                    entity_manager.remove_monster_from_the_game(self)
+                else:
+                    entity_manager.fix_all_dead_objects_to_pixel_accuracy()
+                    entity_manager.fix_player_position_to_pixel_accuracy()
             
             self.update_animation()
             self.rect = self.image.get_rect(midbottom = (self.image_position))
@@ -203,6 +216,7 @@ class Monster(pygame.sprite.Sprite):
             
             else:
                 self.start_walking()
+                self.increment_make_noise_timer()
         
         elif not self.is_dead:
             self.speed_vector = 0,0
@@ -276,6 +290,9 @@ class Monster(pygame.sprite.Sprite):
         self.image = self.character_pain[self.character_pain_index]
 
     def character_death_animation(self):
+        if self.NAME is DARK_BISHOP and self.character_death_index == 0:
+            entity_manager.remove_entity_shadow_from_the_game(self)
+
         self.character_death_index += 0.1
         if int(self.character_death_index) == len(self.character_death)-1:
             self.character_death_index = len(self.character_death)-1
@@ -299,13 +316,15 @@ class Monster(pygame.sprite.Sprite):
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_attack_animation(self):
+        if self.character_attack_index[1] == 0:
+            sound_player.play_monster_atk_prep_sound(self.NAME)
+        
         weapon = self.weapons[self.selected_weapon]
         self.character_attack_index[1] += 0.1*weapon.attack_speed
 
         if int(self.character_attack_index[1]) == 3:
             self.interrupt_attack()
-            self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
-            self.weapons[self.selected_weapon].is_ready_to_use = False        
+            self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]     
         else:
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]    
             if round(self.character_attack_index[1],2) >= 2.00 and weapon.chainfire > 0:
@@ -394,18 +413,20 @@ class Monster(pygame.sprite.Sprite):
         if self.health > 0:
             self.is_in_pain = True
             if random.choice(range(4)) == 0:
-                sound_player.ettin_pain_sound.play()
+                sound_player.play_monster_pain_sound(self.NAME)
         else:
-            sound_player.ettin_pain_sound.stop()
+            sound_player.stop_monster_pain_sound(self.NAME)
             if not self.is_dying:
-                sound_player.ettin_death_sound.play()
+                sound_player.play_monster_death_sound(self.NAME)
                 self.is_living = False
                 self.is_in_pain = False
                 self.is_dying = True
             
             if -(self.maxhealth//2) >= self.health:
-                sound_player.ettin_death_sound.stop()
-                sound_player.ettin_overkill_sound.play()
+                sound_player.stop_monster_death_sound(self.NAME)
+                if not self.is_overkilled:
+                    sound_player.play_monster_overkill_sound(self.NAME)
+                
                 self.is_living = False
                 self.is_in_pain = False
                 self.is_dying = False
@@ -414,6 +435,7 @@ class Monster(pygame.sprite.Sprite):
     def interrupt_attack(self):
         self.is_attacking = False
         self.character_attack_index[1] = 0
+        self.weapons[self.selected_weapon].is_ready_to_use = False   
 
     def attack_interupted(self):
         if random.choice(range(1,101)) <= self.attack_interruption_chance:
@@ -438,6 +460,12 @@ class Monster(pygame.sprite.Sprite):
                     self.monster_ai.direction_change_decision_timer_limit = 60
                     self.monster_ai.is_waking_up = True
 
+    def increment_all_weapons_cooldown(self):
+        for weapon_name in self.weapons:
+            weapon = self.weapons[weapon_name]
+            if weapon and not weapon.is_ready_to_use:
+                weapon.increment_item_cooldown_timer()
+
     #Misc
     def activate(self):
         self.active = True
@@ -452,11 +480,16 @@ class Monster(pygame.sprite.Sprite):
             self.monster_ai.end_pathfinding()
             self.monster_ai.reset_obstacle_avoidance_flags()
 
-    def increment_all_weapons_cooldown(self):
-        for weapon_name in self.weapons:
-            weapon = self.weapons[weapon_name]
-            if weapon and not weapon.is_ready_to_use:
-                weapon.increment_item_cooldown_timer()
+    def increment_make_noise_timer(self):
+        if self.noise_timer == 0:
+            self.noise_timer_limit += random.choice(range(6))
+        self.noise_timer += 0.0167
+
+        if int(self.noise_timer) == self.noise_timer_limit:
+            self.noise_timer_limit = 5
+            self.noise_timer = 0
+            sound_player.play_monster_noise_sound(self.NAME)
+
 
     #Conditions
     def leaving_far_proximity_matrix_margin(self):

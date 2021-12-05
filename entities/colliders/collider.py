@@ -48,6 +48,6 @@ class Collider(pygame.sprite.Sprite):
         elif self.type == WALL_HIDER:
             return wall_hider_coolider
 
-        elif self.type == CROSSBOW_BOLT:
-            return bolt_collider
+        elif self.type == PROJECTILE:
+            return projectile_collider
 

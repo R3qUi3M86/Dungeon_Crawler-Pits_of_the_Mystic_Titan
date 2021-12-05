@@ -1039,9 +1039,17 @@ def move_entity_in_all_matrices(entity_id, entity_type, old_tile_index, new_tile
         # far_proximity_entity_and_shadow_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].append(shadow_sprite_group)
         far_proximity_entity_sprite_group_matrix[proximity_matrix_new_index[0]][proximity_matrix_new_index[1]].append(entity_sprite_group)
 
+#Shadow objects
+def remove_entity_shadow_from_the_game(entity):
+    tile_index = entity.tile_index
+
+    shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(entity.id, tile_index, type=SHADOW)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(shadow_sprite_group)
+    far_proximity_shadow_sprite_group_list.remove(shadow_sprite_group)
+
 #Monster entities
 def generate_monsters():
-    generate_monster(ETTIN,(7,3))
+    generate_monster(DARK_BISHOP,(7,3))
     pass
 
 def fill_map_with_monsters(density):
@@ -1061,6 +1069,16 @@ def generate_monster(monster_type, tile_index):
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster))
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster.shadow))
     all_monsters.append(monster)
+
+def remove_monster_from_the_game(monster):
+    tile_index = monster.tile_index
+
+    monster_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(monster.id, tile_index, type=MONSTER)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(monster_sprite_group)
+    far_proximity_entity_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(monster_sprite_group)
+
+    far_proximity_entity_sprites_list.remove(monster)
+    far_proximity_item_sprites_list.remove(monster)
 
 #Item entities
 def generate_items():
@@ -1084,10 +1102,8 @@ def remove_item_from_the_map_and_give_to_player(item):
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(item_sprite_group)
     far_proximity_entity_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(item_sprite_group)
 
-    shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(item.id, tile_index, type=SHADOW)
-    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(shadow_sprite_group)
+    remove_entity_shadow_from_the_game(item)
 
-    far_proximity_shadow_sprite_group_list.remove(shadow_sprite_group)
     far_proximity_entity_sprites_list.remove(item)
     far_proximity_item_sprites_list.remove(item)
 
@@ -1128,12 +1144,6 @@ def remove_projectile_from_from_matrices_and_lists(projectile):
 
     far_proximity_entity_sprites_list.remove(projectile)
     far_proximity_projectile_sprites_list.remove(projectile)
-
-def remove_projectile_shadow_from_matrix_and_list(projectile):
-    tile_index = projectile.tile_index
-    shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(projectile.id, tile_index, type=SHADOW)
-    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(shadow_sprite_group)
-    far_proximity_shadow_sprite_group_list.remove(shadow_sprite_group)
 
 #Misc
 def wake_up_any_sleeping_monsters_in_far_proximity_matrix():

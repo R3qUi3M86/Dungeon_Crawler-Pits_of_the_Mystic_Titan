@@ -11,7 +11,11 @@ from utilities.level_painter import TILE_SIZE
 from utilities import entity_manager
 from sounds import sound_player
 
-PROJECTILE_SPEED_DICT = {CROSSBOW_BOLT:13}
+PROJECTILE_SPEED_DICT = {CROSSBOW_BOLT:13, MAGIC_MISSILE:6}
+PROJECTILE_SIZE_DICT = {CROSSBOW_BOLT:(15, 8), MAGIC_MISSILE:(13, 7)}
+PROJECTILE_STATIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot[0], MAGIC_MISSILE:bishop_magic_missile_shot[0]}
+PROJECTILE_DYNAMIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot, MAGIC_MISSILE:bishop_magic_missile_shot}
+PROJECTILE_DESTRUCT_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_destruct, MAGIC_MISSILE:bishop_magic_missile_destruct}
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, tile_index, position, map_pos, damage, angle, name, launched_by):
@@ -37,15 +41,19 @@ class Projectile(pygame.sprite.Sprite):
         
         ###Animations###
         #Static image assets
-        self.projectile_static_image = self.get_projectile_static_image()
+        self.projectile_static_image = PROJECTILE_STATIC_IMG_DICT[self.NAME]
+
+        #Dynamic image assets
+        self.projectile_dynamic_images = PROJECTILE_DYNAMIC_IMG_DICT[self.NAME]
+        self.projectile_dynamic_index = 0
 
         #Destruction assets
-        self.projectile_destuction_image_list = self.get_projectile_destruction_image_list()
+        self.projectile_destuction_image_list = PROJECTILE_DESTRUCT_IMG_DICT[self.NAME]
         self.projectile_destruction_index = 0
 
         ###Owned sprites###
         #Colliders
-        self.projectile_collider = Collider(self.position, self.id, self.NAME)
+        self.projectile_collider = Collider(self.position, self.id, PROJECTILE)
 
         #Shadow
         self.shadow = Shadow(self.position, self.map_position, self.id, SIZE_TINY, self.tile_index)
@@ -64,7 +72,7 @@ class Projectile(pygame.sprite.Sprite):
         self.angle = angle
         self.damage = damage
         self.speed = PROJECTILE_SPEED_DICT[self.NAME]
-        self.size = self.get_projectile_size()
+        self.size = PROJECTILE_SIZE_DICT[self.NAME]
         self.travel_speed = self.get_travel_speed()
         self.image = self.get_image_and_set_collider_image()
         self.rect = self.image.get_rect(midbottom = (self.image_position))
@@ -79,7 +87,7 @@ class Projectile(pygame.sprite.Sprite):
             self.has_impacted = False
             self.is_disintegrating = True
             self.travel_speed = 0,0
-            entity_manager.remove_projectile_shadow_from_matrix_and_list(self)
+            entity_manager.remove_entity_shadow_from_the_game(self)
             sound_player.play_projectile_impact_sound(self.NAME)
         
         elif self.is_disintegrating:
@@ -104,6 +112,9 @@ class Projectile(pygame.sprite.Sprite):
                     self.direct_proximity_characters = self.get_direct_proximity_characters_list()
                     entity_manager.move_entity_in_all_matrices(self.id, PROJECTILE, self.prevous_tile_index, self.tile_index)
                     self.prevous_tile_index = self.tile_index
+
+                if len(self.projectile_dynamic_images) >= 2:
+                    self.travel_animation()
             
             #Light speed projectile
             else:
@@ -141,14 +152,6 @@ class Projectile(pygame.sprite.Sprite):
             auxilary_sprite.update_position(self.position)
 
     #Getters
-    def get_projectile_static_image(self):
-        if self.NAME is CROSSBOW_BOLT:
-            return emerald_crossbow_bolt
-
-    def get_projectile_destruction_image_list(self):
-        if self.NAME is CROSSBOW_BOLT:
-            return emerald_crossbow_bolt_destruct
-
     def get_image_and_set_collider_image(self):
         total_travel_speed = math.sqrt((self.travel_speed[0]*self.travel_speed[0])+(self.travel_speed[1]*self.travel_speed[1]))
         scaling_factor = total_travel_speed/self.speed
@@ -168,10 +171,6 @@ class Projectile(pygame.sprite.Sprite):
         self.projectile_collider.image = pygame.transform.rotate(self.projectile_collider.image, self.angle)
         self.projectile_collider.mask = pygame.mask.from_surface(self.projectile_collider.image)
         self.projectile_collider.rect = self.projectile_collider.image.get_rect(center = (self.position))
-
-    def get_projectile_size(self):
-        if self.NAME is CROSSBOW_BOLT:
-            return 15, 8
 
     def get_travel_speed(self):
         x_factor = math.cos(math.radians(self.angle))
@@ -196,8 +195,16 @@ class Projectile(pygame.sprite.Sprite):
             return [entity_manager.hero]
     
     #Animations
+    def travel_animation(self):
+        if int(self.projectile_dynamic_index) == len(self.projectile_dynamic_images):
+            self.projectile_dynamic_index = 0
+        else:
+            self.image = self.projectile_dynamic_images[int(self.projectile_dynamic_index)]
+            self.projectile_dynamic_index += 0.075
+        #self.rect = self.image.get_rect(midbottom = (self.image_position))
+
     def disintegration_animation(self):
-        if int(self.projectile_destruction_index) == 4:
+        if int(self.projectile_destruction_index) == len(self.projectile_destuction_image_list):
             self.is_destroyed = True
         else:
             self.image = self.projectile_destuction_image_list[int(self.projectile_destruction_index)]

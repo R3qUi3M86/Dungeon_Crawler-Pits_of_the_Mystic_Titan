@@ -54,6 +54,7 @@ def attack_player_with_melee_attack(monster, weapon):
         sound_player.play_melee_attack_sound(monster.NAME, MISS)
 
 def attack_player_with_ranged_attack(monster, weapon):
+    monster.facing_direction = util.get_facing_direction(monster.map_position, entity_manager.hero.map_position)
     angle = util.get_total_angle(monster.map_position, entity_manager.hero.map_position)
     launch_projectile(monster.tile_index, monster.position, monster.map_position, angle, weapon, MONSTER, monster.base_damage)
     sound_player.play_ranged_attack_sound(weapon.NAME)

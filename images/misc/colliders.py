@@ -12,7 +12,7 @@ entity_collider_sector_sw = pygame.image.load("images/misc/colliders/entity_coll
 entity_collider_sector_se = pygame.image.load("images/misc/colliders/entity_collider_small_se.png").convert_alpha()
 
 ###Projectiles
-bolt_collider = pygame.image.load("images/misc/colliders/bolt_collider.png").convert_alpha()
+projectile_collider = pygame.image.load("images/misc/colliders/projectile_collider.png").convert_alpha()
 
 ###Misc
 wall_hider_coolider = pygame.image.load("images/misc/colliders/wall_hider_coolider.png").convert_alpha()
