@@ -277,16 +277,16 @@ class Monster(pygame.sprite.Sprite):
 
     def character_death_animation(self):
         self.character_death_index += 0.1
-        if int(self.character_death_index) == 7:
-            self.character_death_index = 6
+        if int(self.character_death_index) == len(self.character_death)-1:
+            self.character_death_index = len(self.character_death)-1
             self.is_dying = False
             self.is_dead = True
         self.image = self.character_death[int(self.character_death_index)]
 
     def character_overkill_animation(self):
         self.character_overkill_index += 0.1
-        if int(self.character_overkill_index) == 10:
-            self.character_overkill_index = 9
+        if int(self.character_overkill_index) == len(self.character_overkill)-1:
+            self.character_overkill_index = len(self.character_overkill)-1
             self.is_overkilled = False
             self.is_dead = True
         self.image = self.character_overkill[int(self.character_overkill_index)]       
@@ -294,7 +294,7 @@ class Monster(pygame.sprite.Sprite):
     def character_walk_forward_animation(self):
         if self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
             self.character_walk_index[1] += 0.1
-            if int(self.character_walk_index[1]) == 4:
+            if int(self.character_walk_index[1]) == len(self.character_walk[0]):
                 self.character_walk_index[1] = 0
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
@@ -397,10 +397,11 @@ class Monster(pygame.sprite.Sprite):
                 sound_player.ettin_pain_sound.play()
         else:
             sound_player.ettin_pain_sound.stop()
-            sound_player.ettin_death_sound.play()
-            self.is_living = False
-            self.is_in_pain = False
-            self.is_dying = True
+            if not self.is_dying:
+                sound_player.ettin_death_sound.play()
+                self.is_living = False
+                self.is_in_pain = False
+                self.is_dying = True
             
             if -(self.maxhealth//2) >= self.health:
                 sound_player.ettin_death_sound.stop()
