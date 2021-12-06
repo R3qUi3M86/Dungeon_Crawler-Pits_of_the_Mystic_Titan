@@ -50,9 +50,9 @@ class Ability():
         
         distance_to_player = util.get_absolute_distance(self.monster.map_position, entity_manager.hero.map_position)
         angle_to_player = util.get_total_angle(self.monster.map_position, entity_manager.hero.map_position)
-        if distance_to_player >= 48: 
+        if 300 >= distance_to_player >= 48: 
             random_angle = random.choice(range(90,271)) + angle_to_player
-        else:
+        elif 300 < distance_to_player or distance_to_player < 48:
             random_angle = random.choice(range(-45,46)) + angle_to_player
         
         movement_speed = 7
