@@ -152,9 +152,8 @@ class Monster(pygame.sprite.Sprite):
         if not self.leaving_far_proximity_matrix_margin():
             self.activate()
             
-            if self.is_living:
-                self.increment_all_weapons_cooldown()
-                self.update_abilities()
+            self.increment_all_weapons_cooldown()
+            self.update_abilities()
 
             if not self.is_dead:
                 self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
@@ -183,7 +182,8 @@ class Monster(pygame.sprite.Sprite):
                     entity_manager.fix_all_dead_objects_to_pixel_accuracy()
                     entity_manager.fix_player_position_to_pixel_accuracy()
             
-            self.update_animation()
+            if not self.monster_ai.is_using_ability:
+                self.update_animation()
             self.rect = self.image.get_rect(midbottom = (self.image_position))
 
         else:
@@ -322,6 +322,9 @@ class Monster(pygame.sprite.Sprite):
         self.image = self.character_death[int(self.character_death_index)]
 
     def character_overkill_animation(self):
+        if self.NAME is DARK_BISHOP and self.character_overkill_index == 0:
+            entity_manager.remove_entity_shadow_from_the_game(self)
+        
         self.character_overkill_index += 0.1
         if int(self.character_overkill_index) == len(self.character_overkill)-1:
             self.character_overkill_index = len(self.character_overkill)-1

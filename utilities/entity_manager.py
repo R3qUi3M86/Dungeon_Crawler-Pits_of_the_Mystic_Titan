@@ -1019,10 +1019,12 @@ def move_entity_in_all_matrices(entity_id, entity_type, old_tile_index, new_tile
     shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(entity_id, old_tile_index, SHADOW)
 
     all_entity_and_shadow_sprite_group_matrix[old_tile_index[0]][old_tile_index[1]].remove(entity_sprite_group)
-    all_entity_and_shadow_sprite_group_matrix[old_tile_index[0]][old_tile_index[1]].remove(shadow_sprite_group)
+    if shadow_sprite_group:
+        all_entity_and_shadow_sprite_group_matrix[old_tile_index[0]][old_tile_index[1]].remove(shadow_sprite_group)
     
     all_entity_and_shadow_sprite_group_matrix[new_tile_index[0]][new_tile_index[1]].append(entity_sprite_group)
-    all_entity_and_shadow_sprite_group_matrix[new_tile_index[0]][new_tile_index[1]].append(shadow_sprite_group)
+    if shadow_sprite_group:
+        all_entity_and_shadow_sprite_group_matrix[new_tile_index[0]][new_tile_index[1]].append(shadow_sprite_group)
 
 
     if entity_is_in_far_proximity_matrix(new_tile_index):
@@ -1044,8 +1046,9 @@ def remove_entity_shadow_from_the_game(entity):
     tile_index = entity.tile_index
 
     shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(entity.id, tile_index, type=SHADOW)
-    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(shadow_sprite_group)
-    far_proximity_shadow_sprite_group_list.remove(shadow_sprite_group)
+    if shadow_sprite_group:
+        all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(shadow_sprite_group)
+        far_proximity_shadow_sprite_group_list.remove(shadow_sprite_group)
 
 #Monster entities
 def generate_monsters():
