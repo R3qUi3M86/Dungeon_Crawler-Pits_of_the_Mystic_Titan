@@ -127,6 +127,8 @@ FLOOR_LIKE = [FLOOR, FLOOR_PIT, SIMPLE_CRACK, CORNER_CRACK]
 ##### Abilities #####
 #####################
 ###Ability names###
+ABILITY = "ability"
+
 FLYING = "Flying"
 TELEPORT_BLUR = "Teleport Blur"
 

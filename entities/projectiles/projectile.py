@@ -75,7 +75,7 @@ class Projectile(pygame.sprite.Sprite):
         self.damage = damage
         self.speed = PROJECTILE_SPEED_DICT[self.NAME]
         self.size = PROJECTILE_SIZE_DICT[self.NAME]
-        self.travel_speed = self.get_travel_speed()
+        self.travel_speed = util.get_travel_speed(self.angle, self.speed)
         self.image = self.get_image_and_set_collider_image()
         self.rect = self.image.get_rect(midbottom = (self.image_position))
         self.effects = []
@@ -173,22 +173,6 @@ class Projectile(pygame.sprite.Sprite):
         self.projectile_collider.image = pygame.transform.rotate(self.projectile_collider.image, self.angle)
         self.projectile_collider.mask = pygame.mask.from_surface(self.projectile_collider.image)
         self.projectile_collider.rect = self.projectile_collider.image.get_rect(center = (self.position))
-
-    def get_travel_speed(self):
-        x_factor = math.cos(math.radians(self.angle))
-        y_factor = 0.55*math.sin(math.radians(self.angle))
-
-        x_factored_speed = x_factor*self.speed
-        y_factored_speed = y_factor*self.speed
-
-        total_factored_speed = math.sqrt((x_factored_speed*x_factored_speed) + (y_factored_speed*y_factored_speed))
-
-        x_factor_travel = math.cos(math.radians(self.angle))
-        y_factor_travel = math.sin(math.radians(self.angle))
-
-        travel_speed = x_factor_travel*total_factored_speed, -y_factor_travel*total_factored_speed
-
-        return travel_speed
 
     def get_direct_proximity_characters_list(self):
         if self.launched_by is PLAYER:

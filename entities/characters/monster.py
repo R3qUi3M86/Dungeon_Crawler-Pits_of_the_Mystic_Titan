@@ -11,6 +11,7 @@ from utilities.constants import *
 from utilities.level_painter import TILE_SIZE
 from images.characters.ettin_images import *
 from images.characters.dark_bishop_images import *
+from entities.characters.ability import Ability
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
 from entities.items.item import Item
@@ -26,7 +27,7 @@ Y_SIZE_DICT = {ETTIN:11, DARK_BISHOP:11}
 INTERRUPT_CHANCE_DICT = {ETTIN:50, DARK_BISHOP:70}
 SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE, DARK_BISHOP:BISHOP_MAGIC_MISSILE}
 WEAPON_NAMES_DICT = {ETTIN:[ETTIN_MACE], DARK_BISHOP:[BISHOP_MAGIC_MISSILE]}
-ABILITIES_DICT = {ETTIN:[None], DARK_BISHOP:[TELEPORT_BLUR]}
+ABILITIES_DICT = {ETTIN:[None], DARK_BISHOP:[FLYING, TELEPORT_BLUR]}
 SPEED_DICT = {ETTIN:1.4, DARK_BISHOP:1.3}
 REFLEX_DICT = {ETTIN:1.2, DARK_BISHOP:1.6}
 
@@ -99,7 +100,7 @@ class Monster(pygame.sprite.Sprite):
         ###Initial sprite definition###
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
         self.rect = self.image.get_rect(midbottom = (self.image_position))
-        self.monster_ai = monster_ai.Ai(self, level_painter.pathfinding_matrix, tile_index)
+        self.monster_ai = self.get_monster_ai()
 
         #####General variables#####
         ###Status flags###
@@ -113,6 +114,7 @@ class Monster(pygame.sprite.Sprite):
         self.is_corpse = False
         self.has_los = False
         self.can_collide = False
+        self.can_collide_with_player = True
         self.active = False
         
         ###Character properties###
@@ -135,7 +137,7 @@ class Monster(pygame.sprite.Sprite):
         self.selected_weapon = SELECTED_WEAPON_DICT[name]
 
         #Abilities and weapons list
-        self.abilities = self.get_abilities_list()
+        self.abilities = self.get_abilities_dict()
         self.weapons = self.get_weapons_dict()
 
         #Movement
@@ -150,6 +152,7 @@ class Monster(pygame.sprite.Sprite):
         if not self.leaving_far_proximity_matrix_margin():
             self.activate()
             self.increment_all_weapons_cooldown()
+            self.update_abilities()
 
             if not self.is_dead:
                 self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
@@ -211,10 +214,11 @@ class Monster(pygame.sprite.Sprite):
                 self.monster_ai.reset_obstacle_avoidance_flags()
                 self.monster_ai.end_pathfinding()
 
-            elif self.weapons[self.selected_weapon].is_ready_to_use and (self.monster_ai.monster_can_melee_attack_player() or self.monster_ai.monster_can_range_attack_player()):
+            elif self.weapons[self.selected_weapon].is_ready_to_use and not self.monster_ai.is_using_ability and (self.monster_ai.monster_can_melee_attack_player() or self.monster_ai.monster_can_range_attack_player()):
                 self.initialize_attack_sequence()
             
             else:
+                self.monster_ai.use_ability_if_able()
                 self.start_walking()
                 self.increment_make_noise_timer()
         
@@ -253,7 +257,22 @@ class Monster(pygame.sprite.Sprite):
                 auxilary_sprite.tile_index = self.tile_index
                 auxilary_sprite.update_position(self.position)
     
+    def update_abilities(self):
+        for ability in self.abilities:
+            if self.abilities[ability] and self.abilities[ability].is_usable:
+                self.abilities[ability].update()
+
     #Getters
+    def get_monster_ai(self):
+        pathfinding_matrix = None
+        
+        if FLYING in ABILITIES_DICT[self.NAME]:
+            pathfinding_matrix = level_painter.pathfinding_flying_matrix
+        else:
+            pathfinding_matrix = level_painter.pathfinding_matrix
+        
+        return monster_ai.Ai(self, pathfinding_matrix, self.tile_index)
+
     def get_item_by_name(self, item_name):
         for item in self.items:
             if item.NAME is item_name:
@@ -270,16 +289,16 @@ class Monster(pygame.sprite.Sprite):
 
         return weapons_dict
 
-    def get_abilities_list(self):
+    def get_abilities_dict(self):
         ability_names_list = ABILITIES_DICT[self.NAME]
-        abilities_list = []
+        abilities_dict = {}
 
         for ability_name in ability_names_list:
             if ability_name:
-                ability = 1
-                abilities_list.append(ability)
+                ability = Ability(self, ability_name)
+                abilities_dict[ability_name] = ability
 
-        return abilities_list
+        return abilities_dict
 
     #Animations
     def character_pain_animation(self):
@@ -349,13 +368,14 @@ class Monster(pygame.sprite.Sprite):
 
     #Walking functions
     def start_walking(self):
-        if not self.monster_ai.is_following_path and not self.monster_ai.is_path_finding:
-            self.monster_ai.increment_direction_change_decision_timer()
-            self.monster_ai.increment_pathfinding_prepare_timer()
-            self.set_speed_vector()
-        
-        else:
-            self.use_pathfinding_logic()
+        if not self.monster_ai.is_using_ability:
+            if not self.monster_ai.is_following_path and not self.monster_ai.is_path_finding:
+                self.monster_ai.increment_direction_change_decision_timer()
+                self.monster_ai.increment_pathfinding_prepare_timer()
+                self.set_speed_vector()
+            
+            else:
+                self.use_pathfinding_logic()
 
     def use_pathfinding_logic(self):
         if self.monster_ai.is_path_finding and not self.monster_ai.is_following_path:

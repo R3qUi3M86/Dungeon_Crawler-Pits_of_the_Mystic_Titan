@@ -91,7 +91,7 @@ class Hero(pygame.sprite.Sprite):
 
         ###Character properties###
         #General
-        self.maxhealth = 20
+        self.maxhealth = 2000
         self.health = self.maxhealth
 
         #Combat
@@ -294,13 +294,15 @@ class Hero(pygame.sprite.Sprite):
 
         else:
             sound_player.player_pain_sound.stop()
-            sound_player.player_death_sound.play()
+            if not self.is_dying:
+                sound_player.player_death_sound.play()
             self.is_living = False
             self.is_dying = True
 
             if -(self.maxhealth//2) >= self.health:
                 sound_player.player_death_sound.stop()
-                random.choice(sound_player.player_overkill_sounds).play()
+                if not self.is_overkilled:
+                    random.choice(sound_player.player_overkill_sounds).play()
                 self.is_living = False
                 self.is_dying = False
                 self.is_overkilled = True

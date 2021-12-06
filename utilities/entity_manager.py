@@ -1049,7 +1049,12 @@ def remove_entity_shadow_from_the_game(entity):
 
 #Monster entities
 def generate_monsters():
-    generate_monster(DARK_BISHOP,(7,3))
+    generate_monster(DARK_BISHOP,(14,22))
+    generate_monster(DARK_BISHOP,(14,23))
+    generate_monster(DARK_BISHOP,(14,24))
+    generate_monster(DARK_BISHOP,(13,22))
+    generate_monster(DARK_BISHOP,(13,23))
+    generate_monster(DARK_BISHOP,(13,24))
     pass
 
 def fill_map_with_monsters(density):

@@ -48,6 +48,8 @@ MONSTER_DEATH_SOUND = {ETTIN:ettin_death_sound, DARK_BISHOP:bishop_death_sound}
 MONSTER_OVERKILL_SOUND = {ETTIN:ettin_overkill_sound, DARK_BISHOP:bishop_overkill_sound}
 MONSTER_ATKPREP_SOUNDS = {ETTIN:None, DARK_BISHOP:bishop_atkprep_sound}
 
+ABILITIES_SOUNDS = {TELEPORT_BLUR:bishop_tele_blur_sound}
+
 RANGED_WEAPON_SOUNDS_DICT = {EMERALD_CROSSBOW:crossbow_attack_sound, BISHOP_MAGIC_MISSILE:bishop_magic_missile_attack_sound}
 PROJECTILE_HIT_SOUNDS_DICT = {CROSSBOW_BOLT:crossbow_bolt_hit_sound, MAGIC_MISSILE:bishop_magic_missile_hit_sound}
 
@@ -60,18 +62,6 @@ def play_item_picked_sound(self):
 def set_volume_for_all_sounds(volume):
     for sound in all_sounds:
         sound.set_volume(volume)
-
-def play_melee_attack_sound(attacking_entity_name, hit):
-    if hit:
-        if attacking_entity_name == PLAYER:
-            hero_melee_hit_sound.play()
-        elif attacking_entity_name == ETTIN:
-            monster_melee_hit_sound.play()
-    else:
-        if attacking_entity_name == PLAYER:
-            hero_melee_miss_sound.play()
-        elif attacking_entity_name == ETTIN:
-            monster_melee_miss_sound.play()
 
 def play_monster_pain_sound(monster_name):
     MONSTER_PAIN_SOUND[monster_name].play()
@@ -88,15 +78,30 @@ def stop_monster_death_sound(monster_name):
 def play_monster_overkill_sound(monster_name):
     MONSTER_OVERKILL_SOUND[monster_name].play()
 
-def play_ranged_attack_sound(weapon_name):
-    RANGED_WEAPON_SOUNDS_DICT[weapon_name].play()
-
-def play_projectile_impact_sound(projectile_name):
-    PROJECTILE_HIT_SOUNDS_DICT[projectile_name].play()
-
 def play_monster_noise_sound(monster_name):
     random.choice(MONSTER_NOISE_SOUNDS[monster_name]).play()
 
 def play_monster_atk_prep_sound(monster_name):
     if MONSTER_ATKPREP_SOUNDS[monster_name]:
         MONSTER_ATKPREP_SOUNDS[monster_name].play()
+
+def play_melee_attack_sound(attacking_entity_name, hit):
+    if hit:
+        if attacking_entity_name == PLAYER:
+            hero_melee_hit_sound.play()
+        elif attacking_entity_name == ETTIN:
+            monster_melee_hit_sound.play()
+    else:
+        if attacking_entity_name == PLAYER:
+            hero_melee_miss_sound.play()
+        elif attacking_entity_name == ETTIN:
+            monster_melee_miss_sound.play()
+
+def play_ranged_attack_sound(weapon_name):
+    RANGED_WEAPON_SOUNDS_DICT[weapon_name].play()
+
+def play_projectile_impact_sound(projectile_name):
+    PROJECTILE_HIT_SOUNDS_DICT[projectile_name].play()
+
+def play_ability_use_sound(ability_name):
+    ABILITIES_SOUNDS[ability_name].play()

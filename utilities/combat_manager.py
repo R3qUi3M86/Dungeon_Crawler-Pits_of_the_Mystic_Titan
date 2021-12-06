@@ -44,6 +44,7 @@ def attack_monsters_with_ranged_weapon(weapon, damage_modifer):
     angle = util.get_total_angle(player_position, cursor_location)
     launch_projectile(entity_manager.hero.tile_index, player_position, entity_manager.hero.map_position, angle, weapon, PLAYER, damage_modifer)
     sound_player.play_ranged_attack_sound(weapon.NAME)
+    entity_manager.wake_up_any_sleeping_monsters_in_far_proximity_matrix()
 
 def attack_player_with_melee_attack(monster, weapon):
     hero = entity_manager.hero

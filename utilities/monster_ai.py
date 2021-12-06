@@ -38,6 +38,7 @@ class Ai():
         self.is_avoiding_obstacle = False
         self.is_doing_diagonal_avoidance = False
         self.is_on_final_approach = False
+        self.is_using_ability = False
         self.path_finding_is_ready = True
         self.obstacle_sector = None
         self.avoidance_direction_sector = None
@@ -244,7 +245,17 @@ class Ai():
             else:
                 if util.monster_has_line_of_sight(self.monster.map_position):
                     return True
-        return False        
+        return False
+
+    def use_ability_if_able(self):
+        abilities = self.monster.abilities
+
+        if not self.is_using_ability:
+            for ability in abilities:
+                if abilities[ability] and abilities[ability].is_usable and abilities[ability].is_ready_to_use:
+                    self.is_using_ability = True
+                    abilities[ability].is_being_used = True
+                    break
 
     #Combat decisions timer
     def increment_attack_decision_timer(self):

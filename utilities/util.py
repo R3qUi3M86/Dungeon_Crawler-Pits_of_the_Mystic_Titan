@@ -82,6 +82,22 @@ def get_facing_direction(current_entity_pos,other_entity_pos):
     elif angle >= 305 and angle < 346.5:
         return SECTOR_SE
 
+def get_travel_speed(angle, speed):
+    x_factor = math.cos(math.radians(angle))
+    y_factor = 0.55*math.sin(math.radians(angle))
+
+    x_factored_speed = x_factor*speed
+    y_factored_speed = y_factor*speed
+
+    total_factored_speed = math.sqrt((x_factored_speed*x_factored_speed) + (y_factored_speed*y_factored_speed))
+
+    x_factor_travel = math.cos(math.radians(angle))
+    y_factor_travel = math.sin(math.radians(angle))
+
+    travel_speed = x_factor_travel*total_factored_speed, -y_factor_travel*total_factored_speed
+
+    return travel_speed
+
 def generate_entity_id():
     if len(entity_manager.entities_id) == 0:
         entity_manager.entities_id.append(0)
@@ -112,6 +128,14 @@ def get_vicinity_matrix_indices_for_index(index_x_y, size=(3,3)):
         vicinity_matrix.append(deepcopy(vicinity_matrix_row))
 
     return vicinity_matrix
+
+def get_absolute_distance(entity1_map_pos, entity2_map_pos):
+    x_abs_distance = abs(entity1_map_pos[0] - entity2_map_pos[0])
+    y_abs_distance = abs(entity1_map_pos[1] - entity2_map_pos[1])
+
+    distance = math.sqrt((x_abs_distance*x_abs_distance)+(y_abs_distance*y_abs_distance))
+
+    return distance
 
 def elipses_intersect(entity1_map_pos,entity2_map_pos,entity1_a_b,entity2_a_b):
     x_abs_distance = abs(entity1_map_pos[0] - entity2_map_pos[0])

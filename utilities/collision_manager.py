@@ -36,7 +36,7 @@ def player_vs_monster_movement_collision():
     hero = entity_manager.hero
     
     for monster in entity_manager.hero.direct_proximity_monsters:
-        if not monster.is_corpse and not monster.is_overkilled and util.elipses_intersect(hero.map_position, monster.map_position, hero.size, monster.size):
+        if not monster.is_corpse and not monster.is_overkilled and monster.can_collide_with_player and util.elipses_intersect(hero.map_position, monster.map_position, hero.size, monster.size):
             collision_matrix = get_collision_matrix(entity_manager.hero, monster)
                        
             if any_sector_collider_collides(collision_matrix):
@@ -48,7 +48,7 @@ def player_vs_monster_movement_collision():
 def character_vs_level_collision(character):
     for level_collision_sprite in character.direct_proximity_collision_tiles:
         
-        if character.can_collide and character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
+        if character.can_collide and not (level_collision_sprite.TYPE is WATER and FLYING in character.abilities) and character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
             collision_matrix = get_collision_matrix(character,level_collision_sprite)
 
             if any_sector_collider_collides(collision_matrix):

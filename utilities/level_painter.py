@@ -12,6 +12,7 @@ from utilities.constants import *
 TILE_SIZE = 48,48
 level_layout = level_01_map
 pathfinding_matrix = []
+pathfinding_flying_matrix = []
 level_surface = None
 level_walls_primary_surface = None
 level_walls_secondary_surface = None
@@ -35,7 +36,8 @@ def paint_level():
     level_walls_secondary_surface = get_level_surface(SECONDARY_OVERLAY)
 
     create_all_level_tiles()
-    generate_pathfinding_matrix()
+    generate_pathfinding_matrix(IMPASSABLE_TILES)
+    generate_pathfinding_matrix(WALL_LIKE)
     level_surface.fill([25, 23, 22])
     
     for row in entity_manager.level_sprites_matrix:
@@ -75,18 +77,22 @@ def create_level_tile(type,tile_index,position,size,vicinity_matrix, wall_mode=H
     new_tile_sprite = Tile(type,tile_index,position,size,vicinity_matrix, wall_mode)
     return new_tile_sprite
 
-def generate_pathfinding_matrix():
+def generate_pathfinding_matrix(impassable_tiles_type):
     global pathfinding_matrix
+    global pathfinding_flying_matrix
     
-    for row_index,level_layout_row in enumerate(level_layout):
+    for level_layout_row in level_layout:
         matrix_row = []
-        for col_index,_ in enumerate(level_layout_row):
-            tile_index = row_index,col_index
-            if get_tile_sprite_by_index(tile_index).passable == False:
+        for cell in level_layout_row:
+            if cell in impassable_tiles_type:
                 matrix_row.append(0)
             else:
                 matrix_row.append(1)
-        pathfinding_matrix.append(matrix_row)
+
+        if impassable_tiles_type == IMPASSABLE_TILES:
+            pathfinding_matrix.append(matrix_row)
+        elif impassable_tiles_type == WALL_LIKE:
+            pathfinding_flying_matrix.append(matrix_row)
 
 #Getters
 def get_tile_position(tile_index):
