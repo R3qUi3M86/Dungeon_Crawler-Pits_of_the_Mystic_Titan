@@ -1,4 +1,5 @@
 import pygame
+from utilities.constants import *
 
 ########################
 ### Weapons and ammo ###
@@ -12,6 +13,8 @@ crossbow_quiver_01 = pygame.image.load("images/items/weapons_and_ammo/emerald_cr
 crossbow_quiver_02 = pygame.image.load("images/items/weapons_and_ammo/emerald_crossbow/crossbow_quiver_02.png").convert_alpha()
 crossbow_quiver_03 = pygame.image.load("images/items/weapons_and_ammo/emerald_crossbow/crossbow_quiver_03.png").convert_alpha()
 crossbow_bolts = pygame.image.load("images/items/weapons_and_ammo/emerald_crossbow/crossbow_bolts.png").convert_alpha()
+
+crossbow_quiver = [crossbow_quiver_01,crossbow_quiver_02,crossbow_quiver_03]
 
 
 ###################
@@ -29,3 +32,5 @@ torch_08 = pygame.image.load("images/items/decor/torch/torch_08.png").convert_al
 torch_light_source = pygame.image.load("images/items/decor/torch/light_source.png").convert_alpha()
 
 wall_torch_images = [torch_01, torch_02, torch_03, torch_04, torch_05, torch_06, torch_07, torch_08]
+
+STATIC_IMAGE_DICT = {SWORD:sword, ETTIN_MACE:sword, BISHOP_MAGIC_MISSILE:sword, EMERALD_CROSSBOW:emerald_crossbow, EMERALD_CROSSBOW_QUIVER:crossbow_quiver_01, EMERALD_CROSSBOW_BOLTS:crossbow_bolts, WALL_TORCH:torch_01}

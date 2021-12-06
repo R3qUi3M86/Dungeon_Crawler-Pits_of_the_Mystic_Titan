@@ -53,12 +53,14 @@ def attack_player_with_melee_attack(monster, weapon):
         hero.take_damage(weapon.damage + monster.base_damage)
     else:
         sound_player.play_melee_attack_sound(monster.NAME, MISS)
+    entity_manager.wake_up_any_sleeping_monsters_in_far_proximity_matrix()
 
 def attack_player_with_ranged_attack(monster, weapon):
     monster.facing_direction = util.get_facing_direction(monster.map_position, entity_manager.hero.map_position)
     angle = util.get_total_angle(monster.map_position, entity_manager.hero.map_position)
     launch_projectile(monster.tile_index, monster.position, monster.map_position, angle, weapon, MONSTER, monster.base_damage)
     sound_player.play_ranged_attack_sound(weapon.NAME)
+    entity_manager.wake_up_any_sleeping_monsters_in_far_proximity_matrix()
 
 def launch_projectile(launching_tile_index, entity_pos, launching_map_pos, angle, weapon, launching_entity_type, damage_modifer):
     projectile_name = PROJECTILE_DICT[weapon.NAME]

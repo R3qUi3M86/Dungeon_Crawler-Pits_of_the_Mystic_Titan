@@ -9,7 +9,6 @@ from utilities import level_painter
 from utilities import entity_manager
 from sounds import sound_player
 
-STATIC_IMAGE_DICT = {SWORD:sword, ETTIN_MACE:sword, BISHOP_MAGIC_MISSILE:sword, EMERALD_CROSSBOW:emerald_crossbow, WALL_TORCH:torch_01}
 WEAPON_DAMAGE_DICT = {SWORD:2, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:1, EMERALD_CROSSBOW:2}
 WEAPON_RANGE_DICT = {EMERALD_CROSSBOW:30, BISHOP_MAGIC_MISSILE:20}
 WEAPON_CHAINFIRE_DICT = {SWORD:1, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:5, EMERALD_CROSSBOW:1}
@@ -120,6 +119,9 @@ class Item(pygame.sprite.Sprite):
         if self.NAME in DECORATIONS:
             if self.NAME is WALL_TORCH:
                 return wall_torch_images
+        elif self.NAME in AMMOTYPES:
+            if self.NAME is EMERALD_CROSSBOW_QUIVER:
+                return crossbow_quiver
 
     def get_is_animated(self):
         if self.NAME is WALL_TORCH:
