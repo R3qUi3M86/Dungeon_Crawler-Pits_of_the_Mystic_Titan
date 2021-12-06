@@ -1,4 +1,5 @@
 import random
+import numpy as np
 from utilities import util
 from utilities import entity_manager
 from utilities.constants import *
@@ -6,8 +7,11 @@ from sounds import sound_player
 
 USABLE_ABILITIES_DICT = {FLYING:False, TELEPORT_BLUR: True}
 
+
 class Ability():
     def __init__(self, owner, name):
+        ABILITIES_COOLDOWN_DICT = {FLYING:0, TELEPORT_BLUR: 4 + random.choice(np.arange(0,1,0.05))}
+
         self.monster = owner
         self.NAME = name
         self.TYPE = ABILITY
@@ -15,7 +19,7 @@ class Ability():
         self.use_speed = 0.5
         self.use_speed_timer = 0
 
-        self.cooldown = 4.5
+        self.cooldown = ABILITIES_COOLDOWN_DICT[self.NAME]
         self.cooldown_timer = 0
 
         self.is_usable = USABLE_ABILITIES_DICT[self.NAME]

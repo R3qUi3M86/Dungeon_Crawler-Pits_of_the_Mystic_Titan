@@ -151,8 +151,10 @@ class Monster(pygame.sprite.Sprite):
     def update(self):
         if not self.leaving_far_proximity_matrix_margin():
             self.activate()
-            self.increment_all_weapons_cooldown()
-            self.update_abilities()
+            
+            if self.is_living:
+                self.increment_all_weapons_cooldown()
+                self.update_abilities()
 
             if not self.is_dead:
                 self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
