@@ -169,7 +169,7 @@ def draw_sprites():
             else:
                 tile.image.set_alpha(255)
             screen.blit(tile.image,tile.position)
-                
+                  
 def draw_ui():
     screen.blit(ui_elements.central_ligtht,(0,0))
     ui_elements.draw_health_bar()

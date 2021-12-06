@@ -1052,6 +1052,7 @@ def remove_entity_shadow_from_the_game(entity):
 
 #Monster entities
 def generate_monsters():
+    generate_monster(ETTIN,(8,5))
     generate_monster(DARK_BISHOP,(14,22))
     generate_monster(DARK_BISHOP,(14,23))
     generate_monster(DARK_BISHOP,(14,24))
@@ -1091,6 +1092,8 @@ def remove_monster_from_the_game(monster):
 #Item entities
 def generate_items():
     generate_item((8,5), EMERALD_CROSSBOW)
+    generate_item((5,2), WALL_TORCH)
+    generate_item((5,6), WALL_TORCH)
 
 def generate_item(tile_index, item_name):
     global all_entity_and_shadow_sprite_group_matrix

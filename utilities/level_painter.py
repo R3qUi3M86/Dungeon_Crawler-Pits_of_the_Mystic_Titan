@@ -1,6 +1,7 @@
 import pygame
 from copy import deepcopy
 
+from images.ui import ui
 import math
 from settings import *
 from entities.level.level import *

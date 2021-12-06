@@ -53,7 +53,7 @@ class Monster(pygame.sprite.Sprite):
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
         self.direct_proximity_monsters = []
-        self.position = level_painter.get_tile_position(tile_index)
+        self.position = level_painter.get_tile_position(tile_index)[0]+24, level_painter.get_tile_position(tile_index)[1]+24
         self.map_position = (tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
         

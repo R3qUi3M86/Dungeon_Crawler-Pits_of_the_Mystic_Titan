@@ -94,7 +94,7 @@ def projectile_vs_entity_collision(projectile_sprite):
 def item_collision(item_sprite):
     hero = entity_manager.hero
 
-    if util.elipses_intersect(hero.map_position, item_sprite.map_position, hero.size, item_sprite.size):
+    if item_sprite.can_collide and util.elipses_intersect(hero.map_position, item_sprite.map_position, hero.size, item_sprite.size):
         if item_sprite.is_pickable:
             item_sprite.is_picked = True
 

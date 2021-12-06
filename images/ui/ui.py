@@ -8,6 +8,7 @@ central_light3 = pygame.image.load("images/ui/light_source3.png").convert_alpha(
 central_light4 = pygame.image.load("images/ui/light_source4.png").convert_alpha()
 central_light5 = pygame.image.load("images/ui/light_source5.png").convert_alpha()
 central_light6 = pygame.image.load("images/ui/light_source6.png").convert_alpha()
+central_light7 = pygame.image.load("images/ui/light_source7.png").convert_alpha()
 
 #Wall hider
 wall_hider_mask = pygame.image.load("images/ui/wall_hider_mask.png").convert_alpha()

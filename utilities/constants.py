@@ -92,6 +92,12 @@ CRYSTAL_VIAL = "crystal vial"
 
 CONSUMABLES = [CRYSTAL_VIAL]
 
+###Decorations###
+WALL_TORCH = "wall torch"
+
+DECORATIONS = [WALL_TORCH]
+LIGHT_SOURCES = [WALL_TORCH]
+
 ##### Projectiles #####
 CROSSBOW_BOLT = "crossbow bolt"
 MAGIC_MISSILE = "magic missile"

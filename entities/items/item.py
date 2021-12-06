@@ -1,4 +1,5 @@
 import pygame
+import random
 from images.items.item_images import *
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
@@ -8,7 +9,7 @@ from utilities import level_painter
 from utilities import entity_manager
 from sounds import sound_player
 
-STATIC_IMAGE_DICT = {SWORD:sword, ETTIN_MACE:sword, BISHOP_MAGIC_MISSILE:sword, EMERALD_CROSSBOW:emerald_crossbow}
+STATIC_IMAGE_DICT = {SWORD:sword, ETTIN_MACE:sword, BISHOP_MAGIC_MISSILE:sword, EMERALD_CROSSBOW:emerald_crossbow, WALL_TORCH:torch_01}
 WEAPON_DAMAGE_DICT = {SWORD:2, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:1, EMERALD_CROSSBOW:2}
 WEAPON_RANGE_DICT = {EMERALD_CROSSBOW:30, BISHOP_MAGIC_MISSILE:20}
 WEAPON_CHAINFIRE_DICT = {SWORD:1, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:5, EMERALD_CROSSBOW:1}
@@ -27,7 +28,7 @@ class Item(pygame.sprite.Sprite):
 
         ###Position variables###
         self.tile_index = tile_index
-        self.position = level_painter.get_tile_position(tile_index)
+        self.position = self.get_position()
         self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
 
@@ -35,8 +36,9 @@ class Item(pygame.sprite.Sprite):
         self.id = util.generate_entity_id()
         
         ###Animations###
-        #Static image assets
         self.item_static_image = STATIC_IMAGE_DICT[name]
+        self.item_animation_images = self.get_item_animation_images()
+        self.animation_index = 0
 
         ###Owned sprites###
         #Colliders
@@ -49,16 +51,19 @@ class Item(pygame.sprite.Sprite):
         self.entity_auxilary_sprites = [self.entity_small_square_collider, self.shadow]
 
         ###Initial sprite definition###
-        self.image = self.get_image()
+        self.image = self.item_static_image
         self.rect = self.image.get_rect(midbottom = (self.image_position))
 
         #####General variables#####
         ###Status flags###
         self.is_picked = False
+        self.is_animated = self.get_is_animated()
+        self.is_decor = self.get_is_decor()
         self.is_weapon = self.get_is_weapon()
         self.is_ammo = self.get_is_ammo()
         self.is_consumable = self.get_is_consumable()
         self.is_pickable = self.get_pickable()
+        self.can_collide = self.get_can_collide()
 
         ###Item properties###
         #General
@@ -83,6 +88,9 @@ class Item(pygame.sprite.Sprite):
         if self.is_picked:
             entity_manager.remove_item_from_the_map_and_give_to_player(self)
             sound_player.play_item_picked_sound(self)
+        
+        if self.is_animated:
+            self.increment_animation_timer()
 
     def update_position(self, vector=None):
         self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
@@ -95,19 +103,38 @@ class Item(pygame.sprite.Sprite):
                 auxilary_sprite.update_position(self.position)
 
     #Getters
+    def get_position(self):
+        if self.NAME is WALL_TORCH:
+            return level_painter.get_tile_position(self.tile_index)[0]+24, level_painter.get_tile_position(self.tile_index)[1]
+        else:
+            return level_painter.get_tile_position(self.tile_index)[0]+24, level_painter.get_tile_position(self.tile_index)[1]+24
+
     def get_pickable(self):
         if self.is_weapon:
             return True
         elif self.is_ammo:
             return True
-        return False
+        return False       
 
-    def get_image(self):
-        if self.NAME in WEAPONS:
-            return self.item_static_image
+    def get_item_animation_images(self):
+        if self.NAME in DECORATIONS:
+            if self.NAME is WALL_TORCH:
+                return wall_torch_images
+
+    def get_is_animated(self):
+        if self.NAME is WALL_TORCH:
+            return True
+        elif self.NAME is EMERALD_CROSSBOW_QUIVER:
+            return True
+        return False
 
     def get_is_weapon(self):
         if self.NAME in WEAPONS:
+            return True
+        return False
+
+    def get_is_decor(self):
+        if self.NAME in DECORATIONS:
             return True
         return False
 
@@ -152,6 +179,13 @@ class Item(pygame.sprite.Sprite):
         if self.is_pickable or self.is_weapon:
             return 15, 8
 
+    def get_can_collide(self):
+        if self.is_pickable:
+            return True
+        elif self.NAME is WALL_TORCH:
+            return False
+        return False
+
     def get_attack_speed(self):
         if self.is_weapon:
             return WEAPON_ATTACK_SPEED_DICT[self.NAME]
@@ -178,6 +212,19 @@ class Item(pygame.sprite.Sprite):
 
         elif self.is_consumable:
             return CONSUMABLE_COOLDOWN_DICT[self.NAME]
+
+    #Timers
+    def increment_animation_timer(self):
+        self.animation_index += 0.1
+        if int(self.animation_index) >= len(self.item_animation_images):
+            self.animation_index = 0
+        
+        if self.NAME is WALL_TORCH:
+            if int(self.animation_index) >= 1:
+                self.animation_index = 0
+                self.image = self.item_animation_images[random.choice(range(len(self.item_animation_images)))]
+        else:
+            self.image = self.item_animation_images[int(self.animation_index)]
 
     def increment_item_cooldown_timer(self):
         if not self.is_ready_to_use:

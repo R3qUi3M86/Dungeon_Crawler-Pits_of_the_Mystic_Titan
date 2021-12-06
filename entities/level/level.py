@@ -47,7 +47,7 @@ level_01_map = [
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 "XXXEEEXXXXX       XX           XXXX",
 "XXXEEEXXXXX       XX     O     XX X",
-"XX    XX          XX           XX X",
+"XX     XX         XX           XX X",
 "X          XX                  XX X",
 "XX  *    XXXX                ``   X",
 "XX       XXXX         XXXX   ``XXXX",
