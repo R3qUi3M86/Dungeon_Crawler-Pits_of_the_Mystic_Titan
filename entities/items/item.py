@@ -15,7 +15,7 @@ WEAPON_CHAINFIRE_DICT = {SWORD:1, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:5, EMERALD_
 WEAPON_CHAINFIRE_COOLDOWN_LIMIT_DICT = {SWORD:0, ETTIN_MACE:0, BISHOP_MAGIC_MISSILE:0.15, EMERALD_CROSSBOW:0}
 WEAPON_ATTACK_SPEED_DICT = {SWORD:1, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:0.8, EMERALD_CROSSBOW:3}
 WEAPON_ATTACK_COOLDOWN_DICT = {SWORD:0, ETTIN_MACE:0, BISHOP_MAGIC_MISSILE:3.5, EMERALD_CROSSBOW:1.2}
-CONSUMABLE_COOLDOWN_DICT = {CRYSTAL_VIAL:5}
+CONSUMABLE_COOLDOWN_DICT = {QUARTZ_FLASK:5}
 
 class Item(pygame.sprite.Sprite):
     def __init__(self, tile_index, name):
@@ -113,20 +113,16 @@ class Item(pygame.sprite.Sprite):
             return True
         elif self.is_ammo:
             return True
+        elif self.is_consumable:
+            return True
         return False       
 
     def get_item_animation_images(self):
-        if self.NAME in DECORATIONS:
-            if self.NAME is WALL_TORCH:
-                return wall_torch_images
-        elif self.NAME in AMMOTYPES:
-            if self.NAME is EMERALD_CROSSBOW_QUIVER:
-                return crossbow_quiver
+        if self.NAME in ANIMATED_ITEMS:
+            return ANIMATED_ITEM_IMAGES[self.NAME]
 
     def get_is_animated(self):
-        if self.NAME is WALL_TORCH:
-            return True
-        elif self.NAME is EMERALD_CROSSBOW_QUIVER:
+        if self.NAME in ANIMATED_ITEMS:
             return True
         return False
 

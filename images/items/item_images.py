@@ -16,6 +16,15 @@ crossbow_bolts = pygame.image.load("images/items/weapons_and_ammo/emerald_crossb
 
 crossbow_quiver = [crossbow_quiver_01,crossbow_quiver_02,crossbow_quiver_03]
 
+###################
+### Consumables ###
+###################
+### Quartz flask
+quartz_flask_01 = pygame.image.load("images/items/consumables/quartz_flask/quartz_flask_01.png").convert_alpha()
+quartz_flask_02 = pygame.image.load("images/items/consumables/quartz_flask/quartz_flask_02.png").convert_alpha()
+quartz_flask_03 = pygame.image.load("images/items/consumables/quartz_flask/quartz_flask_03.png").convert_alpha()
+
+quartz_flask = [quartz_flask_01,quartz_flask_02,quartz_flask_03]
 
 ###################
 ### Decorations ###
@@ -33,4 +42,15 @@ torch_light_source = pygame.image.load("images/items/decor/torch/light_source.pn
 
 wall_torch_images = [torch_01, torch_02, torch_03, torch_04, torch_05, torch_06, torch_07, torch_08]
 
-STATIC_IMAGE_DICT = {SWORD:sword, ETTIN_MACE:sword, BISHOP_MAGIC_MISSILE:sword, EMERALD_CROSSBOW:emerald_crossbow, EMERALD_CROSSBOW_QUIVER:crossbow_quiver_01, EMERALD_CROSSBOW_BOLTS:crossbow_bolts, WALL_TORCH:torch_01}
+                     #Weapons
+STATIC_IMAGE_DICT = {SWORD:sword, EMERALD_CROSSBOW:emerald_crossbow,
+                     ETTIN_MACE:sword, BISHOP_MAGIC_MISSILE:sword, 
+                     #Ammo
+                     EMERALD_CROSSBOW_QUIVER:crossbow_quiver_01, EMERALD_CROSSBOW_BOLTS:crossbow_bolts, 
+                     #Consumables
+                     QUARTZ_FLASK:quartz_flask_01,
+                     #Decor
+                     WALL_TORCH:torch_01}
+
+ANIMATED_ITEMS = [EMERALD_CROSSBOW_QUIVER, QUARTZ_FLASK, WALL_TORCH]
+ANIMATED_ITEM_IMAGES = {WALL_TORCH:wall_torch_images, EMERALD_CROSSBOW_QUIVER:crossbow_quiver, QUARTZ_FLASK:quartz_flask}

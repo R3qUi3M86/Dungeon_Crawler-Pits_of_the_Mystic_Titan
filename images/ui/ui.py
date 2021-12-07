@@ -27,3 +27,14 @@ sword_inv = pygame.image.load("images/ui/ammo_counter/sword.png").convert_alpha(
 crossbow_inv = pygame.image.load("images/ui/ammo_counter/crossbow.png").convert_alpha()
 inventory_weapons = [sword_inv, crossbow_inv]
 infinity_sign = pygame.image.load("images/ui/ammo_counter/infinity.png").convert_alpha()
+
+#Consumables counter
+consumable_counter_overlay = pygame.image.load("images/ui/consumables/consumable_gui.png").convert_alpha()
+consumable_use_01 = pygame.image.load("images/ui/consumables/consumable_use_01.png").convert_alpha()
+consumable_use_02 = pygame.image.load("images/ui/consumables/consumable_use_02.png").convert_alpha()
+consumable_use_03 = pygame.image.load("images/ui/consumables/consumable_use_03.png").convert_alpha()
+consumable_use_04 = pygame.image.load("images/ui/consumables/consumable_use_04.png").convert_alpha()
+health_potion_inv = pygame.image.load("images/ui/consumables/healh_potion.png").convert_alpha()
+consumable_use = [consumable_use_01,consumable_use_02,consumable_use_03,consumable_use_04]
+inventory_consumables = [health_potion_inv]
+

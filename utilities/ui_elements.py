@@ -9,6 +9,7 @@ from utilities.text_printer import *
 pickup_text_display_timer = 0
 pickup_text_display_timer_limit = 210
 
+consumable_use_image_index = 0
 
 PALE_WHITE_COLOR = (180,200,200)
 PALE_ORANGE_COLOR = (210,200,150)
@@ -26,6 +27,14 @@ AMMO_WEAP_IMAGE_POS = AMMO_COUNTER_BOX_POS[0] + AMMO_WEAP_IMAGE_OFFSET[0], AMMO_
 AMMO_NUMBER_OFFSET = 31, 0
 AMMO_NUMBER_POS = AMMO_WEAP_IMAGE_POS[0] + AMMO_NUMBER_OFFSET[0], AMMO_WEAP_IMAGE_POS[1] + AMMO_NUMBER_OFFSET[1]
 AMMO_INF_POS = AMMO_NUMBER_POS[0], AMMO_NUMBER_POS[1]+13
+
+CONSUMABLE_COUNTER_BOX_SIZE = 108, 82
+CONSUMABLE_COUNTER_BOX_POS = 0, screen_height - CONSUMABLE_COUNTER_BOX_SIZE[1]
+CONSUMABLE_IMAGE_SIZE = 35, 35
+CONSUMABLE_IMAGE_OFFSET = 54, 23
+CONSUMABLE_IMAGE_POS = CONSUMABLE_COUNTER_BOX_POS[0] + CONSUMABLE_IMAGE_OFFSET[0], CONSUMABLE_COUNTER_BOX_POS[1] + CONSUMABLE_IMAGE_OFFSET[1]
+CONSUMABLE_NUMBER_OFFSET = -39, -6
+CONSUMABLE_NUMBER_POS = CONSUMABLE_IMAGE_POS[0] + CONSUMABLE_NUMBER_OFFSET[0], CONSUMABLE_IMAGE_POS[1] + CONSUMABLE_NUMBER_OFFSET[1]
 
 PICKUP_TEXT_POS = screen_width//2, HEALTH_BAR_POS[1] - 25
 PICKUP_TEXT = "You have found "
@@ -73,6 +82,33 @@ def draw_weapon_ammo_counter():
     else:
         screen.blit(ui.infinity_sign, AMMO_INF_POS)
 
+def draw_consumable_counter():
+    global consumable_use_image_index
+
+    screen.blit(ui.consumable_counter_overlay, CONSUMABLE_COUNTER_BOX_POS)
+    selected_consumable_image = get_selected_consumable_image()
+    if selected_consumable_image:
+        cooldown = hero.consumables[hero.selected_consumable].use_cooldown
+        cooldown_limit = hero.consumables[hero.selected_consumable].use_cooldown_limit
+        if cooldown == 0:
+            selected_consumable_image.set_alpha(255)
+        else:
+            selected_consumable_image.set_alpha(int(255*cooldown/cooldown_limit))
+
+        consumable_use_image = ui.consumable_use[int(consumable_use_image_index)]
+
+        screen.blit(selected_consumable_image, CONSUMABLE_IMAGE_POS)
+        if cooldown != 0 and cooldown < 0.4:
+            consumable_use_image_index += 0.1667
+            screen.blit(consumable_use_image, CONSUMABLE_IMAGE_POS)
+        else:
+            consumable_use_image_index = 0
+
+        consumable = hero.consumables[hero.selected_consumable]
+        uses = consumable.consumable_quantity
+        consumable_text = format_consumable_text(uses)
+        display_ammo_runic_text(consumable_text, PALE_WHITE_COLOR, CONSUMABLE_NUMBER_POS[0], CONSUMABLE_NUMBER_POS[1])
+
 def display_pickup_text():
     global pickup_text_display_timer
 
@@ -91,10 +127,14 @@ def display_pickup_text():
         pickup_text_display_timer = 0
         del picked_up_item_names[0]
     
-
 def get_selected_weapon_image():
     weapon = hero.selected_weapon
     return ui.inventory_weapons[HERO_WEAPONS.index(weapon)]
+
+def get_selected_consumable_image():
+    consumable = hero.selected_consumable
+    if consumable:
+        return ui.inventory_consumables[CONSUMABLES.index(consumable)]
 
 def format_ammo_text(ammo):
     if ammo != -1:
@@ -106,4 +146,10 @@ def format_ammo_text(ammo):
             return str(ammo)
     else:
         return "INF"
+
+def format_consumable_text(uses):
+    if len(str(uses)) == 1:
+        return " "+str(uses)
+    elif len(str(uses)) == 2:
+        return str(uses)
         

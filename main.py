@@ -111,6 +111,10 @@ def switch_weapon(weapon_index):
         else:
             entity_manager.hero.character_attack_index[1] = 1
 
+def use_consumable():
+    if entity_manager.hero.selected_consumable and entity_manager.hero.consumables[entity_manager.hero.selected_consumable].is_ready_to_use:
+        entity_manager.use_consumable_item()
+
 #Visuals drawing and sorting
 def increment_sprite_sorting_timer():
     global sorting_timer
@@ -174,6 +178,7 @@ def draw_ui():
     screen.blit(ui_elements.central_ligtht,(0,0))
     ui_elements.draw_health_bar()
     ui_elements.draw_weapon_ammo_counter()
+    ui_elements.draw_consumable_counter()
 
     if len(ui_elements.picked_up_item_names) != 0:
         ui_elements.display_pickup_text()
@@ -216,6 +221,8 @@ while True:
                 switch_weapon(0)
             elif event.key == pygame.K_2:
                 switch_weapon(1)
+            elif event.key == pygame.K_SPACE:
+                use_consumable()
 
     #Drawing
     draw_sprites()

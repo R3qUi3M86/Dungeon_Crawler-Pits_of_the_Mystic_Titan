@@ -105,11 +105,12 @@ class Hero(pygame.sprite.Sprite):
         self.size = self.x_size, self.y_size
         self.attack_can_be_interrupted = False
         self.selected_weapon = WEAPONS[0]
+        self.selected_consumable = None
         
         #Abilities and items list
         self.abilities = []
         self.items = []
-        self.consumables = []
+        self.consumables = {}
         self.weapons = {SWORD:None, EMERALD_CROSSBOW:None}
         self.ammo = {SWORD:0, EMERALD_CROSSBOW:30}
         
@@ -313,7 +314,8 @@ class Hero(pygame.sprite.Sprite):
             if weapon and not weapon.is_ready_to_use:
                 weapon.increment_item_cooldown_timer()
 
-        for consumable in self.consumables:
+        for consumable_name in self.consumables:
+            consumable = self.consumables[consumable_name]
             if not consumable.is_ready_to_use:
                 consumable.increment_item_cooldown_timer()
 

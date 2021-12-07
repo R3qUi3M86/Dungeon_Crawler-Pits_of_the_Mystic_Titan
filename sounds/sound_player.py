@@ -9,6 +9,9 @@ pygame.mixer.init()
 
 weapon_pickup = pygame.mixer.Sound('sounds/pickups/SAMPLE11.wav')
 ammo_pickup = pygame.mixer.Sound('sounds/pickups/PICUP5.wav')
+consumable_pickup = pygame.mixer.Sound('sounds/pickups/CONSUM_PICUP.wav')
+consumable_artifact_use = pygame.mixer.Sound('sounds/pickups/ARTIUSE.wav')
+consumable_potion_use = pygame.mixer.Sound('sounds/pickups/ARTACT1.wav')
 
 hero_melee_miss_sound = pygame.mixer.Sound('sounds/attack/PUNCHMIS.wav')
 hero_melee_hit_sound = pygame.mixer.Sound('sounds/attack/hit/ETHIT1.wav')
@@ -40,7 +43,7 @@ bishop_atkprep_sound = pygame.mixer.Sound('sounds/bishop/ATKPREP.wav')
 bishop_tele_blur_sound = pygame.mixer.Sound('sounds/bishop/TELE_BLUR.wav')
 
 player_overkill_sounds = [player_overkill_sound1, player_overkill_sound2, player_overkill_sound3]
-all_sounds = [weapon_pickup, ammo_pickup, hero_melee_miss_sound,hero_melee_hit_sound,monster_melee_miss_sound,monster_melee_hit_sound,crossbow_attack_sound,crossbow_bolt_hit_sound,player_pain_sound,player_death_sound,player_overkill_sound1,player_overkill_sound2,player_overkill_sound3,ettin_noise1_sound,ettin_pain_sound,ettin_death_sound,ettin_overkill_sound, bishop_magic_missile_attack_sound,bishop_magic_missile_hit_sound,bishop_noise1_sound,bishop_noise2_sound,bishop_pain_sound,bishop_death_sound,bishop_overkill_sound,bishop_atkprep_sound,bishop_tele_blur_sound]
+all_sounds = [weapon_pickup, ammo_pickup, consumable_pickup, consumable_artifact_use, consumable_potion_use, hero_melee_miss_sound,hero_melee_hit_sound,monster_melee_miss_sound,monster_melee_hit_sound,crossbow_attack_sound,crossbow_bolt_hit_sound,player_pain_sound,player_death_sound,player_overkill_sound1,player_overkill_sound2,player_overkill_sound3,ettin_noise1_sound,ettin_pain_sound,ettin_death_sound,ettin_overkill_sound, bishop_magic_missile_attack_sound,bishop_magic_missile_hit_sound,bishop_noise1_sound,bishop_noise2_sound,bishop_pain_sound,bishop_death_sound,bishop_overkill_sound,bishop_atkprep_sound,bishop_tele_blur_sound]
 
 MONSTER_NOISE_SOUNDS = {ETTIN:[ettin_noise1_sound], DARK_BISHOP:[bishop_noise1_sound,bishop_noise2_sound]}
 MONSTER_PAIN_SOUND = {ETTIN:ettin_pain_sound, DARK_BISHOP:bishop_pain_sound}
@@ -53,11 +56,13 @@ ABILITIES_SOUNDS = {TELEPORT_BLUR:bishop_tele_blur_sound}
 RANGED_WEAPON_SOUNDS_DICT = {EMERALD_CROSSBOW:crossbow_attack_sound, BISHOP_MAGIC_MISSILE:bishop_magic_missile_attack_sound}
 PROJECTILE_HIT_SOUNDS_DICT = {CROSSBOW_BOLT:crossbow_bolt_hit_sound, MAGIC_MISSILE:bishop_magic_missile_hit_sound}
 
-def play_item_picked_sound(self):
-    if self.is_weapon:
+def play_item_picked_sound(item):
+    if item.is_weapon:
         weapon_pickup.play()
-    elif self.is_ammo:
+    elif item.is_ammo:
         ammo_pickup.play()
+    elif item.is_consumable:
+        consumable_pickup.play()
 
 def set_volume_for_all_sounds(volume):
     for sound in all_sounds:
@@ -105,3 +110,9 @@ def play_projectile_impact_sound(projectile_name):
 
 def play_ability_use_sound(ability_name):
     ABILITIES_SOUNDS[ability_name].play()
+
+def play_consumable_use_sound(consumable_name):
+    if consumable_name is QUARTZ_FLASK:
+        consumable_potion_use.play()
+    else:
+        consumable_artifact_use.play()

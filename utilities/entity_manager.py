@@ -1,6 +1,7 @@
 import pygame
 import math
 import random
+from sounds import sound_player
 from utilities import util
 from utilities.constants import *
 from utilities import level_painter
@@ -1094,6 +1095,9 @@ def generate_items():
     generate_item((8,5), EMERALD_CROSSBOW)
     generate_item((8,6), EMERALD_CROSSBOW_BOLTS)
     generate_item((8,4), EMERALD_CROSSBOW_QUIVER)
+    generate_item((9,6), QUARTZ_FLASK)
+    generate_item((7,6), QUARTZ_FLASK)
+    generate_item((7,5), QUARTZ_FLASK)
     generate_item((5,2), WALL_TORCH)
     generate_item((5,6), WALL_TORCH)
 
@@ -1123,11 +1127,41 @@ def remove_item_from_the_map_and_give_to_player(item):
 def give_item_to_player(item):
     if item.is_weapon:
         hero.ammo[item.NAME] += item.ammo
+        if hero.ammo[item.NAME] > 200:
+            hero.ammo[item.NAME] = 200
         if not hero.weapons[item.NAME]:
             hero.weapons[item.NAME] = item
     
     elif item.is_ammo:
         hero.ammo[item.ammo_type] += item.ammo
+        if hero.ammo[item.ammo_type] > 200:
+            hero.ammo[item.ammo_type] = 200
+
+    elif item.is_consumable:
+        if hero.selected_consumable == None:
+            hero.selected_consumable = item.NAME
+        if item.NAME not in hero.consumables:
+            hero.consumables[item.NAME] = item
+        else:
+            hero.consumables[item.NAME].consumable_quantity += item.consumable_quantity
+
+def use_consumable_item():
+    selected_consumable_name = hero.selected_consumable
+    item = hero.consumables[selected_consumable_name]
+    apply_consumable_effect(item)
+    sound_player.play_consumable_use_sound(item.NAME)
+    item.is_ready_to_use = False
+    item.consumable_quantity -= 1
+    if item.consumable_quantity == 0:
+        hero.selected_consumable = None
+        del hero.consumables[item.NAME]
+
+def apply_consumable_effect(item):
+    if item.NAME is QUARTZ_FLASK:
+        hero.health += hero.maxhealth//4
+        if hero.health > hero.maxhealth:
+            hero.health = hero.maxhealth
+
 
 #Projectiles
 def put_projectile_in_matrices_and_lists(new_projectile):
