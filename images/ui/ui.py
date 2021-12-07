@@ -10,6 +10,13 @@ central_light5 = pygame.image.load("images/ui/light_source5.png").convert_alpha(
 central_light6 = pygame.image.load("images/ui/light_source6.png").convert_alpha()
 central_light7 = pygame.image.load("images/ui/light_source7.png").convert_alpha()
 
+#Damage overlay
+damage_overlay_01 = pygame.image.load("images/ui/damage_overlay_01.png").convert_alpha()
+damage_overlay_02 = pygame.image.load("images/ui/damage_overlay_02.png").convert_alpha()
+damage_overlay_03 = pygame.image.load("images/ui/damage_overlay_03.png").convert_alpha()
+damage_overlay_04 = pygame.image.load("images/ui/damage_overlay_04.png").convert_alpha()
+damage_overaly = [damage_overlay_01,damage_overlay_02,damage_overlay_03,damage_overlay_04]
+
 #Wall hider
 wall_hider_mask = pygame.image.load("images/ui/wall_hider_mask.png").convert_alpha()
 wall_hider_mask2 = pygame.image.load("images/ui/wall_hider_mask2.png").convert_alpha()

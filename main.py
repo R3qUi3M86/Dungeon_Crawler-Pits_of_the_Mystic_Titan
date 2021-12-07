@@ -175,7 +175,8 @@ def draw_sprites():
             screen.blit(tile.image,tile.position)
                   
 def draw_ui():
-    screen.blit(ui_elements.central_ligtht,(0,0))
+    screen.blit(ui_elements.central_light,(0,0))
+    ui_elements.draw_damage_overlay()
     ui_elements.draw_health_bar()
     ui_elements.draw_weapon_ammo_counter()
     ui_elements.draw_consumable_counter()

@@ -106,6 +106,9 @@ class Hero(pygame.sprite.Sprite):
         self.attack_can_be_interrupted = False
         self.selected_weapon = WEAPONS[0]
         self.selected_consumable = None
+        self.has_taken_damage = False
+        self.damage_timer = 0
+        self.damage_timer_limit = 0.5
         
         #Abilities and items list
         self.abilities = []
@@ -287,6 +290,8 @@ class Hero(pygame.sprite.Sprite):
     #Combat functions
     def take_damage(self, damage):
         self.health -= damage
+        self.has_taken_damage = True
+        self.damage_timer = 0
 
         if self.health > 0:
             self.is_in_pain = True

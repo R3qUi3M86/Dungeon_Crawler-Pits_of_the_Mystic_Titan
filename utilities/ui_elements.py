@@ -56,7 +56,17 @@ PICKUP_TEXT = "You have found "
 # wall_hider_mask_rect = wall_hider_mask.get_rect(center = WALL_HIDER_POSITION)
 # wall_hider_surf.blit(wall_hider_mask,(0,0))
 
-central_ligtht = ui.central_light6
+central_light = ui.central_light6
+damage_overlay = ui.damage_overaly
+
+def draw_damage_overlay():
+    if hero.has_taken_damage == True:
+        index = int(hero.damage_timer/(hero.damage_timer_limit/4))
+        screen.blit(damage_overlay[index],(0,0))
+        hero.damage_timer += 0.0167
+    if hero.damage_timer >= hero.damage_timer_limit:
+        hero.damage_timer = 0
+        hero.has_taken_damage = False
 
 def draw_health_bar():
     screen.blit(ui.health_bar_empty, HEALTH_BAR_POS)
