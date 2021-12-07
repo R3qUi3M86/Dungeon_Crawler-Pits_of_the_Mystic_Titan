@@ -1098,6 +1098,8 @@ def generate_items():
     generate_item((9,6), QUARTZ_FLASK)
     generate_item((7,6), QUARTZ_FLASK)
     generate_item((7,5), QUARTZ_FLASK)
+    generate_item((6,3), GOLD_COINS)
+    generate_item((6,4), GOLD_COINS)
     generate_item((5,2), WALL_TORCH)
     generate_item((5,6), WALL_TORCH)
 
@@ -1113,7 +1115,7 @@ def remove_item_from_the_map_and_give_to_player(item):
     tile_index = item.tile_index
 
     give_item_to_player(item)
-    picked_up_item_names.append(item.NAME)
+    append_picked_item_names_list(item)
 
     item_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(item.id, tile_index, type=ITEM)
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(item_sprite_group)
@@ -1143,7 +1145,22 @@ def give_item_to_player(item):
         if item.NAME not in hero.consumables:
             hero.consumables[item.NAME] = item
         else:
-            hero.consumables[item.NAME].consumable_quantity += item.consumable_quantity
+            hero.consumables[item.NAME].quantity += item.quantity
+
+    elif item.is_currency:
+        hero.currency[item.NAME] += item.quantity
+
+def append_picked_item_names_list(item):
+    text = item.NAME
+    if item.is_ammo:
+        text = text + f" (+{item.ammo} shots)"
+    elif item.is_currency:
+        if item.quantity > 1:
+            text = text + f" (+{item.quantity} coins)"
+        else:
+            text = text + f" (+{item.quantity} coin)"
+
+    picked_up_item_names.append(text)
 
 def use_consumable_item():
     selected_consumable_name = hero.selected_consumable
@@ -1151,8 +1168,8 @@ def use_consumable_item():
     apply_consumable_effect(item)
     sound_player.play_consumable_use_sound(item.NAME)
     item.is_ready_to_use = False
-    item.consumable_quantity -= 1
-    if item.consumable_quantity == 0:
+    item.quantity -= 1
+    if item.quantity == 0:
         hero.selected_consumable = None
         del hero.consumables[item.NAME]
 

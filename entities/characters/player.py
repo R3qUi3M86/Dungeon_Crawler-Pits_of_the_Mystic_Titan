@@ -116,6 +116,7 @@ class Hero(pygame.sprite.Sprite):
         self.consumables = {}
         self.weapons = {SWORD:None, EMERALD_CROSSBOW:None}
         self.ammo = {SWORD:0, EMERALD_CROSSBOW:30}
+        self.currency = {GOLD_COINS:0}
         
         #Movement
         self.speed = 3

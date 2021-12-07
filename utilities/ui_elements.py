@@ -115,7 +115,7 @@ def draw_consumable_counter():
             consumable_use_image_index = 0
 
         consumable = hero.consumables[hero.selected_consumable]
-        uses = consumable.consumable_quantity
+        uses = consumable.quantity
         consumable_text = format_consumable_text(uses)
         display_ammo_runic_text(consumable_text, PALE_WHITE_COLOR, CONSUMABLE_NUMBER_POS[0], CONSUMABLE_NUMBER_POS[1])
 

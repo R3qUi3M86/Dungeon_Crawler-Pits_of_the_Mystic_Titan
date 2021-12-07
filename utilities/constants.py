@@ -62,6 +62,11 @@ ETTIN = "ettin"
 DARK_BISHOP = "dark bishop"
 
 ##### Items #####
+###Currency###
+GOLD_COINS = "gold coin"
+
+CURRENCIES = [GOLD_COINS]
+
 ###Weapons###
 RANGED = "ranged"
 MELEE = "melee"
@@ -96,7 +101,6 @@ CONSUMABLES = [QUARTZ_FLASK]
 WALL_TORCH = "wall torch"
 
 DECORATIONS = [WALL_TORCH]
-LIGHT_SOURCES = [WALL_TORCH]
 
 ##### Projectiles #####
 CROSSBOW_BOLT = "crossbow bolt"

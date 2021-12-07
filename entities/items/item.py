@@ -21,9 +21,9 @@ class Item(pygame.sprite.Sprite):
     def __init__(self, tile_index, name):
         super().__init__()
         ###Constants###
-        self.IMAGE_DISPLAY_CORRECTION = 0
         self.NAME = name
         self.TYPE = ITEM
+        self.IMAGE_DISPLAY_CORRECTION = self.get_img_display_correction()
 
         ###Position variables###
         self.tile_index = tile_index
@@ -60,6 +60,7 @@ class Item(pygame.sprite.Sprite):
         self.is_decor = self.get_is_decor()
         self.is_weapon = self.get_is_weapon()
         self.is_ammo = self.get_is_ammo()
+        self.is_currency = self.get_is_currency()
         self.is_consumable = self.get_is_consumable()
         self.is_pickable = self.get_pickable()
         self.can_collide = self.get_can_collide()
@@ -80,7 +81,7 @@ class Item(pygame.sprite.Sprite):
         self.is_ready_to_use = True
         self.use_cooldown = 0
         self.use_cooldown_limit = self.get_use_cooldown_limit()
-        self.consumable_quantity = 1
+        self.quantity = self.get_quantity()
 
     #Updates
     def update(self):
@@ -102,6 +103,12 @@ class Item(pygame.sprite.Sprite):
                 auxilary_sprite.update_position(self.position)
 
     #Getters
+    def get_img_display_correction(self):
+        if self.NAME is GOLD_COINS:
+            return 8
+        else:
+            return 0
+
     def get_position(self):
         if self.NAME is WALL_TORCH:
             return level_painter.get_tile_position(self.tile_index)[0]+24, level_painter.get_tile_position(self.tile_index)[1]
@@ -114,6 +121,8 @@ class Item(pygame.sprite.Sprite):
         elif self.is_ammo:
             return True
         elif self.is_consumable:
+            return True
+        elif self.is_currency:
             return True
         return False       
 
@@ -143,6 +152,11 @@ class Item(pygame.sprite.Sprite):
 
     def get_is_consumable(self):
         if self.NAME in CONSUMABLES:
+            return True
+        return False
+
+    def get_is_currency(self):
+        if self.NAME in CURRENCIES:
             return True
         return False
 
@@ -210,6 +224,12 @@ class Item(pygame.sprite.Sprite):
 
         elif self.is_consumable:
             return CONSUMABLE_COOLDOWN_DICT[self.NAME]
+
+    def get_quantity(self):
+        if self.is_consumable:
+            return 1
+        elif self.is_currency:
+            return random.choice(range(1,26))
 
     #Timers
     def increment_animation_timer(self):

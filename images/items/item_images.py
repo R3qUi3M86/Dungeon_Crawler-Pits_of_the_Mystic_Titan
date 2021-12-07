@@ -1,6 +1,20 @@
 import pygame
 from utilities.constants import *
 
+################
+### Currency ###
+################
+### Gold
+gold_01 = pygame.image.load("images/items/currency/gold/gold_01.png").convert_alpha()
+gold_02 = pygame.image.load("images/items/currency/gold/gold_02.png").convert_alpha()
+gold_03 = pygame.image.load("images/items/currency/gold/gold_03.png").convert_alpha()
+gold_04 = pygame.image.load("images/items/currency/gold/gold_04.png").convert_alpha()
+gold_05 = pygame.image.load("images/items/currency/gold/gold_05.png").convert_alpha()
+gold_06 = pygame.image.load("images/items/currency/gold/gold_06.png").convert_alpha()
+gold_07 = pygame.image.load("images/items/currency/gold/gold_07.png").convert_alpha()
+
+gold_coins = [gold_01,gold_02,gold_03,gold_04,gold_05,gold_06,gold_07]
+
 ########################
 ### Weapons and ammo ###
 ########################
@@ -50,7 +64,9 @@ STATIC_IMAGE_DICT = {SWORD:sword, EMERALD_CROSSBOW:emerald_crossbow,
                      #Consumables
                      QUARTZ_FLASK:quartz_flask_01,
                      #Decor
-                     WALL_TORCH:torch_01}
+                     WALL_TORCH:torch_01,
+                     #Currency
+                     GOLD_COINS:gold_01}
 
-ANIMATED_ITEMS = [EMERALD_CROSSBOW_QUIVER, QUARTZ_FLASK, WALL_TORCH]
-ANIMATED_ITEM_IMAGES = {WALL_TORCH:wall_torch_images, EMERALD_CROSSBOW_QUIVER:crossbow_quiver, QUARTZ_FLASK:quartz_flask}
+ANIMATED_ITEMS = [EMERALD_CROSSBOW_QUIVER, QUARTZ_FLASK, WALL_TORCH, GOLD_COINS]
+ANIMATED_ITEM_IMAGES = {WALL_TORCH:wall_torch_images, EMERALD_CROSSBOW_QUIVER:crossbow_quiver, QUARTZ_FLASK:quartz_flask, GOLD_COINS:gold_coins}

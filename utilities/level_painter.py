@@ -9,7 +9,7 @@ from utilities import entity_manager
 from utilities.constants import *
 
 TILE_SIZE = 48,48
-level_layout = test_map
+level_layout = level_01_map
 pathfinding_matrix = []
 pathfinding_flying_matrix = []
 level_surface = None
