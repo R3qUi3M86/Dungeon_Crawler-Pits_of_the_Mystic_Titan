@@ -27,9 +27,12 @@ class Item(pygame.sprite.Sprite):
 
         ###Position variables###
         self.tile_index = tile_index
+        self.prevous_tile_index = tile_index
         self.position = self.get_position()
         self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
+        self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+        self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
 
         ###Object ID###
         self.id = util.generate_entity_id()
@@ -37,17 +40,20 @@ class Item(pygame.sprite.Sprite):
         ###Animations###
         self.item_static_image = STATIC_IMAGE_DICT[name]
         self.item_animation_images = self.get_item_animation_images()
+        self.item_destruction_images = self.get_item_destruction_images()
         self.animation_index = 0
+        self.destruction_index = 0
 
         ###Owned sprites###
         #Colliders
         self.entity_small_square_collider  = Collider(self.position, self.id, SQUARE, size=SIZE_SMALL)
+        self.entity_tiny_omni_collider = Collider(self.position, self.id, ENTITY_OMNI, size=SIZE_TINY)
 
         #Shadow
         self.shadow = Shadow(self.position, self.map_position, self.id, SIZE_TINY, self.tile_index)
 
         #Sprite lists
-        self.entity_auxilary_sprites = [self.entity_small_square_collider, self.shadow]
+        self.entity_auxilary_sprites = [self.entity_small_square_collider, self.shadow, self.entity_tiny_omni_collider]
 
         ###Initial sprite definition###
         self.image = self.item_static_image
@@ -62,7 +68,10 @@ class Item(pygame.sprite.Sprite):
         self.is_ammo = self.get_is_ammo()
         self.is_currency = self.get_is_currency()
         self.is_consumable = self.get_is_consumable()
-        self.is_pickable = self.get_pickable()
+        self.is_pickable = self.get_is_pickable()
+        self.is_destructible = self.get_is_destructible()
+        self.is_falling_apart = False
+        self.is_destroyed = False
         self.can_collide = self.get_can_collide()
 
         ###Item properties###
@@ -72,6 +81,7 @@ class Item(pygame.sprite.Sprite):
         self.chainfire_cooldown_limit = self.get_chainfire_cooldown()
         self.chainfire_cooldown = self.chainfire_cooldown_limit
         self.size = self.get_item_size()
+        self.speed = 0,0
 
         self.ammo_type = self.get_ammo_type()
         self.ammo = self.get_ammo()
@@ -92,11 +102,27 @@ class Item(pygame.sprite.Sprite):
         if self.is_animated:
             self.increment_animation_timer()
 
+        if self.is_falling_apart:
+            self.update_position(self.speed)
+            self.bleed_off_speed()
+            self.increment_destruction_animation_timer()
+
     def update_position(self, vector=None):
-        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
+        if vector:
+            self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
+            self.map_position = round(self.position[0] + entity_manager.hero.map_position[0] - player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
+            self.tile_index = util.get_tile_index(self.map_position)
+        else:
+            self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
+        
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
         self.rect = self.image.get_rect(midbottom = (self.image_position))
         self.update_owned_sprites_position()
+        if self.tile_index != self.prevous_tile_index:
+            self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+            self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
+            entity_manager.move_entity_in_all_matrices(self.id, ITEM, self.prevous_tile_index, self.tile_index)
+            self.prevous_tile_index = self.tile_index
 
     def update_owned_sprites_position(self):
         for auxilary_sprite in self.entity_auxilary_sprites:
@@ -106,6 +132,8 @@ class Item(pygame.sprite.Sprite):
     def get_img_display_correction(self):
         if self.NAME is GOLD_COINS:
             return 8
+        elif self.NAME is VASE:
+            return 3
         else:
             return 0
 
@@ -115,7 +143,7 @@ class Item(pygame.sprite.Sprite):
         else:
             return level_painter.get_tile_position(self.tile_index)[0]+24, level_painter.get_tile_position(self.tile_index)[1]+24
 
-    def get_pickable(self):
+    def get_is_pickable(self):
         if self.is_weapon:
             return True
         elif self.is_ammo:
@@ -126,9 +154,18 @@ class Item(pygame.sprite.Sprite):
             return True
         return False       
 
+    def get_is_destructible(self):
+        if self.NAME in DESTRUCTIBLE_ITEMS:
+            return True
+        return False
+
     def get_item_animation_images(self):
         if self.NAME in ANIMATED_ITEMS:
             return ANIMATED_ITEM_IMAGES[self.NAME]
+
+    def get_item_destruction_images(self):
+        if self.NAME in DESTRUCTIBLE_ITEMS:
+            return DESTRUCTIBLE_ITEM_IMAGES[self.NAME]
 
     def get_is_animated(self):
         if self.NAME in ANIMATED_ITEMS:
@@ -190,9 +227,13 @@ class Item(pygame.sprite.Sprite):
     def get_item_size(self):
         if self.is_pickable or self.is_weapon:
             return 15, 8
+        if self.NAME is VASE:
+            return 18, 10
 
     def get_can_collide(self):
         if self.is_pickable:
+            return True
+        elif self.NAME is VASE:
             return True
         elif self.NAME is WALL_TORCH:
             return False
@@ -231,6 +272,34 @@ class Item(pygame.sprite.Sprite):
         elif self.is_currency:
             return random.choice(range(1,26))
 
+    #Item destruction
+    def destroy_item(self):
+        sound_player.play_vase_break_sound()
+        self.is_falling_apart = True
+
+    def bleed_off_speed(self):
+        x_speed = self.speed[0]
+        y_speed = self.speed[1]
+        if x_speed > 0:
+            x_speed -= 0.05
+            if x_speed < 0:
+                x_speed = 0
+        else:
+            x_speed += 0.05
+            if x_speed > 0:
+                x_speed = 0
+        
+        if y_speed > 0:
+            y_speed -= 0.05
+            if y_speed < 0:
+                y_speed = 0
+        else:
+            y_speed += 0.05
+            if y_speed > 0:
+                y_speed = 0
+        
+        self.speed = x_speed, y_speed
+
     #Timers
     def increment_animation_timer(self):
         self.animation_index += 0.1
@@ -255,6 +324,20 @@ class Item(pygame.sprite.Sprite):
                 self.image = self.item_animation_images[spark_choice]
         else:
             self.image = self.item_animation_images[int(self.animation_index)]
+
+    def increment_destruction_animation_timer(self):
+        self.animation_index += 0.2
+        if int(self.animation_index) >= len(self.item_destruction_images):
+            self.animation_index = len(self.item_destruction_images)-1
+            self.is_destroyed = True
+            self.is_falling_apart = False
+            item = Item(self.tile_index,GOLD_COINS)
+            item.position = self.position[0], self.position[1]+1
+            item.map_position = self.map_position[0], self.map_position[1]+1
+            item.update_position()
+            entity_manager.put_item_in_matrices_and_lists(item)
+            entity_manager.fix_all_dead_objects_to_pixel_accuracy()
+        self.image = self.item_destruction_images[int(self.animation_index)]
 
     def increment_item_cooldown_timer(self):
         if not self.is_ready_to_use:

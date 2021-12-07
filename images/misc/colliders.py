@@ -4,6 +4,7 @@ import pygame
 ###### Entity #####
 ###################
 ###Characters
+entity_collider_tiny = pygame.image.load("images/misc/colliders/entity_collider_omni_tiny.png").convert_alpha()
 entity_collider_small = pygame.image.load("images/misc/colliders/entity_collider_omni_small.png").convert_alpha()
 entity_collider_medium = pygame.image.load("images/misc/colliders/entity_collider_medium.png").convert_alpha()
 entity_collider_sector_nw = pygame.image.load("images/misc/colliders/entity_collider_small_nw.png").convert_alpha()

@@ -56,6 +56,20 @@ torch_light_source = pygame.image.load("images/items/decor/torch/light_source.pn
 
 wall_torch_images = [torch_01, torch_02, torch_03, torch_04, torch_05, torch_06, torch_07, torch_08]
 
+### Vase
+vase_01 = pygame.image.load("images/items/decor/vase/vase_01.png").convert_alpha()
+vase_02 = pygame.image.load("images/items/decor/vase/vase_02.png").convert_alpha()
+vase_03 = pygame.image.load("images/items/decor/vase/vase_03.png").convert_alpha()
+vase_01_destruct_01 = pygame.image.load("images/items/decor/vase/vase_01_destruct_01.png").convert_alpha()
+vase_01_destruct_02 = pygame.image.load("images/items/decor/vase/vase_01_destruct_02.png").convert_alpha()
+vase_01_destruct_03 = pygame.image.load("images/items/decor/vase/vase_01_destruct_03.png").convert_alpha()
+vase_01_destruct_04 = pygame.image.load("images/items/decor/vase/vase_01_destruct_04.png").convert_alpha()
+vase_01_destruct_05 = pygame.image.load("images/items/decor/vase/vase_01_destruct_05.png").convert_alpha()
+vase_01_destruct_06 = pygame.image.load("images/items/decor/vase/vase_01_destruct_06.png").convert_alpha()
+vase_01_destruct_07 = pygame.image.load("images/items/decor/vase/vase_01_destruct_07.png").convert_alpha()
+
+vase_01_destruct = [vase_01_destruct_01,vase_01_destruct_02,vase_01_destruct_03,vase_01_destruct_04,vase_01_destruct_05,vase_01_destruct_06,vase_01_destruct_07]
+
                      #Weapons
 STATIC_IMAGE_DICT = {SWORD:sword, EMERALD_CROSSBOW:emerald_crossbow,
                      ETTIN_MACE:sword, BISHOP_MAGIC_MISSILE:sword, 
@@ -64,9 +78,12 @@ STATIC_IMAGE_DICT = {SWORD:sword, EMERALD_CROSSBOW:emerald_crossbow,
                      #Consumables
                      QUARTZ_FLASK:quartz_flask_01,
                      #Decor
-                     WALL_TORCH:torch_01,
+                     WALL_TORCH:torch_01, VASE:vase_01,
                      #Currency
                      GOLD_COINS:gold_01}
 
 ANIMATED_ITEMS = [EMERALD_CROSSBOW_QUIVER, QUARTZ_FLASK, WALL_TORCH, GOLD_COINS]
 ANIMATED_ITEM_IMAGES = {WALL_TORCH:wall_torch_images, EMERALD_CROSSBOW_QUIVER:crossbow_quiver, QUARTZ_FLASK:quartz_flask, GOLD_COINS:gold_coins}
+
+DESTRUCTIBLE_ITEMS = [VASE]
+DESTRUCTIBLE_ITEM_IMAGES = {VASE:vase_01_destruct}

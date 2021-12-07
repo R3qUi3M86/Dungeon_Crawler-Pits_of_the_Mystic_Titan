@@ -1,3 +1,4 @@
+from math import sqrt
 from utilities.constants import *
 from utilities import entity_manager
 from utilities import util
@@ -30,6 +31,8 @@ def detect_all_collisions():
 
     for item in entity_manager.far_proximity_item_sprites_list:
         item_collision(item)
+        if item.is_falling_apart:
+            item_vs_level_collision(item)
 
 #Collision types
 def player_vs_monster_movement_collision():
@@ -40,7 +43,7 @@ def player_vs_monster_movement_collision():
             collision_matrix = get_collision_matrix(entity_manager.hero, monster)
                        
             if any_sector_collider_collides(collision_matrix):
-                bump_monster_back(entity_manager.hero, monster, collision_matrix)
+                bump_entity_back(entity_manager.hero, monster, collision_matrix)
                 #slow_down_player()
                 if monster.monster_ai.is_idle:
                     monster.monster_ai.is_waking_up = True
@@ -97,6 +100,15 @@ def item_collision(item_sprite):
     if item_sprite.can_collide and util.elipses_intersect(hero.map_position, item_sprite.map_position, hero.size, item_sprite.size):
         if item_sprite.is_pickable:
             item_sprite.is_picked = True
+        elif item_sprite.is_destructible and not item_sprite.is_falling_apart and not item_sprite.is_destroyed and pygame.sprite.collide_mask(hero.entity_collider_omni, item_sprite.entity_tiny_omni_collider):
+            collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
+            bump_entity_back(hero, item_sprite, collision_matrix)
+            item_sprite.destroy_item()
+
+def item_vs_level_collision(item_sprite):
+    for collision_tile in item_sprite.direct_proximity_collision_tiles:
+        if item_sprite.entity_small_square_collider.rect.colliderect(collision_tile.rect):
+            item_sprite.speed = 0,0
 
 #Movement vector adjustment
 def slow_down_player(factor=3):
@@ -365,7 +377,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         correction_vector = 0,0
         current_collision_matrix = get_collision_matrix(current_entity_sprite,colliding_entity_sprite)
         
-def bump_monster_back(player_sprite, monster_sprite, collision_matrix):
+def bump_entity_back(player_sprite, entity_sprite, collision_matrix):
     bounce_vector = 0,0
 
     if all_sector_colliders_collide(collision_matrix):
@@ -386,7 +398,7 @@ def bump_monster_back(player_sprite, monster_sprite, collision_matrix):
         elif character_moving_south_west(player_sprite):
             bounce_vector = 1,-0.58
         elif character_not_moving(player_sprite):
-            bounce_vector = get_bounce_vector_for_static_player(player_sprite, monster_sprite)
+            bounce_vector = get_bounce_vector_for_static_player(player_sprite, entity_sprite)
     elif east_collider_collides(collision_matrix):
         bounce_vector = 1,0
     elif west_collider_collides(collision_matrix):
@@ -404,13 +416,19 @@ def bump_monster_back(player_sprite, monster_sprite, collision_matrix):
     elif south_west_collider_collides(collision_matrix):
         bounce_vector = -1,1
     elif any_sector_collider_collides(collision_matrix):
-        bounce_vector = get_bounce_vector_for_static_player(player_sprite, monster_sprite)
+        bounce_vector = get_bounce_vector_for_static_player(player_sprite, entity_sprite)
 
-    monster_sprite.update_position((-bounce_vector[0],-bounce_vector[1]))
-    adjust_player_speed_scalar(entity_manager.hero.speed_scalar,(-bounce_vector[0],-bounce_vector[1]),15)
+    if entity_sprite.TYPE is not ITEM:
+        entity_sprite.update_position((-bounce_vector[0],-bounce_vector[1]))
+        adjust_player_speed_scalar(entity_manager.hero.speed_scalar,(-bounce_vector[0],-bounce_vector[1]),15)
+    else:
+        hero_x_speed = entity_manager.hero.speed_vector[0]
+        hero_y_speed = entity_manager.hero.speed_vector[1]
+        hero_abs_speed = sqrt(hero_x_speed*hero_x_speed+hero_y_speed*hero_y_speed)
+        entity_sprite.speed = (-hero_abs_speed*bounce_vector[0],-hero_abs_speed*bounce_vector[1])
 
-def get_bounce_vector_for_static_player(player_sprite, monster_sprite):
-    bounce_direction_sector = util.get_facing_direction(player_sprite.map_position, monster_sprite.map_position)
+def get_bounce_vector_for_static_player(player_sprite, entity_sprite):
+    bounce_direction_sector = util.get_facing_direction(player_sprite.map_position, entity_sprite.map_position)
     
     if bounce_direction_sector == SECTOR_E:
         bounce_vector = 1,0
@@ -437,6 +455,8 @@ def get_ne_collider_collision(current_entity_sprite,colliding_entity_sprite):
         return True
     elif (colliding_entity_sprite.TYPE == MONSTER or colliding_entity_sprite.TYPE == PLAYER) and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite.entity_collider_omni) != None:
         return True
+    elif colliding_entity_sprite.TYPE == ITEM and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_ne, colliding_entity_sprite.entity_tiny_omni_collider) != None:
+        return True
     return False
 
 def get_nw_collider_collision(current_entity_sprite,colliding_entity_sprite):
@@ -444,13 +464,16 @@ def get_nw_collider_collision(current_entity_sprite,colliding_entity_sprite):
         return True
     elif (colliding_entity_sprite.TYPE == MONSTER or colliding_entity_sprite.TYPE == PLAYER) and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite.entity_collider_omni) != None:
         return True
+    elif colliding_entity_sprite.TYPE == ITEM and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_nw, colliding_entity_sprite.entity_tiny_omni_collider) != None:
+        return True
     return False
 
 def get_se_collider_collision(current_entity_sprite,colliding_entity_sprite):
     if colliding_entity_sprite.TYPE in IMPASSABLE_TILES and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite) != None:
         return True
-        
     elif (colliding_entity_sprite.TYPE == MONSTER or colliding_entity_sprite.TYPE == PLAYER) and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite.entity_collider_omni) != None:
+        return True
+    elif colliding_entity_sprite.TYPE == ITEM and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_se, colliding_entity_sprite.entity_tiny_omni_collider) != None:
         return True
     return False
 
@@ -458,6 +481,8 @@ def get_sw_collider_collision(current_entity_sprite,colliding_entity_sprite):
     if colliding_entity_sprite.TYPE in IMPASSABLE_TILES and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite) != None:
         return True
     elif (colliding_entity_sprite.TYPE == MONSTER or colliding_entity_sprite.TYPE == PLAYER) and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite.entity_collider_omni) != None:
+        return True
+    elif colliding_entity_sprite.TYPE == ITEM and pygame.sprite.collide_mask(current_entity_sprite.entity_collider_sw, colliding_entity_sprite.entity_tiny_omni_collider) != None:
         return True
     return False
 

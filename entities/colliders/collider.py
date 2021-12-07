@@ -23,7 +23,9 @@ class Collider(pygame.sprite.Sprite):
     #Misc
     def get_image(self):
         if self.type == ENTITY_OMNI:
-            if self.size == SIZE_SMALL:
+            if self.size == SIZE_TINY:
+                return entity_collider_tiny
+            elif self.size == SIZE_SMALL:
                 return entity_collider_small
             elif self.size == SIZE_MEDIUM:
                 return entity_collider_medium

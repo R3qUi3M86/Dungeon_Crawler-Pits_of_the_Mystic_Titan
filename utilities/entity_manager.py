@@ -1097,7 +1097,10 @@ def generate_items():
     generate_item((8,4), EMERALD_CROSSBOW_QUIVER)
     generate_item((9,6), QUARTZ_FLASK)
     generate_item((7,6), QUARTZ_FLASK)
-    generate_item((7,5), QUARTZ_FLASK)
+    generate_item((8,4), VASE)
+    generate_item((5,6), VASE)
+    generate_item((5,2), VASE)
+    generate_item((6,8), VASE)
     generate_item((6,3), GOLD_COINS)
     generate_item((6,4), GOLD_COINS)
     generate_item((5,2), WALL_TORCH)
@@ -1110,6 +1113,21 @@ def generate_item(tile_index, item_name):
 
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(item))
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(item.shadow))
+
+def put_item_in_matrices_and_lists(new_item):
+    tile_index = new_item.tile_index
+    far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
+
+    item_sprite_group = pygame.sprite.GroupSingle(new_item)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(item_sprite_group)
+    far_proximity_entity_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].append(item_sprite_group)
+
+    shadow_sprite_group = pygame.sprite.GroupSingle(new_item.shadow)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(shadow_sprite_group)
+
+    far_proximity_shadow_sprite_group_list.append(shadow_sprite_group)
+    far_proximity_entity_sprites_list.append(new_item)
+    far_proximity_item_sprites_list.append(new_item)
 
 def remove_item_from_the_map_and_give_to_player(item):
     tile_index = item.tile_index
@@ -1219,6 +1237,10 @@ def fix_all_dead_objects_to_pixel_accuracy():
     for character in far_proximity_character_sprites_list:
         if character.is_living == False:
             character.map_position = math.ceil(character.map_position[0]), math.ceil(character.map_position[1])
+    
+    for item in far_proximity_item_sprites_list:
+        if item.is_destroyed:
+            item.map_position = math.ceil(item.map_position[0]), math.ceil(item.map_position[1])
 
 def fix_player_position_to_pixel_accuracy():
     hero.map_position = math.ceil(hero.map_position[0]), math.ceil(hero.map_position[1])

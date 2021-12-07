@@ -99,8 +99,9 @@ CONSUMABLES = [QUARTZ_FLASK]
 
 ###Decorations###
 WALL_TORCH = "wall torch"
+VASE = "vase"
 
-DECORATIONS = [WALL_TORCH]
+DECORATIONS = [WALL_TORCH, VASE]
 
 ##### Projectiles #####
 CROSSBOW_BOLT = "crossbow bolt"
