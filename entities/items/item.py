@@ -241,6 +241,18 @@ class Item(pygame.sprite.Sprite):
             if int(self.animation_index) >= 1:
                 self.animation_index = 0
                 self.image = self.item_animation_images[random.choice(range(len(self.item_animation_images)))]
+        
+        elif self.NAME is GOLD_COINS:
+            if int(self.animation_index) >= 5:
+                spark_decision = random.choice(range(3))
+                spark_choice = None
+                if spark_decision > 1:
+                    spark_choice = random.choice(range(1,7))
+                    self.animation_index = 4.3
+                else:
+                    spark_choice = 0
+                    self.animation_index = 0
+                self.image = self.item_animation_images[spark_choice]
         else:
             self.image = self.item_animation_images[int(self.animation_index)]
 
