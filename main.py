@@ -7,6 +7,7 @@ from utilities import collision_manager
 from utilities import level_painter
 from utilities import util
 from utilities import ui_elements
+from utilities import menu
 from sys import exit
 from entities import cursor
 
@@ -16,7 +17,8 @@ sorting_timer = 20
 sorting_timer_limit = 20
 sorted_entity_matrix = None
 wall_drawing_mode = VISIBLE
-set_volume_for_all_sounds(VOLUME)
+set_volume_for_all_sfx(SFX_VOLUME)
+set_music_volume(MUSIC_VOLUME)
 pygame.event.set_allowed([pygame.QUIT])
 
 #Player inputs
@@ -185,70 +187,80 @@ def draw_ui():
         ui_elements.display_pickup_text()
 
 #Game initialization
-entity_manager.initialize_level_matrices()
-level_painter.paint_level()
-entity_manager.initialize_player()
-entity_manager.initialize_all_entities_and_shadows_sprite_group_matrix()
-#entity_manager.fill_map_with_monsters(1)
-entity_manager.generate_monsters()
-entity_manager.generate_items()
-entity_manager.update_far_proximity_matrices_and_lists()
-entity_manager.finish_init()
+def initialize_game():
+    entity_manager.initialize_level_matrices()
+    level_painter.paint_level()
+    entity_manager.initialize_player()
+    entity_manager.initialize_all_entities_and_shadows_sprite_group_matrix()
+    #entity_manager.fill_map_with_monsters(1)
+    entity_manager.generate_monsters()
+    entity_manager.generate_items()
+    entity_manager.update_far_proximity_matrices_and_lists()
+    entity_manager.finish_init()
 
 #Main game loop
-while True:
-    increment_sprite_sorting_timer()
+def main_game_loop():
+    while True:
+        increment_sprite_sorting_timer()
 
-    #Inputs
-    get_player_wsad_input()
-    get_player_mouse_input()
+        #Inputs
+        get_player_wsad_input()
+        get_player_mouse_input()
 
-    #Updates
-    cursor.cursor.update()
-    entity_manager.update_all_objects_position_in_far_proximity()
-    entity_manager.update_all_objects_in_far_proximity()
-    collision_manager.detect_all_collisions()
+        #Updates
+        cursor.cursor.update()
+        entity_manager.update_all_objects_position_in_far_proximity()
+        entity_manager.update_all_objects_in_far_proximity()
+        collision_manager.detect_all_collisions()
 
-    #Events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
-        
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_TAB:
-                toggle_wall_drawing_mode()
-            elif event.key == pygame.K_1:
-                switch_weapon(0)
-            elif event.key == pygame.K_2:
-                switch_weapon(1)
-            elif event.key == pygame.K_SPACE:
-                use_consumable()
+        #Events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_TAB:
+                    toggle_wall_drawing_mode()
+                elif event.key == pygame.K_1:
+                    switch_weapon(0)
+                elif event.key == pygame.K_2:
+                    switch_weapon(1)
+                elif event.key == pygame.K_SPACE:
+                    use_consumable()
 
-    #Drawing
-    draw_sprites()
-    draw_ui()
-    cursor.cursor.draw(screen)
+        #Drawing
+        draw_sprites()
+        draw_ui()
+        cursor.cursor.draw(screen)
 
-    ################
-    ####Debuging####
-    ################
-    #debug_text(f"{entity_manager.hero.map_position}")
-    #debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
-    #debug_text(f"109 pos: {entity_manager.hero.direct_proximity_collision_tiles[1].map_position}",x = 10, y = 30)
-    debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
-    debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
-    # debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(0).position}",x = 10, y = 60)
-    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
-    # debug_text(f"mon 0 current_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).current_tile_position}",x = 10, y = 60)
-    # debug_text(f"mon 0 prvous_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).previous_tile_position}",x = 10, y = 75)
-    # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 90)
-    # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
+        ################
+        ####Debuging####
+        ################
+        #debug_text(f"{entity_manager.hero.map_position}")
+        #debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
+        #debug_text(f"109 pos: {entity_manager.hero.direct_proximity_collision_tiles[1].map_position}",x = 10, y = 30)
+        debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
+        debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
+        # debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(0).position}",x = 10, y = 60)
+        # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
+        # debug_text(f"mon 0 current_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).current_tile_position}",x = 10, y = 60)
+        # debug_text(f"mon 0 prvous_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).previous_tile_position}",x = 10, y = 75)
+        # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 90)
+        # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)
 
-    #util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")
-    #util.increment_print_matrix_timer(entity_manager.level_sprites_matrix, "S", True)
-    #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix, "S")
+        #util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")
+        #util.increment_print_matrix_timer(entity_manager.level_sprites_matrix, "S", True)
+        #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix, "S")
 
-    #Other
-    pygame.display.update()
-    clock.tick(60)
+        #Other
+        pygame.display.update()
+        clock.tick(60)
+
+def main():
+    play_music(0)
+    menu.menu()
+    initialize_game()
+    main_game_loop()
+
+main()
