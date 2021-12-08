@@ -53,7 +53,8 @@ def initialize_player():
     hero.tile_index = level_painter.player_starting_tile
     hero.prevous_tile_index = level_painter.player_starting_tile
     hero.map_position = TILE_SIZE[X]//2+(48*hero.tile_index[1])+screen_width//2, TILE_SIZE[Y]//2+(48*hero.tile_index[0]+screen_height//2)
-    give_item_to_player(Item((0,0),SWORD))
+    if hero.weapons[SWORD] == None:
+        give_item_to_player(Item((0,0),SWORD))
 
 def initialize_level_matrices():
     initialize_level_sprites_matrix(level_sprites_matrix)
