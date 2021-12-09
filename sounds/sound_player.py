@@ -71,6 +71,42 @@ ABILITIES_SOUNDS = {TELEPORT_BLUR:bishop_tele_blur_sound}
 RANGED_WEAPON_SOUNDS_DICT = {EMERALD_CROSSBOW:crossbow_attack_sound, BISHOP_MAGIC_MISSILE:bishop_magic_missile_attack_sound}
 PROJECTILE_HIT_SOUNDS_DICT = {CROSSBOW_BOLT:crossbow_bolt_hit_sound, MAGIC_MISSILE:bishop_magic_missile_hit_sound}
 
+def increment_effects_volume():
+    global SFX_VOLUME
+
+    SFX_VOLUME += 0.025
+    if SFX_VOLUME >= 1:
+        SFX_VOLUME = 1
+
+    set_volume_for_all_sfx(SFX_VOLUME)
+
+def decrement_effects_volume():
+    global SFX_VOLUME
+
+    SFX_VOLUME -= 0.025
+    if SFX_VOLUME < 0:
+        SFX_VOLUME = 0
+         
+    set_volume_for_all_sfx(SFX_VOLUME)
+
+def increment_music_volume():
+    global MUSIC_VOLUME
+
+    MUSIC_VOLUME += 0.0125
+    if MUSIC_VOLUME >= 1:
+        MUSIC_VOLUME = 1
+
+    set_music_volume(MUSIC_VOLUME)
+
+def decrement_music_volume():
+    global MUSIC_VOLUME
+
+    MUSIC_VOLUME -= 0.0125
+    if MUSIC_VOLUME < 0:
+        MUSIC_VOLUME = 0
+         
+    set_music_volume(MUSIC_VOLUME)
+
 def play_menu_select_sound():
     menu_select.stop()
     menu_select.play()

@@ -10,12 +10,12 @@ slider_fill = pygame.image.load("images/menu/slider/slider_fill.png").convert_al
 slider_mask = pygame.image.load("images/menu/slider/slider_mask.png").convert_alpha()
 
 #Texts
-game_title = pygame.image.load("images/menu/title.png").convert_alpha()
-game_paused = pygame.image.load("images/menu/game_paused.png").convert_alpha()
-settings = pygame.image.load("images/menu/settings.png").convert_alpha()
-sound_volume = pygame.image.load("images/menu/sound_volume.png").convert_alpha()
-leave_question = pygame.image.load("images/menu/leave_game_question.png").convert_alpha()
-quit_question = pygame.image.load("images/menu/quit_question.png").convert_alpha()
+game_title_text = pygame.image.load("images/menu/title.png").convert_alpha()
+game_paused_text = pygame.image.load("images/menu/game_paused.png").convert_alpha()
+settings_text = pygame.image.load("images/menu/settings.png").convert_alpha()
+sound_volume_text = pygame.image.load("images/menu/sound_volume.png").convert_alpha()
+leave_question_text = pygame.image.load("images/menu/leave_game_question.png").convert_alpha()
+quit_question_text = pygame.image.load("images/menu/quit_question.png").convert_alpha()
 
 #Buttons
 new_game_button_01 = pygame.image.load("images/menu/buttons/new_game/new_game_01.png").convert_alpha()
@@ -170,7 +170,16 @@ RESUME_BUTTON = "resume button"
 LEAVE_GAME_BUTTON = "leave game button"
 
 MAIN_MENU_BUTTONS = [QUIT_BUTTON,SETTINGS_BUTTON,NEW_GAME_BUTTON]
-SETTINGS_MENU_BUTTONS = [EFFECTS_BUTTON,MUSIC_BUTTON,BACK_BUTTON]
-PAUSE_MENU_BUTTONS = [LEAVE_GAME_BUTTON,RESUME_BUTTON]
+SETTINGS_MENU_BUTTONS = [BACK_BUTTON, MUSIC_BUTTON, EFFECTS_BUTTON]
+PAUSE_MENU_BUTTONS = [RESUME_BUTTON,LEAVE_GAME_BUTTON, SETTINGS_BUTTON]
 YES_NO_MENU_BUTTONS = [YES_BUTTON,NO_BUTTON]
-MENU_BUTTON_IMGAGE_SETS = {NEW_GAME_BUTTON:new_game_button, SETTINGS_BUTTON:settings_button, QUIT_BUTTON:quit_button}
+MENU_BUTTON_IMGAGE_SETS = {NEW_GAME_BUTTON:new_game_button,
+                           SETTINGS_BUTTON:settings_button, 
+                           QUIT_BUTTON:quit_button, 
+                           RESUME_BUTTON:resume_button, 
+                           BACK_BUTTON:back_button,
+                           EFFECTS_BUTTON:effects_button,
+                           MUSIC_BUTTON:music_button,
+                           LEAVE_GAME_BUTTON:leave_game_button,
+                           YES_BUTTON:yes_button,
+                           NO_BUTTON:no_button}
