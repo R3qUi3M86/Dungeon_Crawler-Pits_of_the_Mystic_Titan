@@ -1,8 +1,8 @@
 import random
 import pygame
 import math
+import settings
 from sys import exit
-from settings import *
 from entities import cursor
 from images.menu.menu_images import *
 from sounds import sound_player
@@ -16,12 +16,14 @@ main_menu = True
 settings_menu = False
 pause_menu = False
 yes_or_no_menu = False
-in_game = False
 selected_button = None
 
+in_game = False
+entering_game = False
 fading_out = False
 fade_out_overlay = pygame.Surface(screen.get_size())
 fade_out_overlay.fill((0,0,0))
+fade_out_overlay.set_alpha(0)
 
 #Background image
 menu_background_image = pygame.transform.scale(menu_background,(1400,934))
@@ -158,7 +160,7 @@ music_slider_pip_rect = slider_pip.get_rect()
 music_slider_pip_rect.center = music_slider_bar_rect.center
 
 #Drawing
-def draw_menu_elements(yes_no_prompt=LEAVE_GAME_BUTTON):
+def draw_menu_elements():
     screen.blit(menu_background_image,(background_pos))
 
     if main_menu:
@@ -170,9 +172,9 @@ def draw_menu_elements(yes_no_prompt=LEAVE_GAME_BUTTON):
         draw_settings_menu_elements()
     
     elif yes_or_no_menu:
-        if yes_no_prompt == LEAVE_GAME_BUTTON:
+        if in_game:
             screen.blit(leave_question_img,leave_question_rect)
-        elif yes_no_prompt == QUIT_BUTTON:
+        else:
             screen.blit(quit_question_img,quit_question_rect)
         draw_yes_no_menu_buttons()
     
@@ -212,8 +214,21 @@ def draw_pause_menu_buttons():
     screen.blit(BUTTON_IMAGES[LEAVE_GAME_BUTTON],leave_game_rect)
 
 #Menu effects
-def fade_out_and_start_game():
-    pass
+def fade_out_and_enter_game():
+    global entering_game
+    global pause_menu
+    global main_menu
+
+    alpha = fade_out_overlay.get_alpha()
+
+    if alpha == 255:
+        entering_game = True
+        pause_menu = True
+        main_menu = False
+    else:
+        fade_out_overlay.set_alpha(alpha+5)
+  
+    screen.blit(fade_out_overlay,(0,0))
 
 def animate_button(button_name, direction):
     index = BUTTON_ANIM_INDICES[button_name]
@@ -488,6 +503,7 @@ def enter_selected_option(used_button):
     global settings_menu
     global yes_or_no_menu
     global fading_out
+    global in_game
 
     sound_player.play_menu_push_sound()
     if used_button == SETTINGS_BUTTON:
@@ -499,20 +515,24 @@ def enter_selected_option(used_button):
         yes_or_no_menu = True
     
     elif used_button == NEW_GAME_BUTTON:
-        main_menu = False
-        pause_menu = True
+        settings.starting_new_game = True
+        in_game = True
         fading_out = True
     
     elif used_button == BACK_BUTTON:
-        main_menu = True
         settings_menu = False
+        if not in_game:
+            main_menu = True
+        else:
+            pause_menu = True
     
     elif used_button == RESUME_BUTTON:
+        settings.starting_new_game = False
         fading_out = True
 
     elif used_button == LEAVE_GAME_BUTTON:
         pause_menu = False
-        main_menu = True
+        yes_or_no_menu = True
 
     elif used_button == NO_BUTTON:
         if in_game:
@@ -524,8 +544,10 @@ def enter_selected_option(used_button):
 
     elif used_button == YES_BUTTON:
         if in_game:
+            yes_or_no_menu = False
             pause_menu = False
             main_menu = True
+            in_game = False
         else:
             pygame.quit()
             exit()
@@ -534,6 +556,8 @@ def menu():
     global selected_button
     global dragging_sfx_pip
     global dragging_music_pip
+    global fading_out
+    global entering_game
 
     while True:
         m_x, m_y = pygame.mouse.get_pos()
@@ -543,12 +567,18 @@ def menu():
         click = False
         rclick = False
 
+        if entering_game:
+            fading_out = False
+            entering_game = False
+            fade_out_overlay.set_alpha(0)
+            break
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and not fading_out:
                 if event.key == pygame.K_UP:
                     cycle_options_up()
                 elif event.key == pygame.K_DOWN:
@@ -563,7 +593,7 @@ def menu():
                     if selected_button:
                         enter_selected_option(selected_button)
             
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and not fading_out:
                 if event.button == 1:
                     click = True
                     if sfx_slider_pip_rect.collidepoint(m_x,m_y):
@@ -573,107 +603,123 @@ def menu():
                 elif event.button == 3:
                     rclick = True
 
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP and not fading_out:
                 if event.button == 1:
                     dragging_sfx_pip = False
                     dragging_music_pip = False
 
         #Buttons animation
-        if main_menu:
-            if new_game_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[NEW_GAME_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(NEW_GAME_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    enter_selected_option(NEW_GAME_BUTTON)
+        if not fading_out:
+            if main_menu:
+                if new_game_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[NEW_GAME_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(NEW_GAME_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(NEW_GAME_BUTTON)
 
-            elif settings_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[SETTINGS_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(SETTINGS_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    enter_selected_option(SETTINGS_BUTTON)
+                elif settings_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[SETTINGS_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(SETTINGS_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(SETTINGS_BUTTON)
 
-            elif quit_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[QUIT_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(QUIT_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    enter_selected_option(QUIT_BUTTON)
+                elif quit_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[QUIT_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(QUIT_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(QUIT_BUTTON)
 
-        elif settings_menu:
-            if effects_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[EFFECTS_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(EFFECTS_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    sound_player.increment_effects_volume()
-                elif rclick:
-                    sound_player.decrement_effects_volume()
+            elif settings_menu:
+                if effects_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[EFFECTS_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(EFFECTS_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        sound_player.increment_effects_volume()
+                    elif rclick:
+                        sound_player.decrement_effects_volume()
 
-            elif music_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[MUSIC_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(MUSIC_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    sound_player.increment_music_volume()
-                elif rclick:
-                    sound_player.decrement_music_volume()
+                elif music_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[MUSIC_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(MUSIC_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        sound_player.increment_music_volume()
+                    elif rclick:
+                        sound_player.decrement_music_volume()
 
-            elif back_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[BACK_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(BACK_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    enter_selected_option(BACK_BUTTON)    
+                elif back_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[BACK_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(BACK_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(BACK_BUTTON)    
 
-        elif pause_menu:
-            if resume_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[RESUME_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(RESUME_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    enter_selected_option(RESUME_BUTTON) 
+            elif pause_menu:
+                if resume_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[RESUME_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(RESUME_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(RESUME_BUTTON) 
 
-            elif settings_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[SETTINGS_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(SETTINGS_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    enter_selected_option(SETTINGS_BUTTON)
+                elif settings_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[SETTINGS_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(SETTINGS_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(SETTINGS_BUTTON)
 
-            elif leave_game_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[LEAVE_GAME_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(LEAVE_GAME_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    enter_selected_option(LEAVE_GAME_BUTTON)
+                elif leave_game_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[LEAVE_GAME_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(LEAVE_GAME_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(LEAVE_GAME_BUTTON)
 
-        elif yes_or_no_menu:
-            if yes_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[YES_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(YES_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    enter_selected_option(YES_BUTTON) 
+            elif yes_or_no_menu:
+                if yes_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[YES_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(YES_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(YES_BUTTON) 
 
-            elif no_rect.collidepoint(m_x, m_y):
-                if BUTTON_ANIM_INDICES[NO_BUTTON] == 0:
-                    sound_player.play_menu_select_sound()
-                animate_button(NO_BUTTON, ASCENDING)
-                selected_button = None
-                if click:
-                    enter_selected_option(NO_BUTTON)
+                elif no_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[NO_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(NO_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(NO_BUTTON)
+
+            if dragging_sfx_pip or dragging_music_pip:
+                zero_volume_pos = sfx_slider_bar_rect.center[0]-665/2
+                volume = (m_x - zero_volume_pos)/665
+                if volume < 0:
+                    volume = 0
+                elif volume > 1:
+                    volume = 1            
+                
+                if dragging_sfx_pip:
+                    sound_player.SFX_VOLUME = volume
+                    sound_player.set_volume_for_all_sfx(volume)
+                elif dragging_music_pip:
+                    sound_player.MUSIC_VOLUME = volume
+                    sound_player.set_music_volume(volume)
 
         if selected_button:
             if BUTTON_ANIM_INDICES[selected_button] == 0:
@@ -681,27 +727,15 @@ def menu():
             animate_button(selected_button, ASCENDING)
         descend_animation_on_not_selected_buttons(m_x,m_y)
 
-        if dragging_sfx_pip or dragging_music_pip:
-            zero_volume_pos = sfx_slider_bar_rect.center[0]-665/2
-            volume = (m_x - zero_volume_pos)/665
-            if volume < 0:
-                volume = 0
-            elif volume > 1:
-                volume = 1            
-            
-            if dragging_sfx_pip:
-                sound_player.SFX_VOLUME = volume
-                sound_player.set_volume_for_all_sfx(volume)
-            elif dragging_music_pip:
-                sound_player.MUSIC_VOLUME = volume
-                sound_player.set_music_volume(volume)
-
         #Background animation
-        animate_background()
+        if not fading_out:
+            animate_background()
 
         #Drawing
         draw_menu_elements()
         cursor.cursor.draw(screen)
+        if fading_out:
+            fade_out_and_enter_game()
 
         #Other
         pygame.display.update()

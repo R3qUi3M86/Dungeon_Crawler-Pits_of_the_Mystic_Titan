@@ -1,6 +1,8 @@
 import pygame
 from pygame.constants import DOUBLEBUF
 
+starting_new_game = False
+
 #Full screen mode
 # screen_width = pygame.display.Info().current_w
 # screen_height = pygame.display.Info().current_h

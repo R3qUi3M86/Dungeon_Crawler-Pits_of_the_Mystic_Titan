@@ -9,6 +9,7 @@ from utilities import util
 from utilities import ui_elements
 from utilities import menu
 from sys import exit
+import settings
 from entities import cursor
 
 pygame.init()
@@ -187,6 +188,12 @@ def draw_ui():
         ui_elements.display_pickup_text()
 
 #Game initialization
+def start_new_game():
+    entity_manager.clear_all_lists()
+    entity_manager.create_new_player()
+    initialize_game()
+    main_game_loop()
+
 def initialize_game():
     entity_manager.initialize_level_matrices()
     level_painter.paint_level()
@@ -228,6 +235,10 @@ def main_game_loop():
                     switch_weapon(1)
                 elif event.key == pygame.K_SPACE:
                     use_consumable()
+                elif event.key == pygame.K_ESCAPE:
+                    menu.menu()
+                    if settings.starting_new_game:
+                        start_new_game()
 
         #Drawing
         draw_sprites()
@@ -260,7 +271,6 @@ def main_game_loop():
 def main():
     play_music(0)
     menu.menu()
-    initialize_game()
-    main_game_loop()
+    start_new_game()
 
 main()

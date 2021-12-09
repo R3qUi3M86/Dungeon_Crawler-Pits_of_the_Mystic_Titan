@@ -3,7 +3,7 @@ from settings import *
 from images.ui import ui
 from utilities.constants import *
 from utilities.entity_manager import picked_up_item_names
-from utilities.entity_manager import hero
+from utilities import entity_manager
 from utilities.text_printer import *
 
 pickup_text_display_timer = 0
@@ -60,20 +60,20 @@ central_light = ui.central_light6
 damage_overlay = ui.damage_overaly
 
 def draw_damage_overlay():
-    if hero.has_taken_damage == True:
-        index = int(hero.damage_timer/(hero.damage_timer_limit/4))
+    if entity_manager.hero.has_taken_damage == True:
+        index = int(entity_manager.hero.damage_timer/(entity_manager.hero.damage_timer_limit/4))
         screen.blit(damage_overlay[index],(0,0))
-        hero.damage_timer += 0.0167
-    if hero.damage_timer >= hero.damage_timer_limit:
-        hero.damage_timer = 0
-        hero.has_taken_damage = False
+        entity_manager.hero.damage_timer += 0.0167
+    if entity_manager.hero.damage_timer >= entity_manager.hero.damage_timer_limit:
+        entity_manager.hero.damage_timer = 0
+        entity_manager.hero.has_taken_damage = False
 
 def draw_health_bar():
     screen.blit(ui.health_bar_empty, HEALTH_BAR_POS)
     health_surface = pygame.Surface(HEALTH_BAR_SIZE, pygame.SRCALPHA)
 
-    health_step = HEALTH_LENGTH // (hero.maxhealth)
-    missing_health = hero.maxhealth - hero.health
+    health_step = HEALTH_LENGTH // (entity_manager.hero.maxhealth)
+    missing_health = entity_manager.hero.maxhealth - entity_manager.hero.health
 
     health_surface.blit(ui.health_bar_health,(-health_step*missing_health,0))
     health_surface.blit(ui.health_bar_health_mask,(0,0))
@@ -85,7 +85,7 @@ def draw_health_bar():
 def draw_weapon_ammo_counter():
     screen.blit(ui.ammo_counter_overlay2, AMMO_COUNTER_BOX_POS)
     screen.blit(get_selected_weapon_image(), AMMO_WEAP_IMAGE_POS)
-    ammo = hero.ammo[hero.selected_weapon]
+    ammo = entity_manager.hero.ammo[entity_manager.hero.selected_weapon]
     ammo_text = format_ammo_text(ammo)
     if ammo_text != "INF":
         display_ammo_runic_text(ammo_text, PALE_WHITE_COLOR, AMMO_NUMBER_POS[0], AMMO_NUMBER_POS[1])
@@ -98,8 +98,8 @@ def draw_consumable_counter():
     screen.blit(ui.consumable_counter_overlay, CONSUMABLE_COUNTER_BOX_POS)
     selected_consumable_image = get_selected_consumable_image()
     if selected_consumable_image:
-        cooldown = hero.consumables[hero.selected_consumable].use_cooldown
-        cooldown_limit = hero.consumables[hero.selected_consumable].use_cooldown_limit
+        cooldown = entity_manager.hero.consumables[entity_manager.hero.selected_consumable].use_cooldown
+        cooldown_limit = entity_manager.hero.consumables[entity_manager.hero.selected_consumable].use_cooldown_limit
         if cooldown == 0:
             selected_consumable_image.set_alpha(255)
         else:
@@ -114,7 +114,7 @@ def draw_consumable_counter():
         else:
             consumable_use_image_index = 0
 
-        consumable = hero.consumables[hero.selected_consumable]
+        consumable = entity_manager.hero.consumables[entity_manager.hero.selected_consumable]
         uses = consumable.quantity
         consumable_text = format_consumable_text(uses)
         display_ammo_runic_text(consumable_text, PALE_WHITE_COLOR, CONSUMABLE_NUMBER_POS[0], CONSUMABLE_NUMBER_POS[1])
@@ -138,11 +138,11 @@ def display_pickup_text():
         del picked_up_item_names[0]
     
 def get_selected_weapon_image():
-    weapon = hero.selected_weapon
+    weapon = entity_manager.hero.selected_weapon
     return ui.inventory_weapons[HERO_WEAPONS.index(weapon)]
 
 def get_selected_consumable_image():
-    consumable = hero.selected_consumable
+    consumable = entity_manager.hero.selected_consumable
     if consumable:
         return ui.inventory_consumables[CONSUMABLES.index(consumable)]
 

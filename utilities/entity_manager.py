@@ -49,6 +49,40 @@ far_proximity_secondary_wall_sprites_list = [] #For faster update_position
 far_proximity_level_water_sprites_list = [] #For faster update_position - animation to be implemented
 
 #Initialization
+def clear_all_lists():
+    global entities_id
+    global picked_up_item_names
+    global all_monsters
+    global far_proximity_entity_sprites_list
+    global far_proximity_character_sprites_list
+    global far_proximity_item_sprites_list
+    global far_proximity_projectile_sprites_list
+    global far_proximity_level_collider_sprites_list
+    global far_proximity_primary_wall_sprites_list
+    global far_proximity_secondary_wall_sprites_list
+    global far_proximity_level_water_sprites_list
+
+    entities_id = []
+    picked_up_item_names = []
+    all_monsters = []
+    far_proximity_entity_sprites_list = []
+    far_proximity_character_sprites_list = []
+    far_proximity_item_sprites_list = []
+    far_proximity_projectile_sprites_list = []
+    far_proximity_level_collider_sprites_list = []
+    far_proximity_primary_wall_sprites_list = []
+    far_proximity_secondary_wall_sprites_list = []
+    far_proximity_level_water_sprites_list = []
+
+def create_new_player():
+    global hero
+    global hero_sprite_group
+    global far_proximity_shadow_sprite_group_list
+
+    hero = Hero(player_position)
+    hero_sprite_group = pygame.sprite.GroupSingle(hero)
+    far_proximity_shadow_sprite_group_list = [pygame.sprite.GroupSingle(hero.shadow)]
+
 def initialize_player():
     hero.tile_index = level_painter.player_starting_tile
     hero.prevous_tile_index = level_painter.player_starting_tile

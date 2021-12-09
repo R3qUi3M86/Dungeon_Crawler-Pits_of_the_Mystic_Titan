@@ -8,6 +8,9 @@ PLAYER_ID = -1
 X = 0
 Y = 1
 
+NEW_GAME = "new game"
+CONTINUE_GAME = "continue game"
+
 #Object type
 ENTITY = "entity"
 SHADOW = "shadow"
