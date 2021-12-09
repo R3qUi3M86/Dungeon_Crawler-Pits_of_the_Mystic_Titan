@@ -6,6 +6,7 @@ from sys import exit
 from entities import cursor
 from images.menu.menu_images import *
 from sounds import sound_player
+from utilities import ui_elements
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -20,10 +21,7 @@ selected_button = None
 
 in_game = False
 entering_game = False
-fading_out = False
-fade_out_overlay = pygame.Surface(screen.get_size())
-fade_out_overlay.fill((0,0,0))
-fade_out_overlay.set_alpha(0)
+going_to_main_menu = False
 
 #Background image
 menu_background_image = pygame.transform.scale(menu_background,(1400,934))
@@ -212,23 +210,6 @@ def draw_pause_menu_buttons():
     screen.blit(BUTTON_IMAGES[RESUME_BUTTON],resume_rect)
     screen.blit(BUTTON_IMAGES[SETTINGS_BUTTON],settings_rect)
     screen.blit(BUTTON_IMAGES[LEAVE_GAME_BUTTON],leave_game_rect)
-
-#Menu effects
-def fade_out_and_enter_game():
-    global entering_game
-    global pause_menu
-    global main_menu
-
-    alpha = fade_out_overlay.get_alpha()
-
-    if alpha == 255:
-        entering_game = True
-        pause_menu = True
-        main_menu = False
-    else:
-        fade_out_overlay.set_alpha(alpha+5)
-  
-    screen.blit(fade_out_overlay,(0,0))
 
 def animate_button(button_name, direction):
     index = BUTTON_ANIM_INDICES[button_name]
@@ -502,8 +483,9 @@ def enter_selected_option(used_button):
     global pause_menu
     global settings_menu
     global yes_or_no_menu
-    global fading_out
     global in_game
+    global entering_game
+    global going_to_main_menu
 
     sound_player.play_menu_push_sound()
     if used_button == SETTINGS_BUTTON:
@@ -515,9 +497,11 @@ def enter_selected_option(used_button):
         yes_or_no_menu = True
     
     elif used_button == NEW_GAME_BUTTON:
+        sound_player.fadeout_music()
         settings.starting_new_game = True
+        entering_game = True
         in_game = True
-        fading_out = True
+        ui_elements.fading_out = True
     
     elif used_button == BACK_BUTTON:
         settings_menu = False
@@ -528,7 +512,7 @@ def enter_selected_option(used_button):
     
     elif used_button == RESUME_BUTTON:
         settings.starting_new_game = False
-        fading_out = True
+        entering_game = True
 
     elif used_button == LEAVE_GAME_BUTTON:
         pause_menu = False
@@ -544,10 +528,10 @@ def enter_selected_option(used_button):
 
     elif used_button == YES_BUTTON:
         if in_game:
-            yes_or_no_menu = False
-            pause_menu = False
-            main_menu = True
+            sound_player.fadeout_music()
             in_game = False
+            going_to_main_menu = True
+            ui_elements.fading_out = True
         else:
             pygame.quit()
             exit()
@@ -556,8 +540,11 @@ def menu():
     global selected_button
     global dragging_sfx_pip
     global dragging_music_pip
-    global fading_out
     global entering_game
+    global going_to_main_menu
+    global pause_menu
+    global main_menu
+    global yes_or_no_menu
 
     while True:
         m_x, m_y = pygame.mouse.get_pos()
@@ -567,49 +554,56 @@ def menu():
         click = False
         rclick = False
 
-        if entering_game:
-            fading_out = False
+        if entering_game and ui_elements.fading_out == False:
             entering_game = False
-            fade_out_overlay.set_alpha(0)
+            pause_menu = True
+            main_menu = False
             break
+
+        if going_to_main_menu and ui_elements.fading_out == False:
+            sound_player.play_music(-1)
+            going_to_main_menu = False
+            yes_or_no_menu = False
+            main_menu = True
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            
-            if event.type == pygame.KEYDOWN and not fading_out:
-                if event.key == pygame.K_UP:
-                    cycle_options_up()
-                elif event.key == pygame.K_DOWN:
-                    cycle_options_down()
-                elif event.key == pygame.K_RIGHT:
-                    increment_option(m_x,m_y)
-                elif event.key == pygame.K_LEFT:
-                    decrement_option(m_x,m_y)
-                elif event.key == pygame.K_ESCAPE:
-                    go_back_or_quit_prompt()
-                elif event.key == pygame.K_RETURN:
-                    if selected_button:
-                        enter_selected_option(selected_button)
-            
-            if event.type == pygame.MOUSEBUTTONDOWN and not fading_out:
-                if event.button == 1:
-                    click = True
-                    if sfx_slider_pip_rect.collidepoint(m_x,m_y):
-                        dragging_sfx_pip = True
-                    elif music_slider_pip_rect.collidepoint(m_x,m_y):
-                        dragging_music_pip = True
-                elif event.button == 3:
-                    rclick = True
+            if not ui_elements.fading_out:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        cycle_options_up()
+                    elif event.key == pygame.K_DOWN:
+                        cycle_options_down()
+                    elif event.key == pygame.K_RIGHT:
+                        increment_option(m_x,m_y)
+                    elif event.key == pygame.K_LEFT:
+                        decrement_option(m_x,m_y)
+                    elif event.key == pygame.K_ESCAPE:
+                        go_back_or_quit_prompt()
+                    elif event.key == pygame.K_RETURN:
+                        if selected_button:
+                            enter_selected_option(selected_button)
+                
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        click = True
+                        if sfx_slider_pip_rect.collidepoint(m_x,m_y):
+                            dragging_sfx_pip = True
+                        elif music_slider_pip_rect.collidepoint(m_x,m_y):
+                            dragging_music_pip = True
+                    elif event.button == 3:
+                        rclick = True
 
-            if event.type == pygame.MOUSEBUTTONUP and not fading_out:
-                if event.button == 1:
-                    dragging_sfx_pip = False
-                    dragging_music_pip = False
+                if event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 1:
+                        dragging_sfx_pip = False
+                        dragging_music_pip = False
 
         #Buttons animation
-        if not fading_out:
+        if not ui_elements.fading_out:
             if main_menu:
                 if new_game_rect.collidepoint(m_x, m_y):
                     if BUTTON_ANIM_INDICES[NEW_GAME_BUTTON] == 0:
@@ -725,17 +719,20 @@ def menu():
             if BUTTON_ANIM_INDICES[selected_button] == 0:
                 sound_player.play_menu_select_sound()
             animate_button(selected_button, ASCENDING)
+        
         descend_animation_on_not_selected_buttons(m_x,m_y)
 
         #Background animation
-        if not fading_out:
+        if not ui_elements.fading_out:
             animate_background()
 
         #Drawing
         draw_menu_elements()
         cursor.cursor.draw(screen)
-        if fading_out:
-            fade_out_and_enter_game()
+        if ui_elements.fading_out:
+            ui_elements.fade_out()
+        elif ui_elements.fading_in:
+            ui_elements.fade_in()
 
         #Other
         pygame.display.update()

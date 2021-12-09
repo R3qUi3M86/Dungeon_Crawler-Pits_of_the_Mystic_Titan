@@ -9,7 +9,8 @@ from utilities import entity_manager
 from utilities.constants import *
 
 TILE_SIZE = 48,48
-level_layout = level_01_map
+levels = [level_01_map, test_map]
+level_layout = levels[0]
 pathfinding_matrix = []
 pathfinding_flying_matrix = []
 level_surface = None
@@ -79,6 +80,9 @@ def create_level_tile(type,tile_index,position,size,vicinity_matrix, wall_mode=H
 def generate_pathfinding_matrix(impassable_tiles_type):
     global pathfinding_matrix
     global pathfinding_flying_matrix
+
+    pathfinding_matrix = []
+    pathfinding_flying_matrix = []
     
     for level_layout_row in level_layout:
         matrix_row = []

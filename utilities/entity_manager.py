@@ -5,7 +5,7 @@ from sounds import sound_player
 from utilities import util
 from utilities.constants import *
 from utilities import level_painter
-from utilities.level_painter import level_layout
+from utilities import level_painter
 from utilities.level_painter import TILE_SIZE
 from entities.level.level import WATER
 from entities.characters.monster import Monster
@@ -61,6 +61,7 @@ def clear_all_lists():
     global far_proximity_primary_wall_sprites_list
     global far_proximity_secondary_wall_sprites_list
     global far_proximity_level_water_sprites_list
+    global far_proximity_shadow_sprite_group_list
 
     entities_id = []
     picked_up_item_names = []
@@ -73,15 +74,25 @@ def clear_all_lists():
     far_proximity_primary_wall_sprites_list = []
     far_proximity_secondary_wall_sprites_list = []
     far_proximity_level_water_sprites_list = []
+    far_proximity_shadow_sprite_group_list = [pygame.sprite.GroupSingle(hero.shadow)]
 
 def create_new_player():
     global hero
     global hero_sprite_group
-    global far_proximity_shadow_sprite_group_list
 
     hero = Hero(player_position)
     hero_sprite_group = pygame.sprite.GroupSingle(hero)
-    far_proximity_shadow_sprite_group_list = [pygame.sprite.GroupSingle(hero.shadow)]
+
+def initialize_game():
+    initialize_level_matrices()
+    level_painter.paint_level()
+    initialize_player()
+    initialize_all_entities_and_shadows_sprite_group_matrix()
+    #fill_map_with_monsters(1)
+    generate_monsters()
+    generate_items()
+    update_far_proximity_matrices_and_lists()
+    finish_init()
 
 def initialize_player():
     hero.tile_index = level_painter.player_starting_tile
@@ -101,9 +112,8 @@ def initialize_level_sprites_matrix(matrix):
     global secondary_wall_sprites_matrix
 
     new_level_matrix = []
-
-    x = len(level_layout)
-    y = len(level_layout[0])
+    x = len(level_painter.level_layout)
+    y = len(level_painter.level_layout[0])
     for _ in range(x):
         row = []
         for _ in range (y):
@@ -121,8 +131,8 @@ def initialize_all_entities_and_shadows_sprite_group_matrix():
     global all_entity_and_shadow_sprite_group_matrix
     
     all_entity_and_shadow_sprite_group_matrix = []
-    x = len(level_layout)
-    y = len(level_layout[0])
+    x = len(level_painter.level_layout)
+    y = len(level_painter.level_layout[0])
     
     for _ in range(x):
         row = []
@@ -152,7 +162,7 @@ def initialize_far_proximity_level_sprite_matrix():
     for row in far_proximity_index_matrix:
         new_tiles_row = []
         for cell in row:
-            if 0 <= cell[0] < len(level_layout) and 0 <= cell[1] < len(level_layout[0]):
+            if 0 <= cell[0] < len(level_painter.level_layout) and 0 <= cell[1] < len(level_painter.level_layout[0]):
                 tile_sprite = level_sprites_matrix[cell[0]][cell[1]]
                 new_tiles_row.append(tile_sprite)
         if len(new_tiles_row) > 0:
@@ -167,7 +177,7 @@ def initialize_far_proximity_primary_wall_sprite_matrix():
     for row in far_proximity_index_matrix:
         new_tiles_row = []
         for cell in row:
-            if 0 <= cell[0] < len(level_layout) and 0 <= cell[1] < len(level_layout[0]):
+            if 0 <= cell[0] < len(level_painter.level_layout) and 0 <= cell[1] < len(level_painter.level_layout[0]):
                 tile_sprite = primary_wall_sprites_matrix[cell[0]][cell[1]]
                 new_tiles_row.append(tile_sprite)
         if len(new_tiles_row) > 0:
@@ -182,7 +192,7 @@ def initialize_far_proximity_secondary_wall_sprite_matrix():
     for row in far_proximity_index_matrix:
         new_tiles_row = []
         for cell in row:
-            if 0 <= cell[0] < len(level_layout) and 0 <= cell[1] < len(level_layout[0]):
+            if 0 <= cell[0] < len(level_painter.level_layout) and 0 <= cell[1] < len(level_painter.level_layout[0]):
                 tile_sprite = secondary_wall_sprites_matrix[cell[0]][cell[1]]
                 new_tiles_row.append(tile_sprite)
         if len(new_tiles_row) > 0:
@@ -197,7 +207,7 @@ def initialize_far_proximity_entity_and_shadow_sprite_group_matrix():
     for row in far_proximity_index_matrix:
         new_list = []
         for cell in row:
-            if 0 <= cell[0] < len(level_layout) and 0 <= cell[1] < len(level_layout[0]):
+            if 0 <= cell[0] < len(level_painter.level_layout) and 0 <= cell[1] < len(level_painter.level_layout[0]):
                 entity_and_shadow_sprite_groups_list = all_entity_and_shadow_sprite_group_matrix[cell[0]][cell[1]]
                 new_list.append(entity_and_shadow_sprite_groups_list)
 
@@ -570,7 +580,7 @@ def append_last_row_to_matrix_and_objects_to_lists(matrix_type, tile_indices_mat
     global far_proximity_primary_wall_sprites_list
     global far_proximity_secondary_wall_sprites_list
     
-    if tile_indices_matrix[-1][0][0] < len(level_layout):
+    if tile_indices_matrix[-1][0][0] < len(level_painter.level_layout):
 
         #Entities and shadows (3D MATRIX)
         if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
@@ -578,7 +588,7 @@ def append_last_row_to_matrix_and_objects_to_lists(matrix_type, tile_indices_mat
             new_entities_row = []
             
             for tile_index in tile_indices_matrix[-1]:
-                if 0 <= tile_index[1] < len(level_layout[0]):
+                if 0 <= tile_index[1] < len(level_painter.level_layout[0]):
                     objects = all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]
                     new_entities_and_shadows_row.append(objects)
                     new_entities_cell = []
@@ -607,7 +617,7 @@ def append_last_row_to_matrix_and_objects_to_lists(matrix_type, tile_indices_mat
             new_level_tiles_row = []
             
             for tile_index in tile_indices_matrix[-1]:
-                if 0 <= tile_index[1] < len(level_layout[0]):
+                if 0 <= tile_index[1] < len(level_painter.level_layout[0]):
                     tile = level_sprites_matrix[tile_index[0]][tile_index[1]]
                     new_level_tiles_row.append(tile)
                     if tile.TYPE in IMPASSABLE_TILES:
@@ -620,7 +630,7 @@ def append_last_row_to_matrix_and_objects_to_lists(matrix_type, tile_indices_mat
             new_level_tiles_row = []
             
             for tile_index in tile_indices_matrix[-1]:
-                if 0 <= tile_index[1] < len(level_layout[0]):
+                if 0 <= tile_index[1] < len(level_painter.level_layout[0]):
                     tile = primary_wall_sprites_matrix[tile_index[0]][tile_index[1]]
                     new_level_tiles_row.append(tile)
                     if tile != 0:
@@ -631,7 +641,7 @@ def append_last_row_to_matrix_and_objects_to_lists(matrix_type, tile_indices_mat
             new_level_tiles_row = []
             
             for tile_index in tile_indices_matrix[-1]:
-                if 0 <= tile_index[1] < len(level_layout[0]):
+                if 0 <= tile_index[1] < len(level_painter.level_layout[0]):
                     tile = secondary_wall_sprites_matrix[tile_index[0]][tile_index[1]]
                     new_level_tiles_row.append(tile)
                     if tile != 0:
@@ -655,7 +665,7 @@ def remove_last_row_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_primary_wall_sprites_list
     global far_proximity_secondary_wall_sprites_list
     
-    if far_proximity_index_matrix[-1][0][0] < len(level_layout)-1: 
+    if far_proximity_index_matrix[-1][0][0] < len(level_painter.level_layout)-1: 
         
         #Entities and shadows (3D MATRIX)
         if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
@@ -722,7 +732,7 @@ def insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, tile_ind
             new_entities_row = []
 
             for tile_index in tile_indices_matrix[0]:
-                if 0 <= tile_index[1] < len(level_layout[0]):
+                if 0 <= tile_index[1] < len(level_painter.level_layout[0]):
                     objects = all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]
                     new_entities_and_shadows_row.append(objects)
                     new_entities_cell = []
@@ -751,7 +761,7 @@ def insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, tile_ind
             new_level_tiles_row = []
             
             for tile_index in tile_indices_matrix[0]:
-                if 0 <= tile_index[1] < len(level_layout[0]):
+                if 0 <= tile_index[1] < len(level_painter.level_layout[0]):
                     tile = level_sprites_matrix[tile_index[0]][tile_index[1]]
                     new_level_tiles_row.append(tile)
                     if tile.TYPE in IMPASSABLE_TILES:
@@ -764,7 +774,7 @@ def insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, tile_ind
             new_level_tiles_row = []
             
             for tile_index in tile_indices_matrix[0]:
-                if 0 <= tile_index[1] < len(level_layout[0]):
+                if 0 <= tile_index[1] < len(level_painter.level_layout[0]):
                     tile = primary_wall_sprites_matrix[tile_index[0]][tile_index[1]]
                     new_level_tiles_row.append(tile)
                     if tile != 0:
@@ -775,7 +785,7 @@ def insert_first_row_in_matrix_and_append_objects_to_lists(matrix_type, tile_ind
             new_level_tiles_row = []
             
             for tile_index in tile_indices_matrix[0]:
-                if 0 <= tile_index[1] < len(level_layout[0]):
+                if 0 <= tile_index[1] < len(level_painter.level_layout[0]):
                     tile = secondary_wall_sprites_matrix[tile_index[0]][tile_index[1]]
                     new_level_tiles_row.append(tile)
                     if tile != 0:
@@ -860,7 +870,7 @@ def append_last_col_to_matrix_and_objects_to_lists(matrix_type):
 
     i = 0
     for row_indices in far_proximity_index_matrix:
-        if 0 <= row_indices[-1][0] < len(level_layout) and row_indices[-1][1] < len(level_layout[0]):
+        if 0 <= row_indices[-1][0] < len(level_painter.level_layout) and row_indices[-1][1] < len(level_painter.level_layout[0]):
             
             #Entities and shadows (3D MATRIX)
             if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
@@ -923,7 +933,7 @@ def remove_last_col_from_matrix_and_objects_from_lists(matrix_type):
     global far_proximity_primary_wall_sprites_list
     global far_proximity_secondary_wall_sprites_list
 
-    if far_proximity_index_matrix[0][-1][1] < len(level_layout[0])-1:
+    if far_proximity_index_matrix[0][-1][1] < len(level_painter.level_layout[0])-1:
         
         #Entities and shadows (3D MATRIX)
         if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
@@ -984,7 +994,7 @@ def insert_first_col_in_matrix_and_append_objects_to_lists(matrix_type):
 
     i = 0
     for row_indices in far_proximity_index_matrix:
-        if 0 <= row_indices[0][0] < len(level_layout) and 0 <= row_indices[0][1]:
+        if 0 <= row_indices[0][0] < len(level_painter.level_layout) and 0 <= row_indices[0][1]:
 
             #Entities and shadows (3D MATRIX)
             if matrix_type == far_proximity_entity_and_shadow_sprite_group_matrix:
@@ -1090,11 +1100,11 @@ def remove_entity_shadow_from_the_game(entity):
 def generate_monsters():
     #generate_monster(ETTIN,(8,5))
     generate_monster(DARK_BISHOP,(14,22))
-    generate_monster(DARK_BISHOP,(14,23))
-    generate_monster(DARK_BISHOP,(14,24))
-    generate_monster(DARK_BISHOP,(13,22))
-    generate_monster(DARK_BISHOP,(13,23))
-    generate_monster(DARK_BISHOP,(13,24))
+    # generate_monster(DARK_BISHOP,(14,23))
+    # generate_monster(DARK_BISHOP,(14,24))
+    # generate_monster(DARK_BISHOP,(13,22))
+    # generate_monster(DARK_BISHOP,(13,23))
+    # generate_monster(DARK_BISHOP,(13,24))
     pass
 
 def fill_map_with_monsters(density):

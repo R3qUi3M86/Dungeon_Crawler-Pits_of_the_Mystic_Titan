@@ -22,6 +22,7 @@ class Tile(pygame.sprite.Sprite):
         
         self.is_convex = False
         self.is_hiding_player = False
+        self.is_exit_tile = False
         self.image_unscaled = self.get_tile_image()
         self.image = pygame.transform.scale(self.image_unscaled, size)
         self.cluster_x_y = self.get_cluster_x_y()
@@ -649,6 +650,7 @@ class Tile(pygame.sprite.Sprite):
             if self.vicinity_matrix[0][1] is not EXIT:
                 return level_exit_images_hidden[0][1]
             else:
+                self.is_exit_tile = True
                 return level_exit_images_hidden[1][1]
         elif self.vicinity_matrix[1][2] is not EXIT:
             if self.vicinity_matrix[0][1] is not EXIT:

@@ -2,7 +2,6 @@ import pygame
 from settings import *
 from images.ui import ui
 from utilities.constants import *
-from utilities.entity_manager import picked_up_item_names
 from utilities import entity_manager
 from utilities.text_printer import *
 
@@ -10,6 +9,12 @@ pickup_text_display_timer = 0
 pickup_text_display_timer_limit = 210
 
 consumable_use_image_index = 0
+
+fading_in = False
+fading_out = False
+fade_overlay = pygame.Surface(screen.get_size())
+fade_overlay.fill((0,0,0))
+fade_overlay.set_alpha(0)
 
 PALE_WHITE_COLOR = (180,200,200)
 PALE_ORANGE_COLOR = (210,200,150)
@@ -122,7 +127,7 @@ def draw_consumable_counter():
 def display_pickup_text():
     global pickup_text_display_timer
 
-    item_name = picked_up_item_names[0]
+    item_name = entity_manager.picked_up_item_names[0]
     displayed_text = PICKUP_TEXT + item_name
     if item_name in WEAPONS:
         displayed_text += "!"
@@ -135,7 +140,7 @@ def display_pickup_text():
     
     else:
         pickup_text_display_timer = 0
-        del picked_up_item_names[0]
+        del entity_manager.picked_up_item_names[0]
     
 def get_selected_weapon_image():
     weapon = entity_manager.hero.selected_weapon
@@ -162,4 +167,31 @@ def format_consumable_text(uses):
         return " "+str(uses)
     elif len(str(uses)) == 2:
         return str(uses)
-        
+
+def fade_in():
+    global fading_in
+    global fade_overlay
+
+    alpha = fade_overlay.get_alpha()
+
+    if alpha == 0:
+        fading_in = False
+    else:
+        fade_overlay.set_alpha(alpha-5)
+  
+    screen.blit(fade_overlay,(0,0))
+
+def fade_out():
+    global fading_out
+    global fading_in
+    global fade_overlay
+
+    alpha = fade_overlay.get_alpha()
+
+    if alpha == 255:
+        fading_out = False
+        fading_in = True
+    else:
+        fade_overlay.set_alpha(alpha+5)
+  
+    screen.blit(fade_overlay,(0,0))

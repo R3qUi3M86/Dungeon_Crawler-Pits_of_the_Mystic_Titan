@@ -2,8 +2,9 @@ from math import sqrt
 from utilities.constants import *
 from utilities import entity_manager
 from utilities import util
-from utilities.level_painter import level_layout
+from utilities import level_painter
 
+moving_to_next_level = False
 wall_hider_timer = 0
 wall_hider_timer_limit = 15
 
@@ -49,9 +50,13 @@ def player_vs_monster_movement_collision():
                     monster.monster_ai.is_waking_up = True
                 
 def character_vs_level_collision(character):
-    for level_collision_sprite in character.direct_proximity_collision_tiles:
-        
+    global moving_to_next_level
+
+    for level_collision_sprite in character.direct_proximity_collision_tiles:        
         if character.can_collide and not (level_collision_sprite.TYPE is WATER and FLYING in character.abilities) and character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
+            if character is entity_manager.hero and level_collision_sprite.is_exit_tile:
+                moving_to_next_level = True
+            
             collision_matrix = get_collision_matrix(character,level_collision_sprite)
 
             if any_sector_collider_collides(collision_matrix):
@@ -152,12 +157,12 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
     else:
         level_collision_sprite_north = entity_manager.level_sprites_matrix[north_tile_index[0]][north_tile_index[1]]        
         
-    if colliding_tile_index[0] == len(level_layout)-1:
+    if colliding_tile_index[0] == len(level_painter.level_layout)-1:
         level_collision_sprite_south = entity_manager.level_sprites_matrix[0][0]
     else:
         level_collision_sprite_south = entity_manager.level_sprites_matrix[south_tile_index[0]][south_tile_index[1]]
 
-    if colliding_tile_index[1] == len(level_layout[0])-1:
+    if colliding_tile_index[1] == len(level_painter.level_layout[0])-1:
         level_collision_sprite_east = entity_manager.level_sprites_matrix[0][0]
     else:
         level_collision_sprite_east = entity_manager.level_sprites_matrix[east_tile_index[0]][east_tile_index[1]]
@@ -593,11 +598,11 @@ def hero_is_above_wall_grid(tile_index):
     hero = entity_manager.hero
     wall_grid_index = None
 
-    if level_layout[tile_index[0]+1][tile_index[1]] == WALL:
+    if level_painter.level_layout[tile_index[0]+1][tile_index[1]] in WALL_LIKE:
         wall_grid_index = tile_index[0]+1, tile_index[1]
-    elif level_layout[tile_index[0]+2][tile_index[1]] == WALL:
+    elif level_painter.level_layout[tile_index[0]+2][tile_index[1]] in WALL_LIKE:
         wall_grid_index = tile_index[0]+2, tile_index[1]
-    elif level_layout[tile_index[0]][tile_index[1]] == WALL:
+    elif level_painter.level_layout[tile_index[0]][tile_index[1]] in WALL_LIKE:
         wall_grid_index = tile_index
 
     if tile_index[0]+2 >= hero.tile_index[0] <= wall_grid_index[0]:

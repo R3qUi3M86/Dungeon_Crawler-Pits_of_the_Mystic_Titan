@@ -10,8 +10,13 @@ pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
 
 #Music
-the_winnowing_hall = 'sounds/music/The Winnowing Hall.mp3'
-music_tracks = [the_winnowing_hall]
+the_winnowing_hall = 'sounds/music/The_Winnowing_Hall.mp3'
+the_dungeons = 'sounds/music/The_Dungeons.mp3'
+the_cathedral = 'sounds/music/The_Cathedral.mp3'
+the_crater = 'sounds/music/The_Crater.mp3'
+the_boss = 'sounds/music/The_Boss.mp3'
+
+music_tracks = [the_dungeons, the_cathedral, the_crater, the_boss, the_winnowing_hall]
 
 #Sound Effects
 menu_select = pygame.mixer.Sound('sounds/menu/KEYS2A.wav')
@@ -107,6 +112,9 @@ def decrement_music_volume():
          
     set_music_volume(MUSIC_VOLUME)
 
+def fadeout_music():
+    pygame.mixer.music.fadeout(1000)
+
 def play_menu_select_sound():
     menu_select.stop()
     menu_select.play()
@@ -114,6 +122,13 @@ def play_menu_select_sound():
 def play_menu_push_sound():
     menu_push.stop()
     menu_push.play()
+
+def set_volume_for_all_sfx(volume):
+    for sound in all_sounds:
+        sound.set_volume(volume)
+
+def set_music_volume(volume):
+    pygame.mixer.music.set_volume(volume)
 
 def play_item_picked_sound(item):
     if item.is_weapon:
@@ -127,13 +142,6 @@ def play_item_picked_sound(item):
 
 def play_vase_break_sound():
     vase_break.play()
-
-def set_volume_for_all_sfx(volume):
-    for sound in all_sounds:
-        sound.set_volume(volume)
-
-def set_music_volume(volume):
-    pygame.mixer.music.set_volume(volume)
 
 def play_monster_pain_sound(monster_name):
     MONSTER_PAIN_SOUND[monster_name].play()

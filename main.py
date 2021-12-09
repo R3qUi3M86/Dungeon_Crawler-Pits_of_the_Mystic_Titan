@@ -14,10 +14,13 @@ from entities import cursor
 
 pygame.init()
 clock = pygame.time.Clock()
+mouse_input_pause = False
+mouse_input_pause_timer = 0
 sorting_timer = 20
 sorting_timer_limit = 20
 sorted_entity_matrix = None
 wall_drawing_mode = VISIBLE
+
 set_volume_for_all_sfx(SFX_VOLUME)
 set_music_volume(MUSIC_VOLUME)
 pygame.event.set_allowed([pygame.QUIT])
@@ -26,7 +29,7 @@ pygame.event.set_allowed([pygame.QUIT])
 def get_player_wsad_input():
     keys = pygame.key.get_pressed()
 
-    if entity_manager.hero.is_living:
+    if entity_manager.hero.is_living and not collision_manager.moving_to_next_level:
         if keys[pygame.K_s] and entity_manager.hero.speed_scalar[Y] < 30.0:
             entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+1
 
@@ -89,13 +92,22 @@ def get_player_wsad_input():
         entity_manager.hero.speed_vector = 0,0
     
 def get_player_mouse_input():
+    global mouse_input_pause
+    global mouse_input_pause_timer
+
     mouse_pos = pygame.mouse.get_pos()
     entity_manager.hero.facing_direction = util.get_facing_direction(player_position,mouse_pos)
     
-    if pygame.mouse.get_pressed()[0]:
+    if pygame.mouse.get_pressed()[0] and not mouse_input_pause:
         if entity_manager.hero.is_living == True:
             entity_manager.hero.is_in_pain = False
             entity_manager.hero.is_attacking = True
+
+    if mouse_input_pause:
+        mouse_input_pause_timer += 1
+        if mouse_input_pause_timer == 10:
+            mouse_input_pause_timer = 0
+            mouse_input_pause = False
 
 def toggle_wall_drawing_mode():
     global wall_drawing_mode
@@ -117,6 +129,11 @@ def switch_weapon(weapon_index):
 def use_consumable():
     if entity_manager.hero.selected_consumable and entity_manager.hero.consumables[entity_manager.hero.selected_consumable].is_ready_to_use:
         entity_manager.use_consumable_item()
+
+def pause_mouse_input():
+    global mouse_input_pause
+
+    mouse_input_pause = True
 
 #Visuals drawing and sorting
 def increment_sprite_sorting_timer():
@@ -184,31 +201,34 @@ def draw_ui():
     ui_elements.draw_weapon_ammo_counter()
     ui_elements.draw_consumable_counter()
 
-    if len(ui_elements.picked_up_item_names) != 0:
+    if len(entity_manager.picked_up_item_names) != 0:
         ui_elements.display_pickup_text()
+
+    if ui_elements.fading_in:
+        ui_elements.fade_in()
+    elif ui_elements.fading_out:
+        ui_elements.fade_out()
 
 #Game initialization
 def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
-    initialize_game()
+    play_music(0)
+    entity_manager.initialize_game()
     main_game_loop()
 
-def initialize_game():
-    entity_manager.initialize_level_matrices()
-    level_painter.paint_level()
-    entity_manager.initialize_player()
-    entity_manager.initialize_all_entities_and_shadows_sprite_group_matrix()
-    #entity_manager.fill_map_with_monsters(1)
-    entity_manager.generate_monsters()
-    entity_manager.generate_items()
-    entity_manager.update_far_proximity_matrices_and_lists()
-    entity_manager.finish_init()
+def start_next_level():
+    entity_manager.clear_all_lists()
+    currenet_level_index = level_painter.levels.index(level_painter.level_layout)
+    next_level_index = currenet_level_index + 1
+    level_painter.level_layout = level_painter.levels[next_level_index]
+    play_music(next_level_index)
+    entity_manager.initialize_game()
+    main_game_loop()
 
 #Main game loop
 def main_game_loop():
     while True:
-        increment_sprite_sorting_timer()
 
         #Inputs
         get_player_wsad_input()
@@ -237,10 +257,18 @@ def main_game_loop():
                     use_consumable()
                 elif event.key == pygame.K_ESCAPE:
                     menu.menu()
+                    pause_mouse_input()
                     if settings.starting_new_game:
                         start_new_game()
-
+        
+        if collision_manager.moving_to_next_level and not ui_elements.fading_out and not ui_elements.fading_in:
+            ui_elements.fading_out = True
+        elif collision_manager.moving_to_next_level and ui_elements.fading_in:
+            collision_manager.moving_to_next_level = False
+            start_next_level()
+        
         #Drawing
+        increment_sprite_sorting_timer()
         draw_sprites()
         draw_ui()
         cursor.cursor.draw(screen)
@@ -269,7 +297,7 @@ def main_game_loop():
         clock.tick(60)
 
 def main():
-    play_music(0)
+    play_music(-1)
     menu.menu()
     start_new_game()
 
