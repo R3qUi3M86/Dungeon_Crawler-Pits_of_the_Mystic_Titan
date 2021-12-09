@@ -396,7 +396,7 @@ def cycle_options_up():
         if selected_button == None:
             selected_button = EFFECTS_BUTTON
         else:
-            index = EFFECTS_BUTTON.index(selected_button)
+            index = SETTINGS_MENU_BUTTONS.index(selected_button)
             if index < len(SETTINGS_MENU_BUTTONS) - 1:
                 selected_button = SETTINGS_MENU_BUTTONS[index+1]
             else:
@@ -487,7 +487,11 @@ def enter_selected_option(used_button):
     global entering_game
     global going_to_main_menu
 
-    sound_player.play_menu_push_sound()
+    if used_button == NEW_GAME_BUTTON:
+        sound_player.play_menu_push_sound(new_game=True)
+    else:
+        sound_player.play_menu_push_sound()
+
     if used_button == SETTINGS_BUTTON:
         main_menu = False
         settings_menu = True

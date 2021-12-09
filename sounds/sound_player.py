@@ -11,16 +11,18 @@ pygame.mixer.init()
 
 #Music
 the_winnowing_hall = 'sounds/music/The_Winnowing_Hall.mp3'
+the_docks = 'sounds/music/The_Docks.mp3'
 the_dungeons = 'sounds/music/The_Dungeons.mp3'
 the_cathedral = 'sounds/music/The_Cathedral.mp3'
 the_crater = 'sounds/music/The_Crater.mp3'
 the_boss = 'sounds/music/The_Boss.mp3'
 
-music_tracks = [the_dungeons, the_cathedral, the_crater, the_boss, the_winnowing_hall]
+music_tracks = [the_docks,the_dungeons, the_cathedral, the_crater, the_boss, the_winnowing_hall]
 
 #Sound Effects
 menu_select = pygame.mixer.Sound('sounds/menu/KEYS2A.wav')
 menu_push = pygame.mixer.Sound('sounds/menu/SWITCH.wav')
+menu_new_game = pygame.mixer.Sound('sounds/menu/NEW_GAME.wav')
 
 weapon_pickup = pygame.mixer.Sound('sounds/pickups/SAMPLE11.wav')
 ammo_pickup = pygame.mixer.Sound('sounds/pickups/PICUP5.wav')
@@ -63,7 +65,7 @@ bishop_atkprep_sound = pygame.mixer.Sound('sounds/bishop/ATKPREP.wav')
 bishop_tele_blur_sound = pygame.mixer.Sound('sounds/bishop/TELE_BLUR.wav')
 
 player_overkill_sounds = [player_overkill_sound1, player_overkill_sound2, player_overkill_sound3]
-all_sounds = [menu_select, menu_push, weapon_pickup, ammo_pickup, consumable_pickup, coin_01, coin_02, coin_03, consumable_artifact_use, consumable_potion_use, vase_break, hero_melee_miss_sound,hero_melee_hit_sound,monster_melee_miss_sound,monster_melee_hit_sound,crossbow_attack_sound,crossbow_bolt_hit_sound,player_pain_sound,player_death_sound,player_overkill_sound1,player_overkill_sound2,player_overkill_sound3,ettin_noise1_sound,ettin_pain_sound,ettin_death_sound,ettin_overkill_sound, bishop_magic_missile_attack_sound,bishop_magic_missile_hit_sound,bishop_noise1_sound,bishop_noise2_sound,bishop_pain_sound,bishop_death_sound,bishop_overkill_sound,bishop_atkprep_sound,bishop_tele_blur_sound]
+all_sounds = [menu_select, menu_push, menu_new_game, weapon_pickup, ammo_pickup, consumable_pickup, coin_01, coin_02, coin_03, consumable_artifact_use, consumable_potion_use, vase_break, hero_melee_miss_sound,hero_melee_hit_sound,monster_melee_miss_sound,monster_melee_hit_sound,crossbow_attack_sound,crossbow_bolt_hit_sound,player_pain_sound,player_death_sound,player_overkill_sound1,player_overkill_sound2,player_overkill_sound3,ettin_noise1_sound,ettin_pain_sound,ettin_death_sound,ettin_overkill_sound, bishop_magic_missile_attack_sound,bishop_magic_missile_hit_sound,bishop_noise1_sound,bishop_noise2_sound,bishop_pain_sound,bishop_death_sound,bishop_overkill_sound,bishop_atkprep_sound,bishop_tele_blur_sound]
 
 MONSTER_NOISE_SOUNDS = {ETTIN:[ettin_noise1_sound], DARK_BISHOP:[bishop_noise1_sound,bishop_noise2_sound]}
 MONSTER_PAIN_SOUND = {ETTIN:ettin_pain_sound, DARK_BISHOP:bishop_pain_sound}
@@ -119,9 +121,13 @@ def play_menu_select_sound():
     menu_select.stop()
     menu_select.play()
 
-def play_menu_push_sound():
+def play_menu_push_sound(new_game=False):
     menu_push.stop()
-    menu_push.play()
+    
+    if new_game:
+        menu_new_game.play()
+    else:
+        menu_push.play()
 
 def set_volume_for_all_sfx(volume):
     for sound in all_sounds:
