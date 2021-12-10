@@ -1125,6 +1125,37 @@ def generate_monster(monster_type, tile_index):
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster.shadow))
     all_monsters.append(monster)
 
+def get_new_monster(monster_type):
+    return Monster((0,0), monster_type)
+
+def summon_new_monster(monster_type, tile_index):
+    global all_entity_and_shadow_sprite_group_matrix
+    global all_monsters
+    global far_proximity_entity_sprite_group_matrix
+    global far_proximity_shadow_sprite_group_list
+    global far_proximity_entity_sprites_list
+    global far_proximity_character_sprites_list
+
+    sound_player.portal_open_sound.play()
+
+    new_monster = Monster(tile_index, monster_type)
+    new_monster.is_summoned = True
+    new_monster.facing_direction = util.get_facing_direction(new_monster.map_position, hero.map_position)
+    monster_sprite_group = pygame.sprite.GroupSingle(new_monster)
+    shadow_sprite_group = pygame.sprite.GroupSingle(new_monster.shadow)
+
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(monster_sprite_group)
+    all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(shadow_sprite_group)
+    all_monsters.append(new_monster)
+
+    far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
+    
+    if far_proximity_matrix_index:
+        far_proximity_entity_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].append(monster_sprite_group)
+        far_proximity_shadow_sprite_group_list.append(shadow_sprite_group)
+        far_proximity_entity_sprites_list.append(new_monster)
+        far_proximity_character_sprites_list.append(new_monster)
+
 def remove_monster_from_the_game(monster):
     tile_index = monster.tile_index
 

@@ -1,6 +1,5 @@
 import random
 import numpy as np
-import copy
 
 from pygame.constants import SRCALPHA
 from utilities import util
@@ -8,12 +7,12 @@ from utilities import entity_manager
 from utilities.constants import *
 from sounds import sound_player
 
-USABLE_ABILITIES_DICT = {FLYING:False, TELEPORT_BLUR: True}
+USABLE_ABILITIES_DICT = {FLYING:False, TELEPORT_BLUR: True, SUMMON_MONSTER: True}
 
 
 class Ability():
     def __init__(self, owner, name):
-        ABILITIES_COOLDOWN_DICT = {FLYING:0, TELEPORT_BLUR: 4 + random.choice(np.arange(0,1,0.05))}
+        ABILITIES_COOLDOWN_DICT = {FLYING:0, TELEPORT_BLUR: 4 + random.choice(np.arange(0,1,0.05)), SUMMON_MONSTER: 10}
 
         self.monster = owner
         self.NAME = name
@@ -54,6 +53,7 @@ class Ability():
                     self.is_ready_to_use = False
                 if self.NAME is TELEPORT_BLUR:
                     self.apply_blur_visual_effect()
+
                 self.increment_use_speed_timer()
             
             elif not self.is_ready_to_use:
@@ -63,6 +63,8 @@ class Ability():
     def apply_ability_effects(self):
         if self.NAME is TELEPORT_BLUR:
             self.use_teleport_blur_ability()
+        elif self.NAME is SUMMON_MONSTER:
+            self.use_summon_monster_ability()
 
     def set_blur_visual_effects(self):
         self.monster_original_image.blit(self.monster.image, (0,0))
@@ -158,6 +160,28 @@ class Ability():
         self.monster.speed_vector = travel_speed
         
         sound_player.play_ability_use_sound(self.NAME)
+
+    def use_summon_monster_ability(self):
+        summon_name = random.choice([ETTIN,DARK_BISHOP])
+        summon_monster = entity_manager.get_new_monster(summon_name)
+        summon_tile = self.get_summon_tile(summon_monster)
+        if summon_tile:
+            entity_manager.summon_new_monster(summon_name,summon_tile)
+
+    #Getters
+    def get_summon_tile(self, summon_monster):
+        idices_matrix = self.monster.direct_proximity_index_matrix
+        possible_summon_tiles = []
+        for row in idices_matrix:
+            for cell in row:
+                if FLYING in summon_monster.abilities and entity_manager.level_sprites_matrix[cell[0]][cell[1]] not in WALL_LIKE:
+                    possible_summon_tiles.append(cell)
+                elif entity_manager.level_sprites_matrix[cell[0]][cell[1]] not in IMPASSABLE_TILES:
+                    possible_summon_tiles.append(cell)
+
+        possible_summon_tiles.remove(self.monster.tile_index)
+        return random.choice(possible_summon_tiles)
+
 
     #Timers
     def increment_use_speed_timer(self):

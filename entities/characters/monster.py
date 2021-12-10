@@ -12,6 +12,7 @@ from utilities.level_painter import TILE_SIZE
 from images.characters.ettin_images import *
 from images.characters.dark_bishop_images import *
 from images.characters.iron_lich_images import *
+from images.abilities.ability_images import *
 from entities.characters.ability import Ability
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
@@ -28,7 +29,7 @@ Y_SIZE_DICT = {ETTIN:11, DARK_BISHOP:11, IRON_LICH:17}
 INTERRUPT_CHANCE_DICT = {ETTIN:50, DARK_BISHOP:70, IRON_LICH:10}
 SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE, DARK_BISHOP:BISHOP_MAGIC_MISSILE, IRON_LICH:SPIKE_BALL_SPELL}
 WEAPON_NAMES_DICT = {ETTIN:[ETTIN_MACE], DARK_BISHOP:[BISHOP_MAGIC_MISSILE], IRON_LICH:[SPIKE_BALL_SPELL,WHIRLWIND_SPELL,RED_ORB_SPELL]}
-ABILITIES_DICT = {ETTIN:[None], DARK_BISHOP:[FLYING, TELEPORT_BLUR], IRON_LICH:[FLYING]}
+ABILITIES_DICT = {ETTIN:[None], DARK_BISHOP:[FLYING, TELEPORT_BLUR], IRON_LICH:[FLYING, SUMMON_MONSTER]}
 SPEED_DICT = {ETTIN:1.4, DARK_BISHOP:1.3, IRON_LICH:1}
 REFLEX_DICT = {ETTIN:1.2, DARK_BISHOP:1.6, IRON_LICH:2}
 
@@ -83,6 +84,12 @@ class Monster(pygame.sprite.Sprite):
         self.character_pain_index = 0
         self.character_pain_timer = 0
 
+        #Summon assets
+        self.summon_flash = summon_flash
+        self.summon_flash_index = 0
+        self.summon_flash_timer = 0
+        self.summon_flash_timer_limit = 1.5
+
         ###Owned sprites###
         #Colliders
         self.entity_collider_nw    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NW)
@@ -113,6 +120,7 @@ class Monster(pygame.sprite.Sprite):
         self.is_in_pain = False
         self.is_dead = False
         self.is_corpse = False
+        self.is_summoned = False
         self.has_los = False
         self.can_collide = False
         self.can_collide_with_player = True
@@ -156,32 +164,33 @@ class Monster(pygame.sprite.Sprite):
             self.increment_all_weapons_cooldown()
             self.update_abilities()
 
-            if not self.is_dead:
-                self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
-                self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
-                self.update_owned_sprites_position()
+            if not self.is_summoned:
+                if not self.is_dead:
+                    self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
+                    self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
+                    self.update_owned_sprites_position()
 
-                self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
-                self.tile_index = util.get_tile_index(self.map_position)
-            
-                if self.tile_index != self.prevous_tile_index:
-                    self.previous_tile_position = (self.prevous_tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.prevous_tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
-                    self.current_tile_position = (self.tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
-                    self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-                    self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
-                    entity_manager.update_all_nearby_monsters_and_self_direct_proximity_monsters_lists(self.direct_proximity_index_matrix)
-                    entity_manager.move_entity_in_all_matrices(self.id, MONSTER, self.prevous_tile_index, self.tile_index)
-                    self.prevous_tile_index = self.tile_index
+                    self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
+                    self.tile_index = util.get_tile_index(self.map_position)
                 
-                self.update_decisions()
+                    if self.tile_index != self.prevous_tile_index:
+                        self.previous_tile_position = (self.prevous_tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.prevous_tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
+                        self.current_tile_position = (self.tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
+                        self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+                        self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
+                        entity_manager.update_all_nearby_monsters_and_self_direct_proximity_monsters_lists(self.direct_proximity_index_matrix)
+                        entity_manager.move_entity_in_all_matrices(self.id, MONSTER, self.prevous_tile_index, self.tile_index)
+                        self.prevous_tile_index = self.tile_index
+                    
+                    self.update_decisions()
 
-            elif not self.is_corpse:
-                self.is_corpse = True
-                if self.NAME is DARK_BISHOP and self.is_overkilled:
-                    entity_manager.remove_monster_from_the_game(self)
-                else:
-                    entity_manager.fix_all_dead_objects_to_pixel_accuracy()
-                    entity_manager.fix_player_position_to_pixel_accuracy()
+                elif not self.is_corpse:
+                    self.is_corpse = True
+                    if self.NAME is DARK_BISHOP and self.is_overkilled:
+                        entity_manager.remove_monster_from_the_game(self)
+                    else:
+                        entity_manager.fix_all_dead_objects_to_pixel_accuracy()
+                        entity_manager.fix_player_position_to_pixel_accuracy()
             
             if not self.monster_ai.is_using_ability:
                 self.update_animation()
@@ -241,20 +250,24 @@ class Monster(pygame.sprite.Sprite):
     def update_animation(self): 
         self.set_character_animation_direction_indices()
         
-        if self.is_living:
-            self.character_walk_forward_animation()
+        if not self.is_summoned:
+            if self.is_living:
+                self.character_walk_forward_animation()
 
-        if self.is_in_pain and not self.is_attacking:
-            self.character_pain_animation()
-        
-        elif self.is_attacking:
-            self.character_attack_animation()
-        
-        elif self.is_dying:
-            self.character_death_animation()
+            if self.is_in_pain and not self.is_attacking:
+                self.character_pain_animation()
+            
+            elif self.is_attacking:
+                self.character_attack_animation()
+            
+            elif self.is_dying:
+                self.character_death_animation()
 
-        elif self.is_overkilled:
-            self.character_overkill_animation()
+            elif self.is_overkilled:
+                self.character_overkill_animation()
+        
+        else:
+            self.character_summon_animation()
     
     def update_owned_sprites_position(self):
         for auxilary_sprites_row in self.entity_auxilary_sprites:
@@ -275,8 +288,10 @@ class Monster(pygame.sprite.Sprite):
         if FLYING in ABILITIES_DICT[self.NAME]:
             pathfinding_matrix = level_painter.pathfinding_flying_matrix
         else:
+            print(level_painter.pathfinding_matrix)
             pathfinding_matrix = level_painter.pathfinding_matrix
         
+        print(pathfinding_matrix)
         return monster_ai.Ai(self, pathfinding_matrix, self.tile_index)
 
     def get_item_by_name(self, item_name):
@@ -367,6 +382,21 @@ class Monster(pygame.sprite.Sprite):
                     weapon.increment_chainfire_cooldown()
                 
                 self.character_attack_index[1] = 2
+
+    def character_summon_animation(self):
+        char_image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
+        new_char_img_surf = pygame.Surface(char_image.get_size(),pygame.SRCALPHA)
+        new_char_img_surf.blit(char_image,(0,0))
+        flash_rect = self.summon_flash[0].get_rect()
+        flash_rect.center = char_image.get_rect().center
+        new_char_img_surf.blit(self.summon_flash[int(self.summon_flash_index)],flash_rect)
+        new_char_img_surf.set_alpha(int(255*self.summon_flash_timer/self.summon_flash_timer_limit))
+        self.image = new_char_img_surf
+        
+        self.summon_flash_timer += 0.0167
+        self.summon_flash_index = (len(self.summon_flash)-1)*self.summon_flash_timer/self.summon_flash_timer_limit
+        if self.summon_flash_timer >= self.summon_flash_timer_limit:
+            self.is_summoned = False
 
     def set_character_animation_direction_indices(self):
         for sector in SECTORS:

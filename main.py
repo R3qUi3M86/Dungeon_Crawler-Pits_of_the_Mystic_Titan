@@ -278,7 +278,7 @@ def main_game_loop():
         ################
         ####Debuging####
         ################
-        #debug_text(f"{entity_manager.hero.map_position}")
+        #debug_text(f"{entity_manager.hero.map_position}")wwwwwwwwwwssssssssssss
         #debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
         #debug_text(f"109 pos: {entity_manager.hero.direct_proximity_collision_tiles[1].map_position}",x = 10, y = 30)
         debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)

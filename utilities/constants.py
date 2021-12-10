@@ -80,8 +80,8 @@ MELEE = "melee"
 
 #Player weapons
 SWORD = "Sword"
-EMERALD_CROSSBOW = "Emerald Crossbow"
-NECROLIGHT = "Necrolight"
+EMERALD_CROSSBOW = "The Emerald Crossbow"
+NECROLIGHT = "The Necrolight"
 
 #Monster weapons
 ETTIN_MACE = "ettin mace"
@@ -99,8 +99,8 @@ MELEE_WEAPONS = [SWORD, ETTIN_MACE]
 ###Ammo###
 EMERALD_CROSSBOW_BOLTS = "emerald crossbow bolts"
 EMERALD_CROSSBOW_QUIVER = "emerald crossbow quiver"
-NECRO_SMALL_AMMO = "necrolight small ammo"
-NECRO_LARGE_AMMO = "necrolight large ammo"
+NECRO_SMALL_AMMO = "necrolight small rune"
+NECRO_LARGE_AMMO = "necrolight large rune"
 
 AMMOTYPES = [EMERALD_CROSSBOW_BOLTS,EMERALD_CROSSBOW_QUIVER, NECRO_SMALL_AMMO, NECRO_LARGE_AMMO]
 CROSSBOW_AMMO = [EMERALD_CROSSBOW_BOLTS,EMERALD_CROSSBOW_QUIVER]
@@ -169,5 +169,6 @@ ABILITY = "ability"
 
 FLYING = "Flying"
 TELEPORT_BLUR = "Teleport Blur"
+SUMMON_MONSTER = "Summon Monster"
 
 

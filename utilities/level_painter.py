@@ -81,8 +81,10 @@ def generate_pathfinding_matrix(impassable_tiles_type):
     global pathfinding_matrix
     global pathfinding_flying_matrix
 
-    pathfinding_matrix = []
-    pathfinding_flying_matrix = []
+    if impassable_tiles_type == IMPASSABLE_TILES:
+        pathfinding_matrix = []
+    elif impassable_tiles_type == WALL_LIKE:
+        pathfinding_flying_matrix = []
     
     for level_layout_row in level_layout:
         matrix_row = []
