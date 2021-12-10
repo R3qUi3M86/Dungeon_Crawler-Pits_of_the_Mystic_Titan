@@ -17,6 +17,8 @@ level_surface = None
 level_walls_primary_surface = None
 level_walls_secondary_surface = None
 player_starting_tile = None
+cutscene_tile_indices = None
+cutscene_place_index = None
 
 def set_player_tile_index():
     global player_starting_tile

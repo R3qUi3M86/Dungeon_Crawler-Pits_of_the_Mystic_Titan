@@ -174,12 +174,14 @@ class Ability():
         possible_summon_tiles = []
         for row in idices_matrix:
             for cell in row:
-                if FLYING in summon_monster.abilities and entity_manager.level_sprites_matrix[cell[0]][cell[1]] not in WALL_LIKE:
+                if FLYING in summon_monster.abilities and entity_manager.level_sprites_matrix[cell[0]][cell[1]].TYPE not in WALL_LIKE:
                     possible_summon_tiles.append(cell)
-                elif entity_manager.level_sprites_matrix[cell[0]][cell[1]] not in IMPASSABLE_TILES:
+                elif entity_manager.level_sprites_matrix[cell[0]][cell[1]].TYPE not in IMPASSABLE_TILES:
                     possible_summon_tiles.append(cell)
 
-        possible_summon_tiles.remove(self.monster.tile_index)
+        if self.monster.tile_index in possible_summon_tiles:
+            possible_summon_tiles.remove(self.monster.tile_index)
+        
         return random.choice(possible_summon_tiles)
 
 

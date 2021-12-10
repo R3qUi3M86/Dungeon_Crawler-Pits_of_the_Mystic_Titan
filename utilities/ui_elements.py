@@ -4,9 +4,13 @@ from images.ui import ui
 from utilities.constants import *
 from utilities import entity_manager
 from utilities.text_printer import *
+from utilities import cutscene_manager
 
 pickup_text_display_timer = 0
 pickup_text_display_timer_limit = 210
+
+narrator_text_display_timer = 0
+narrator_text_display_timer_limit = 240
 
 consumable_use_image_index = 0
 
@@ -142,6 +146,19 @@ def display_pickup_text():
         pickup_text_display_timer = 0
         del entity_manager.picked_up_item_names[0]
     
+def display_narrator_text():
+    global narrator_text_display_timer
+
+    text = cutscene_manager.narrator_text[0]
+
+    if narrator_text_display_timer < narrator_text_display_timer_limit:
+        display_pickup_runic_text(text, PALE_ORANGE_COLOR, PICKUP_TEXT_POS[0], PICKUP_TEXT_POS[1])
+        narrator_text_display_timer += 1
+    
+    else:
+        narrator_text_display_timer = 0
+        del cutscene_manager.narrator_text[0]
+
 def get_selected_weapon_image():
     weapon = entity_manager.hero.selected_weapon
     return ui.inventory_weapons[HERO_WEAPONS.index(weapon)]

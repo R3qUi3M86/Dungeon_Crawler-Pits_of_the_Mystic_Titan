@@ -7,6 +7,7 @@ from utilities import combat_manager
 from utilities import entity_manager
 from utilities import level_painter
 from utilities import monster_ai
+from utilities import cutscene_manager
 from utilities.constants import *
 from utilities.level_painter import TILE_SIZE
 from images.characters.ettin_images import *
@@ -158,7 +159,7 @@ class Monster(pygame.sprite.Sprite):
 
     #Update functions
     def update(self):
-        if not self.leaving_far_proximity_matrix_margin():
+        if not self.leaving_far_proximity_matrix_margin() and not cutscene_manager.playing_cutscene:
             self.activate()
             
             self.increment_all_weapons_cooldown()
@@ -288,10 +289,8 @@ class Monster(pygame.sprite.Sprite):
         if FLYING in ABILITIES_DICT[self.NAME]:
             pathfinding_matrix = level_painter.pathfinding_flying_matrix
         else:
-            print(level_painter.pathfinding_matrix)
             pathfinding_matrix = level_painter.pathfinding_matrix
         
-        print(pathfinding_matrix)
         return monster_ai.Ai(self, pathfinding_matrix, self.tile_index)
 
     def get_item_by_name(self, item_name):

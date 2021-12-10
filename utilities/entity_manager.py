@@ -1128,7 +1128,7 @@ def generate_monster(monster_type, tile_index):
 def get_new_monster(monster_type):
     return Monster((0,0), monster_type)
 
-def summon_new_monster(monster_type, tile_index):
+def summon_new_monster(monster_type, tile_index, summon_mode=SUMMON_MONSTER):
     global all_entity_and_shadow_sprite_group_matrix
     global all_monsters
     global far_proximity_entity_sprite_group_matrix
@@ -1136,11 +1136,13 @@ def summon_new_monster(monster_type, tile_index):
     global far_proximity_entity_sprites_list
     global far_proximity_character_sprites_list
 
-    sound_player.portal_open_sound.play()
-
     new_monster = Monster(tile_index, monster_type)
-    new_monster.is_summoned = True
+    new_monster.update_position()
     new_monster.facing_direction = util.get_facing_direction(new_monster.map_position, hero.map_position)
+    if summon_mode == SUMMON_MONSTER:
+        sound_player.portal_open_sound.play()
+        new_monster.is_summoned = True
+    
     monster_sprite_group = pygame.sprite.GroupSingle(new_monster)
     shadow_sprite_group = pygame.sprite.GroupSingle(new_monster.shadow)
 

@@ -8,6 +8,7 @@ from utilities import level_painter
 from utilities import util
 from utilities import ui_elements
 from utilities import menu
+from utilities import cutscene_manager
 from sys import exit
 import settings
 from entities import cursor
@@ -16,6 +17,7 @@ pygame.init()
 clock = pygame.time.Clock()
 mouse_input_pause = False
 mouse_input_pause_timer = 0
+playing_cutscene = False
 sorting_timer = 20
 sorting_timer_limit = 20
 sorted_entity_matrix = None
@@ -29,7 +31,7 @@ pygame.event.set_allowed([pygame.QUIT])
 def get_player_wsad_input():
     keys = pygame.key.get_pressed()
 
-    if entity_manager.hero.is_living and not collision_manager.moving_to_next_level:
+    if entity_manager.hero.is_living and not collision_manager.moving_to_next_level and not cutscene_manager.playing_cutscene:
         if keys[pygame.K_s] and entity_manager.hero.speed_scalar[Y] < 30.0:
             entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+1
 
@@ -98,7 +100,7 @@ def get_player_mouse_input():
     mouse_pos = pygame.mouse.get_pos()
     entity_manager.hero.facing_direction = util.get_facing_direction(player_position,mouse_pos)
     
-    if pygame.mouse.get_pressed()[0] and not mouse_input_pause:
+    if pygame.mouse.get_pressed()[0] and not mouse_input_pause and not cutscene_manager.playing_cutscene:
         if entity_manager.hero.is_living == True:
             entity_manager.hero.is_in_pain = False
             entity_manager.hero.is_attacking = True
@@ -178,6 +180,9 @@ def draw_sprites():
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
         shadow.draw(screen)
 
+    if cutscene_manager.playing_cutscene:
+        cutscene_manager.play_cutscene(BOSS_ENTRY)
+
     sorted_entity_matrix = order_sprites()
     for row in sorted_entity_matrix:
         for entity in row:
@@ -185,7 +190,7 @@ def draw_sprites():
             # if entity.sprite.TYPE is PROJECTILE:
             #     img = entity.sprite.projectile_collider.image
             #     screen.blit(img, entity.sprite.projectile_collider.rect)
-    
+
     if wall_drawing_mode == VISIBLE:
         for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
             if tile.is_hiding_player:
@@ -201,8 +206,10 @@ def draw_ui():
     ui_elements.draw_weapon_ammo_counter()
     ui_elements.draw_consumable_counter()
 
-    if len(entity_manager.picked_up_item_names) != 0:
+    if len(entity_manager.picked_up_item_names) != 0 and not cutscene_manager.playing_cutscene:
         ui_elements.display_pickup_text()
+    elif len(cutscene_manager.narrator_text) != 0 and cutscene_manager.playing_cutscene:
+        ui_elements.display_narrator_text()
 
     if ui_elements.fading_in:
         ui_elements.fade_in()
@@ -215,6 +222,9 @@ def start_new_game():
     entity_manager.create_new_player()
     play_music(0)
     entity_manager.initialize_game()
+    level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
+    level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
+    cutscene_manager.playing_cutscene = False
     main_game_loop()
 
 def start_next_level():
@@ -229,7 +239,6 @@ def start_next_level():
 #Main game loop
 def main_game_loop():
     while True:
-
         #Inputs
         get_player_wsad_input()
         get_player_mouse_input()
@@ -297,6 +306,10 @@ def main_game_loop():
         #Other
         pygame.display.update()
         clock.tick(60)
+        if entity_manager.hero.tile_index in level_painter.cutscene_tile_indices and level_painter.level_layout is level_painter.level_01_map and not cutscene_manager.playing_cutscene:
+            cutscene_manager.playing_cutscene = True
+            level_painter.cutscene_tile_indices = []
+            print("cutscene")
 
 def main():
     play_music(-1)

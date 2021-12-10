@@ -52,6 +52,11 @@ SECTORS = [SECTOR_E,SECTOR_NE,SECTOR_N,SECTOR_NW,SECTOR_W,SECTOR_SW,SECTOR_S,SEC
 HORIZONTAL = "horizontal"
 VERTICAL = "vertical"
 
+#Cutscenes
+BOSS_ENTRY = "boss entry cutscene"
+CUTSCENE_PLACE_INDEX = 9,4
+CUTSCENE_TILE_INDICES = [(11,4)]
+
 #Wall hider
 WALL_HIDER_POSITION = player_position[0], player_position[1] - 48
 
