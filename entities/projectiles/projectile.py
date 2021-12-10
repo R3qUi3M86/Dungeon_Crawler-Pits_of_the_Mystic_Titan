@@ -1,3 +1,4 @@
+import random
 import pygame
 import math
 from images.projectiles.projectile_images import *
@@ -9,21 +10,23 @@ from utilities import level_painter
 from utilities import collision_manager
 from utilities.level_painter import TILE_SIZE
 from utilities import entity_manager
+from utilities import combat_manager
 from sounds import sound_player
 
-PROJECTILE_SPEED_DICT = {CROSSBOW_BOLT:13, MAGIC_MISSILE:6}
-PROJECTILE_SIZE_DICT = {CROSSBOW_BOLT:(15, 8), MAGIC_MISSILE:(13, 7)}
-PROJECTILE_STATIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot[0], MAGIC_MISSILE:bishop_magic_missile_shot[0]}
-PROJECTILE_DYNAMIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot, MAGIC_MISSILE:bishop_magic_missile_shot}
-PROJECTILE_DESTRUCT_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_destruct, MAGIC_MISSILE:bishop_magic_missile_destruct}
-PROJECTILE_GLOW_DICT = {CROSSBOW_BOLT:GREEN_GLOW, MAGIC_MISSILE:GREEN_GLOW}
-PROJECTILE_SHADOW_SIZE_DICT = {CROSSBOW_BOLT:SIZE_SMALL, MAGIC_MISSILE:SIZE_MEDIUM}
+PROJECTILE_DISPLAY_CORRECTION = {CROSSBOW_BOLT:-30, NECRO_BALL:-5, MAGIC_MISSILE:-30, SPIKE_BALL:-15, SPIKE_SHARD:-30, WHIRLWIND:0, RED_ORB:-5}
+PROJECTILE_SPEED_DICT = {CROSSBOW_BOLT:13, NECRO_BALL:8, MAGIC_MISSILE:6, SPIKE_BALL:8, SPIKE_SHARD:13, WHIRLWIND:4, RED_ORB:5}
+PROJECTILE_SIZE_DICT = {CROSSBOW_BOLT:(15, 8), NECRO_BALL:(20, 11), MAGIC_MISSILE:(13, 7), SPIKE_BALL:(15, 8), SPIKE_SHARD:(9, 5), WHIRLWIND:(60, 34), RED_ORB:(18, 10)}
+PROJECTILE_STATIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot[0], NECRO_BALL:necrolight_ball_shot[0], MAGIC_MISSILE:bishop_magic_missile_shot[0], SPIKE_BALL:spike_ball[0], SPIKE_SHARD:spike_shard[0], WHIRLWIND:whirlwind[0], RED_ORB:red_orb[0]}
+PROJECTILE_DYNAMIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot, NECRO_BALL:necrolight_ball_shot, MAGIC_MISSILE:bishop_magic_missile_shot, SPIKE_BALL:spike_ball, SPIKE_SHARD:spike_shard, WHIRLWIND:whirlwind, RED_ORB:red_orb}
+PROJECTILE_DESTRUCT_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_destruct, NECRO_BALL:necrolight_ball_destruct, MAGIC_MISSILE:bishop_magic_missile_destruct, SPIKE_BALL:spike_ball_destruct, SPIKE_SHARD:[spike_shard_destruct], WHIRLWIND:whirlwind_destruct, RED_ORB:red_orb_destruct}
+PROJECTILE_GLOW_DICT = {CROSSBOW_BOLT:GREEN_GLOW, NECRO_BALL:RED_GLOW, MAGIC_MISSILE:GREEN_GLOW, SPIKE_BALL:BLUE_GLOW, SPIKE_SHARD:BLUE_GLOW, WHIRLWIND:None, RED_ORB:RED_GLOW}
+PROJECTILE_SHADOW_SIZE_DICT = {CROSSBOW_BOLT:SIZE_SMALL, NECRO_BALL:SIZE_MEDIUM, MAGIC_MISSILE:SIZE_MEDIUM, SPIKE_BALL:SIZE_MEDIUM, SPIKE_SHARD:SIZE_TINY, WHIRLWIND:SIZE_TINY, RED_ORB:SIZE_LARGE}
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, tile_index, position, map_pos, damage, angle, name, launched_by):
         super().__init__()
         ###Constants###
-        self.IMAGE_DISPLAY_CORRECTION = -30
+        self.IMAGE_DISPLAY_CORRECTION = PROJECTILE_DISPLAY_CORRECTION[name]
         self.NAME = name
         self.TYPE = PROJECTILE
 
@@ -73,24 +76,47 @@ class Projectile(pygame.sprite.Sprite):
         #General
         self.angle = angle
         self.damage = damage
+        self.damage_ticks = self.get_damage_ticks()
+        self.tick_cooldown = 0
+        self.tick_cooldown_limit = self.get_tick_cooldown_limit()
         self.speed = PROJECTILE_SPEED_DICT[self.NAME]
         self.size = PROJECTILE_SIZE_DICT[self.NAME]
         self.travel_speed = util.get_travel_speed(self.angle, self.speed)
+        self.delta_travel_speed = 0,0
         self.image = self.get_image_and_set_collider_image()
         self.rect = self.image.get_rect(midbottom = (self.image_position))
         self.effects = []
 
     #Updates
     def update(self):
+        if self.NAME is WHIRLWIND:
+            self.rotate_speed_vector()
+
         if self.leaving_far_proximity_matrix_margin() or self.is_destroyed:
             entity_manager.remove_projectile_from_from_matrices_and_lists(self)
         
         elif self.has_impacted:
-            self.has_impacted = False
-            self.is_disintegrating = True
-            self.travel_speed = 0,0
-            entity_manager.remove_entity_shadow_from_the_game(self)
-            sound_player.play_projectile_impact_sound(self.NAME)
+            self.tick_cooldown += 0.0167
+            if self.NAME is WHIRLWIND:
+                self.travel_animation()
+                self.pull_player_into_whirlwind()
+            
+            if self.tick_cooldown >= self.tick_cooldown_limit:
+                self.damage_ticks -= 1
+                self.has_impacted = False
+                self.tick_cooldown = 0
+            
+            if self.damage_ticks == 0:
+                self.has_impacted = False
+                self.is_disintegrating = True
+                self.travel_speed = 0,0
+                self.delta_travel_speed = 0,0
+                entity_manager.remove_entity_shadow_from_the_game(self)
+                sound_player.play_projectile_impact_sound(self.NAME)
+                if self.NAME is SPIKE_BALL:
+                    self.launch_spike_shards()
+                elif self.NAME is RED_ORB:
+                    self.deal_aoe_damage()
         
         elif self.is_disintegrating:
              self.disintegration_animation()
@@ -98,7 +124,7 @@ class Projectile(pygame.sprite.Sprite):
         else:
             #Relative speed projectile
             if self.speed != -1:
-                self.map_position = round((self.map_position[0] + self.travel_speed[0]),2), round((self.map_position[1] + self.travel_speed[1]),2)
+                self.map_position = round((self.map_position[0] + self.travel_speed[0] + self.delta_travel_speed[0]),2), round((self.map_position[1] + self.travel_speed[1]+ self.delta_travel_speed[1]),2)
                 self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
                 self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
                 self.rect = self.image.get_rect(midbottom = (self.image_position))
@@ -121,7 +147,7 @@ class Projectile(pygame.sprite.Sprite):
             #Light speed projectile
             else:
                 while not self.has_impacted:
-                    self.map_position = round((self.map_position[0] + self.travel_speed[0]),2), round((self.map_position[1] + self.travel_speed[1]),2)
+                    self.map_position = round((self.map_position[0] + self.travel_speed[0] + self.delta_travel_speed[0]),2), round((self.map_position[1] + self.travel_speed[1] + self.delta_travel_speed[1]),2)
                     self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
                     self.update_owned_sprites_position()
                     self.tile_index = util.get_tile_index(self.map_position)
@@ -157,16 +183,19 @@ class Projectile(pygame.sprite.Sprite):
     def get_image_and_set_collider_image(self):
         total_travel_speed = math.sqrt((self.travel_speed[0]*self.travel_speed[0])+(self.travel_speed[1]*self.travel_speed[1]))
         scaling_factor = total_travel_speed/self.speed
-        
-        static_image_width = self.projectile_static_image.get_width()
-        static_image_height = self.projectile_static_image.get_height()
-        scaled_image = pygame.transform.scale(self.projectile_static_image,(static_image_width*scaling_factor,static_image_height))
-        
-        final_image = pygame.transform.rotate(scaled_image,self.angle)
-
         self.set_collider_image_and_mask(scaling_factor)
+        
+        if self.NAME is CROSSBOW_BOLT or self.NAME is SPIKE_SHARD:
+            static_image_width = self.projectile_static_image.get_width()
+            static_image_height = self.projectile_static_image.get_height()
+            scaled_image = pygame.transform.scale(self.projectile_static_image,(static_image_width*scaling_factor,static_image_height))
+            
+            final_image = pygame.transform.rotate(scaled_image,self.angle)
 
-        return final_image
+            return final_image
+        
+        else:
+            return self.projectile_static_image
 
     def set_collider_image_and_mask(self, scaling_factor):
         self.projectile_collider.image = pygame.transform.scale(self.projectile_collider.image, (self.projectile_collider.image.get_width()*scaling_factor,self.projectile_collider.image.get_height()))
@@ -180,6 +209,18 @@ class Projectile(pygame.sprite.Sprite):
         else:
             return [entity_manager.hero]
     
+    def get_damage_ticks(self):
+        if self.NAME is WHIRLWIND:
+            return 5
+        else:
+            return 1
+
+    def get_tick_cooldown_limit(self):
+        if self.NAME is WHIRLWIND:
+            return 0.2
+        else:
+            return 0
+
     #Animations
     def travel_animation(self):
         if int(self.projectile_dynamic_index) == len(self.projectile_dynamic_images):
@@ -197,7 +238,27 @@ class Projectile(pygame.sprite.Sprite):
             self.projectile_destruction_index += 0.075
         self.rect = self.image.get_rect(midbottom = (self.image_position))
 
-    
+    #Special behaviours
+    def launch_spike_shards(self):
+        for i in range(8):
+            combat_manager.launch_projectile(self.tile_index,self.position,self.map_position,i*45,self,MONSTER,-3)
+
+    def deal_aoe_damage(self):
+        if util.elipses_intersect(self.map_position,entity_manager.hero.map_position,(80,44), entity_manager.hero.size):
+            entity_manager.hero.take_damage(self.damage//2)
+
+    def rotate_speed_vector(self):
+        self.angle+= random.choice(range(10))
+
+        self.delta_travel_speed = util.get_travel_speed(self.angle,5)
+
+    def pull_player_into_whirlwind(self):
+        if util.elipses_intersect(self.map_position,entity_manager.hero.map_position,self.size,entity_manager.hero.size):
+            angle = util.get_total_angle(entity_manager.hero.map_position, self.map_position)
+            pull_vector = util.get_travel_speed(angle,1)
+            entity_manager.hero.speed_scalar=entity_manager.hero.speed_scalar[0]+pull_vector[0]*6, entity_manager.hero.speed_scalar[1]+pull_vector[1]*6
+
+
     #Conditions
     def leaving_far_proximity_matrix_margin(self):
         hero_tile_index = entity_manager.hero.tile_index

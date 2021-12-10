@@ -91,7 +91,7 @@ class Hero(pygame.sprite.Sprite):
 
         ###Character properties###
         #General
-        self.maxhealth = 20
+        self.maxhealth = 2000
         self.health = self.maxhealth
 
         #Combat
@@ -114,8 +114,8 @@ class Hero(pygame.sprite.Sprite):
         self.abilities = []
         self.items = []
         self.consumables = {}
-        self.weapons = {SWORD:None, EMERALD_CROSSBOW:None}
-        self.ammo = {SWORD:0, EMERALD_CROSSBOW:30}
+        self.weapons = {SWORD:None, EMERALD_CROSSBOW:None, NECROLIGHT:None}
+        self.ammo = {SWORD:0, EMERALD_CROSSBOW:30, NECROLIGHT:10}
         self.currency = {GOLD_COINS:0}
         
         #Movement

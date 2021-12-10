@@ -11,31 +11,32 @@ from utilities.constants import *
 from utilities.level_painter import TILE_SIZE
 from images.characters.ettin_images import *
 from images.characters.dark_bishop_images import *
+from images.characters.iron_lich_images import *
 from entities.characters.ability import Ability
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
 from entities.items.item import Item
 
-MONSTER_IMAGE_DISPLAY_CORRECTION = {ETTIN:12, DARK_BISHOP:0}
-MONSTER_SHADOW_SIZE = {ETTIN:SIZE_MEDIUM, DARK_BISHOP:SIZE_SMALL}
-MAX_HEALTH_DICT = {ETTIN:10, DARK_BISHOP:10}
-BASE_DAMAGE_DICT = {ETTIN:2, DARK_BISHOP:0}
-X_MELEE_RANGE_DICT = {ETTIN:50, DARK_BISHOP:50}
-Y_MELEE_RANGE_DICT = {ETTIN:27, DARK_BISHOP:27}
-X_SIZE_DICT = {ETTIN:20, DARK_BISHOP:20}
-Y_SIZE_DICT = {ETTIN:11, DARK_BISHOP:11}
-INTERRUPT_CHANCE_DICT = {ETTIN:50, DARK_BISHOP:70}
-SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE, DARK_BISHOP:BISHOP_MAGIC_MISSILE}
-WEAPON_NAMES_DICT = {ETTIN:[ETTIN_MACE], DARK_BISHOP:[BISHOP_MAGIC_MISSILE]}
-ABILITIES_DICT = {ETTIN:[None], DARK_BISHOP:[FLYING, TELEPORT_BLUR]}
-SPEED_DICT = {ETTIN:1.4, DARK_BISHOP:1.3}
-REFLEX_DICT = {ETTIN:1.2, DARK_BISHOP:1.6}
+MONSTER_IMAGE_DISPLAY_CORRECTION = {ETTIN:12, DARK_BISHOP:0, IRON_LICH:19}
+MONSTER_SHADOW_SIZE = {ETTIN:SIZE_MEDIUM, DARK_BISHOP:SIZE_SMALL, IRON_LICH:SIZE_LARGE}
+MAX_HEALTH_DICT = {ETTIN:10, DARK_BISHOP:10, IRON_LICH:20}
+BASE_DAMAGE_DICT = {ETTIN:2, DARK_BISHOP:0, IRON_LICH:0}
+X_MELEE_RANGE_DICT = {ETTIN:50, DARK_BISHOP:50, IRON_LICH:50}
+Y_MELEE_RANGE_DICT = {ETTIN:27, DARK_BISHOP:27, IRON_LICH:27}
+X_SIZE_DICT = {ETTIN:20, DARK_BISHOP:20, IRON_LICH:30}
+Y_SIZE_DICT = {ETTIN:11, DARK_BISHOP:11, IRON_LICH:17}
+INTERRUPT_CHANCE_DICT = {ETTIN:50, DARK_BISHOP:70, IRON_LICH:10}
+SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE, DARK_BISHOP:BISHOP_MAGIC_MISSILE, IRON_LICH:SPIKE_BALL_SPELL}
+WEAPON_NAMES_DICT = {ETTIN:[ETTIN_MACE], DARK_BISHOP:[BISHOP_MAGIC_MISSILE], IRON_LICH:[SPIKE_BALL_SPELL,WHIRLWIND_SPELL,RED_ORB_SPELL]}
+ABILITIES_DICT = {ETTIN:[None], DARK_BISHOP:[FLYING, TELEPORT_BLUR], IRON_LICH:[FLYING]}
+SPEED_DICT = {ETTIN:1.4, DARK_BISHOP:1.3, IRON_LICH:1}
+REFLEX_DICT = {ETTIN:1.2, DARK_BISHOP:1.6, IRON_LICH:2}
 
-monster_walk = {ETTIN:ettin_walk, DARK_BISHOP:dark_bishop_walk}
-monster_attack = {ETTIN:ettin_attack, DARK_BISHOP:dark_bishop_attack}
-monster_death = {ETTIN:ettin_death, DARK_BISHOP:dark_bishop_death}
-monster_overkill = {ETTIN:ettin_overkill, DARK_BISHOP:dark_bishop_overkill}
-monster_pain = {ETTIN:ettin_pain, DARK_BISHOP:dark_bishop_pain}
+monster_walk = {ETTIN:ettin_walk, DARK_BISHOP:dark_bishop_walk, IRON_LICH:iron_lich_walk}
+monster_attack = {ETTIN:ettin_attack, DARK_BISHOP:dark_bishop_attack, IRON_LICH:iron_lich_attack}
+monster_death = {ETTIN:ettin_death, DARK_BISHOP:dark_bishop_death, IRON_LICH:iron_lich_death}
+monster_overkill = {ETTIN:ettin_overkill, DARK_BISHOP:dark_bishop_overkill, IRON_LICH:iron_lich_overkill}
+monster_pain = {ETTIN:ettin_pain, DARK_BISHOP:dark_bishop_pain, IRON_LICH:iron_lich_pain}
 
 class Monster(pygame.sprite.Sprite):
     def __init__(self,tile_index, name, facing_direction=SECTOR_S):
@@ -202,6 +203,9 @@ class Monster(pygame.sprite.Sprite):
     
     def update_decisions(self):
         if self.is_living:
+            
+            if not self.weapons[self.selected_weapon].is_ready_to_use and len(self.weapons) > 1:
+                self.switch_weapons()
 
             if entity_manager.hero.is_living and self.monster_ai.is_idle:
                 if not self.monster_ai.is_waking_up:
@@ -460,7 +464,7 @@ class Monster(pygame.sprite.Sprite):
     def interrupt_attack(self):
         self.is_attacking = False
         self.character_attack_index[1] = 0
-        self.weapons[self.selected_weapon].is_ready_to_use = False   
+        self.weapons[self.selected_weapon].is_ready_to_use = False
 
     def attack_interupted(self):
         if random.choice(range(1,101)) <= self.attack_interruption_chance:
@@ -490,6 +494,20 @@ class Monster(pygame.sprite.Sprite):
             weapon = self.weapons[weapon_name]
             if weapon and not weapon.is_ready_to_use:
                 weapon.increment_item_cooldown_timer()
+
+    def switch_weapons(self):
+        smallest_eta_use = None
+        smallest_eta_use_weap_name = None
+
+        for weapon_name in self.weapons:
+            weapon = self.weapons[weapon_name]
+            eta_use = weapon.use_cooldown_limit - weapon.use_cooldown
+            
+            if smallest_eta_use == None or smallest_eta_use > eta_use or weapon.use_cooldown == 0:
+                smallest_eta_use = eta_use
+                smallest_eta_use_weap_name = weapon_name
+
+        self.selected_weapon = smallest_eta_use_weap_name
 
     #Misc
     def activate(self):

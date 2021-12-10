@@ -95,7 +95,7 @@ def projectile_vs_level_collision(projectile_sprite):
 def projectile_vs_entity_collision(projectile_sprite):
     for character in projectile_sprite.direct_proximity_characters:
         if character.rect.colliderect(projectile_sprite.projectile_collider.rect):
-            if util.elipses_intersect(character.map_position, projectile_sprite.map_position, character.size, projectile_sprite.size) and not projectile_sprite.is_disintegrating and not character.is_dead and not character.is_overkilled:
+            if util.elipses_intersect(character.map_position, projectile_sprite.map_position, character.size, projectile_sprite.size) and not projectile_sprite.is_disintegrating and not projectile_sprite.has_impacted and not character.is_dead and not character.is_overkilled:
                 projectile_sprite.has_impacted = True
                 character.take_damage(projectile_sprite.damage)
 

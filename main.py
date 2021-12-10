@@ -253,6 +253,8 @@ def main_game_loop():
                     switch_weapon(0)
                 elif event.key == pygame.K_2:
                     switch_weapon(1)
+                elif event.key == pygame.K_3:
+                    switch_weapon(2)
                 elif event.key == pygame.K_SPACE:
                     use_consumable()
                 elif event.key == pygame.K_ESCAPE:

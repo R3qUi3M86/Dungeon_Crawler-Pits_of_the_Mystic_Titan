@@ -32,6 +32,19 @@ class Shadow(pygame.sprite.Sprite):
                 return shadow_small
             elif self.shadow_size == SIZE_MEDIUM:
                 return shadow_medium
+            elif self.shadow_size == SIZE_LARGE:
+                return shadow_large
+
+        elif self.glow == RED_GLOW:
+            if self.shadow_size == SIZE_TINY:
+                return shadow_tiny_red
+            elif self.shadow_size == SIZE_SMALL:
+                return shadow_small_red
+            elif self.shadow_size == SIZE_MEDIUM:
+                return shadow_medium_red
+            elif self.shadow_size == SIZE_LARGE:
+                return shadow_large_red
+
         elif self.glow == GREEN_GLOW:
             if self.shadow_size == SIZE_TINY:
                 return shadow_tiny_green
@@ -39,5 +52,17 @@ class Shadow(pygame.sprite.Sprite):
                 return shadow_small_green
             elif self.shadow_size == SIZE_MEDIUM:
                 return shadow_medium_green
+            elif self.shadow_size == SIZE_LARGE:
+                return shadow_large_green
+
+        elif self.glow == BLUE_GLOW:
+            if self.shadow_size == SIZE_TINY:
+                return shadow_tiny_blue
+            elif self.shadow_size == SIZE_SMALL:
+                return shadow_small_blue
+            elif self.shadow_size == SIZE_MEDIUM:
+                return shadow_medium_blue
+            elif self.shadow_size == SIZE_LARGE:
+                return shadow_large_blue
 
 

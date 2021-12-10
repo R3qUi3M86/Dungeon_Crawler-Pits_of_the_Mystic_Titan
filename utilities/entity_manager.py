@@ -1099,7 +1099,7 @@ def remove_entity_shadow_from_the_game(entity):
 #Monster entities
 def generate_monsters():
     #generate_monster(ETTIN,(8,5))
-    generate_monster(DARK_BISHOP,(14,22))
+    generate_monster(IRON_LICH,(14,22))
     # generate_monster(DARK_BISHOP,(14,23))
     # generate_monster(DARK_BISHOP,(14,24))
     # generate_monster(DARK_BISHOP,(13,22))
@@ -1137,12 +1137,11 @@ def remove_monster_from_the_game(monster):
 
 #Item entities
 def generate_items():
-    generate_item((8,5), EMERALD_CROSSBOW)
-    generate_item((8,6), EMERALD_CROSSBOW_BOLTS)
-    generate_item((8,4), EMERALD_CROSSBOW_QUIVER)
+    generate_item((8,5), NECROLIGHT)
+    generate_item((8,6), NECRO_SMALL_AMMO)
+    generate_item((8,4), NECRO_LARGE_AMMO)
     generate_item((9,6), QUARTZ_FLASK)
     generate_item((7,6), QUARTZ_FLASK)
-    generate_item((8,4), VASE)
     generate_item((5,6), VASE)
     generate_item((5,2), VASE)
     generate_item((6,8), VASE)

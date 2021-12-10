@@ -32,7 +32,8 @@ ammo_counter_overlay = pygame.image.load("images/ui/ammo_counter/ammo_counter.pn
 ammo_counter_overlay2 = pygame.image.load("images/ui/ammo_counter/ammo_counter2.png").convert_alpha()
 sword_inv = pygame.image.load("images/ui/ammo_counter/sword.png").convert_alpha()
 crossbow_inv = pygame.image.load("images/ui/ammo_counter/crossbow.png").convert_alpha()
-inventory_weapons = [sword_inv, crossbow_inv]
+necrolight_inv = pygame.image.load("images/ui/ammo_counter/necrolight.png").convert_alpha()
+inventory_weapons = [sword_inv, crossbow_inv, necrolight_inv]
 infinity_sign = pygame.image.load("images/ui/ammo_counter/infinity.png").convert_alpha()
 
 #Consumables counter
