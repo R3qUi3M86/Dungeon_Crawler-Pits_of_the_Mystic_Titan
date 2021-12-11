@@ -306,10 +306,9 @@ def main_game_loop():
         #Other
         pygame.display.update()
         clock.tick(60)
-        if entity_manager.hero.tile_index in level_painter.cutscene_tile_indices and level_painter.level_layout is level_painter.level_01_map and not cutscene_manager.playing_cutscene:
+        if entity_manager.hero.tile_index in level_painter.cutscene_tile_indices and level_painter.level_layout is level_painter.level_04_map and not cutscene_manager.playing_cutscene:
             cutscene_manager.playing_cutscene = True
             level_painter.cutscene_tile_indices = []
-            print("cutscene")
 
 def main():
     play_music(-1)

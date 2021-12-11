@@ -8,6 +8,7 @@ from utilities import level_painter
 from utilities import level_painter
 from utilities.level_painter import TILE_SIZE
 from entities.level.level import WATER
+from entities.level.level import *
 from entities.characters.monster import Monster
 from entities.characters.player import Hero
 from entities.items.item import Item
@@ -88,9 +89,9 @@ def initialize_game():
     level_painter.paint_level()
     initialize_player()
     initialize_all_entities_and_shadows_sprite_group_matrix()
+    generate_items()
     #fill_map_with_monsters(1)
     generate_monsters()
-    generate_items()
     update_far_proximity_matrices_and_lists()
     finish_init()
 
@@ -346,6 +347,16 @@ def get_direct_proximity_objects_list(matrix, object_type = IMPASSABLE_TILES):
                         direct_proximity_monster_sprites.append(entity.sprite)
         
         return direct_proximity_monster_sprites
+
+    elif object_type == ITEM:
+        direct_proximity_item_sprites = []
+        for row in matrix:
+            for tile_index in row:
+                for entity in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
+                    if entity.sprite.TYPE == ITEM:
+                        direct_proximity_item_sprites.append(entity.sprite)
+        
+        return direct_proximity_item_sprites
 
 def get_entity_sprite_by_id(entity_id):
     for monster in all_monsters:
@@ -1098,14 +1109,15 @@ def remove_entity_shadow_from_the_game(entity):
 
 #Monster entities
 def generate_monsters():
-    #generate_monster(ETTIN,(8,5))
-    generate_monster(IRON_LICH,(14,22))
-    # generate_monster(DARK_BISHOP,(14,23))
-    # generate_monster(DARK_BISHOP,(14,24))
-    # generate_monster(DARK_BISHOP,(13,22))
-    # generate_monster(DARK_BISHOP,(13,23))
-    # generate_monster(DARK_BISHOP,(13,24))
-    pass
+    level_layout_key = None
+    
+    for key in LEVEL_LAYOUT_DICT:
+        if level_painter.level_layout == LEVEL_LAYOUT_DICT[key]:
+            level_layout_key = key
+            break
+
+    for monster_args in LEVEL_MONSTERS_DICT[level_layout_key]:
+        generate_monster(monster_args[0],monster_args[1],monster_args[2])
 
 def fill_map_with_monsters(density):
     for row in level_sprites_matrix:
@@ -1113,13 +1125,13 @@ def fill_map_with_monsters(density):
             if tile.TYPE == FLOOR and tile.tile_index is not hero.tile_index:
                 result = random.choice(range(1,101))
                 if result <= density:
-                    generate_monster(ETTIN,(tile.tile_index[0],tile.tile_index[1]))
+                    generate_monster((tile.tile_index[0],tile.tile_index[1]),ETTIN)
 
-def generate_monster(monster_type, tile_index):
+def generate_monster(tile_index, monster_type, facing_dir):
     global all_entity_and_shadow_sprite_group_matrix
     global all_monsters
 
-    monster = Monster(tile_index, monster_type)
+    monster = Monster(tile_index, monster_type, facing_dir)
 
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster))
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(monster.shadow))
@@ -1170,18 +1182,15 @@ def remove_monster_from_the_game(monster):
 
 #Item entities
 def generate_items():
-    generate_item((8,5), NECROLIGHT)
-    generate_item((8,6), NECRO_SMALL_AMMO)
-    generate_item((8,4), NECRO_LARGE_AMMO)
-    generate_item((9,6), QUARTZ_FLASK)
-    generate_item((7,6), QUARTZ_FLASK)
-    generate_item((5,6), VASE)
-    generate_item((5,2), VASE)
-    generate_item((6,8), VASE)
-    generate_item((6,3), GOLD_COINS)
-    generate_item((6,4), GOLD_COINS)
-    generate_item((5,2), WALL_TORCH)
-    generate_item((5,6), WALL_TORCH)
+    level_layout_key = None
+    
+    for key in LEVEL_LAYOUT_DICT:
+        if level_painter.level_layout == LEVEL_LAYOUT_DICT[key]:
+            level_layout_key = key
+            break
+
+    for item_args in LEVEL_ITEMS_DICT[level_layout_key]:
+        generate_item(item_args[0], item_args[1])
 
 def generate_item(tile_index, item_name):
     global all_entity_and_shadow_sprite_group_matrix
@@ -1190,6 +1199,10 @@ def generate_item(tile_index, item_name):
 
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(item))
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].append(pygame.sprite.GroupSingle(item.shadow))
+
+    if item.can_collide and not item.is_destructible and not item.is_pickable:
+        level_painter.pathfinding_matrix[tile_index[0]][tile_index[1]] = 0
+        level_painter.pathfinding_flying_matrix[tile_index[0]][tile_index[1]] = 0
 
 def put_item_in_matrices_and_lists(new_item):
     tile_index = new_item.tile_index
@@ -1212,9 +1225,11 @@ def remove_item_from_the_map_and_give_to_player(item):
     give_item_to_player(item)
     append_picked_item_names_list(item)
 
+    far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
+
     item_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(item.id, tile_index, type=ITEM)
     all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(item_sprite_group)
-    far_proximity_entity_sprite_group_matrix[tile_index[0]][tile_index[1]].remove(item_sprite_group)
+    far_proximity_entity_sprite_group_matrix[far_proximity_matrix_index[0]][far_proximity_matrix_index[1]].remove(item_sprite_group)
 
     remove_entity_shadow_from_the_game(item)
 

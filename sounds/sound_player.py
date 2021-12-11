@@ -17,7 +17,7 @@ the_cathedral = 'sounds/music/The_Cathedral.mp3'
 the_crater = 'sounds/music/The_Crater.mp3'
 the_boss = 'sounds/music/The_Boss.mp3'
 
-music_tracks = [the_docks,the_dungeons, the_cathedral, the_crater, the_boss, the_winnowing_hall]
+music_tracks = [the_docks, the_dungeons, the_crater, the_cathedral, the_boss, the_winnowing_hall]
 
 ###Sound Effects
 blank_sound = pygame.mixer.Sound('sounds/attack/hit/BLANK.wav')

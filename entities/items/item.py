@@ -13,7 +13,7 @@ WEAPON_DAMAGE_DICT = {SWORD:2, EMERALD_CROSSBOW:2, NECROLIGHT:15, ETTIN_MACE:1, 
 WEAPON_RANGE_DICT = {EMERALD_CROSSBOW:30, NECROLIGHT:30, BISHOP_MAGIC_MISSILE:20, SPIKE_BALL_SPELL:30, WHIRLWIND_SPELL:30, RED_ORB_SPELL:30}
 WEAPON_CHAINFIRE_DICT = {SWORD:1, NECROLIGHT:1, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:5, EMERALD_CROSSBOW:1, SPIKE_BALL_SPELL:1, WHIRLWIND_SPELL:1, RED_ORB_SPELL:1}
 WEAPON_CHAINFIRE_COOLDOWN_LIMIT_DICT = {SWORD:0, EMERALD_CROSSBOW:0, NECROLIGHT:0, ETTIN_MACE:0, BISHOP_MAGIC_MISSILE:0.15, SPIKE_BALL_SPELL:0, WHIRLWIND_SPELL:0, RED_ORB_SPELL:0}
-WEAPON_ATTACK_SPEED_DICT = {SWORD:1, EMERALD_CROSSBOW:3, NECROLIGHT:4, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:0.8, SPIKE_BALL_SPELL:0.5, WHIRLWIND_SPELL:0.5, RED_ORB_SPELL:0.5}
+WEAPON_ATTACK_SPEED_DICT = {SWORD:1, EMERALD_CROSSBOW:3, NECROLIGHT:4, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:0.8, SPIKE_BALL_SPELL:1, WHIRLWIND_SPELL:1, RED_ORB_SPELL:1}
 WEAPON_ATTACK_COOLDOWN_DICT = {SWORD:0, EMERALD_CROSSBOW:1.2, NECROLIGHT:0.25, ETTIN_MACE:0, BISHOP_MAGIC_MISSILE:3.5, SPIKE_BALL_SPELL:3, WHIRLWIND_SPELL:4, RED_ORB_SPELL:6}
 CONSUMABLE_COOLDOWN_DICT = {QUARTZ_FLASK:5}
 
@@ -48,12 +48,14 @@ class Item(pygame.sprite.Sprite):
         #Colliders
         self.entity_small_square_collider  = Collider(self.position, self.id, SQUARE, size=SIZE_SMALL)
         self.entity_tiny_omni_collider = Collider(self.position, self.id, ENTITY_OMNI, size=SIZE_TINY)
+        self.entity_collider_omni  = Collider(self.position, self.id, ENTITY_OMNI)
 
         #Shadow
-        self.shadow = Shadow(self.position, self.map_position, self.id, SIZE_TINY, self.tile_index)
+        self.shadow_size = self.get_shadow_size()
+        self.shadow = Shadow(self.position, self.map_position, self.id, self.shadow_size, self.tile_index)
 
         #Sprite lists
-        self.entity_auxilary_sprites = [self.entity_small_square_collider, self.shadow, self.entity_tiny_omni_collider]
+        self.entity_auxilary_sprites = [self.entity_small_square_collider, self.shadow, self.entity_tiny_omni_collider, self.entity_collider_omni]
 
         ###Initial sprite definition###
         self.image = self.item_static_image
@@ -132,8 +134,16 @@ class Item(pygame.sprite.Sprite):
     def get_img_display_correction(self):
         if self.NAME is GOLD_COINS:
             return 8
+        
         elif self.NAME is VASE:
             return 3
+
+        elif self.NAME is FLAME_PEDESTAL1:
+            return 22
+
+        elif self.NAME is SCULPTURE1:
+            return 6
+        
         else:
             return 0
 
@@ -166,6 +176,12 @@ class Item(pygame.sprite.Sprite):
     def get_item_destruction_images(self):
         if self.NAME in DESTRUCTIBLE_ITEMS:
             return DESTRUCTIBLE_ITEM_IMAGES[self.NAME]
+
+    def get_shadow_size(self):
+        if self.NAME is FLAME_PEDESTAL1 or self.NAME is SCULPTURE1:
+            return SIZE_SMALL
+        else:
+            return SIZE_TINY
 
     def get_is_animated(self):
         if self.NAME in ANIMATED_ITEMS:
@@ -229,13 +245,16 @@ class Item(pygame.sprite.Sprite):
     def get_item_size(self):
         if self.is_pickable or self.is_weapon:
             return 15, 8
-        if self.NAME is VASE:
+        elif self.NAME is VASE:
             return 18, 10
+
+        elif self.NAME is SCULPTURE1 or self.NAME is FLAME_PEDESTAL1:
+            return 20, 11
 
     def get_can_collide(self):
         if self.is_pickable:
             return True
-        elif self.NAME is VASE:
+        elif self.NAME is VASE or self.NAME is FLAME_PEDESTAL1 or self.NAME is SCULPTURE1:
             return True
         elif self.NAME is WALL_TORCH:
             return False
@@ -308,7 +327,7 @@ class Item(pygame.sprite.Sprite):
         if int(self.animation_index) >= len(self.item_animation_images):
             self.animation_index = 0
         
-        if self.NAME is WALL_TORCH:
+        if self.NAME is WALL_TORCH or self.NAME is FLAME_PEDESTAL1:
             if int(self.animation_index) >= 1:
                 self.animation_index = 0
                 self.image = self.item_animation_images[random.choice(range(len(self.item_animation_images)))]

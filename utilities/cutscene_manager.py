@@ -1,6 +1,3 @@
-import pygame
-
-from utilities.level_painter import TILE_SIZE
 from utilities import level_painter
 from utilities import entity_manager
 from utilities.constants import *

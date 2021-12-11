@@ -40,6 +40,7 @@ class Projectile(pygame.sprite.Sprite):
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.direct_proximity_wall_like_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, WALL_LIKE)
         self.direct_proximity_characters = self.get_direct_proximity_characters_list()
+        self.direct_proximity_coolidable_items = self.get_direct_proximity_colidable_items()
 
         ###Object ID###
         self.id = util.generate_entity_id()
@@ -115,7 +116,7 @@ class Projectile(pygame.sprite.Sprite):
                 sound_player.play_projectile_impact_sound(self.NAME)
                 if self.NAME is SPIKE_BALL:
                     self.launch_spike_shards()
-                elif self.NAME is RED_ORB:
+                elif self.NAME is RED_ORB or self.NAME is NECRO_BALL:
                     self.deal_aoe_damage()
         
         elif self.is_disintegrating:
@@ -138,6 +139,7 @@ class Projectile(pygame.sprite.Sprite):
                     self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
                     self.direct_proximity_wall_like_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, WALL_LIKE)
                     self.direct_proximity_characters = self.get_direct_proximity_characters_list()
+                    self.direct_proximity_coolidable_items = self.get_direct_proximity_colidable_items()
                     entity_manager.move_entity_in_all_matrices(self.id, PROJECTILE, self.prevous_tile_index, self.tile_index)
                     self.prevous_tile_index = self.tile_index
 
@@ -156,6 +158,7 @@ class Projectile(pygame.sprite.Sprite):
                         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
                         self.direct_proximity_wall_like_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, WALL_LIKE)
                         self.direct_proximity_characters = self.get_direct_proximity_characters_list()
+                        self.direct_proximity_coolidable_items = self.get_direct_proximity_colidable_items()
                         entity_manager.move_entity_in_all_matrices(self.id, PROJECTILE, self.prevous_tile_index, self.tile_index)
                         self.prevous_tile_index = self.tile_index
                 
@@ -209,6 +212,15 @@ class Projectile(pygame.sprite.Sprite):
         else:
             return [entity_manager.hero]
     
+    def get_direct_proximity_colidable_items(self):
+        items_list = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, ITEM)
+        filtered_item_list = []
+        for item in items_list:
+            if item.can_collide and not item.is_pickable and not item.is_falling_apart and not item.is_destroyed:
+                filtered_item_list.append(item)
+
+        return filtered_item_list
+
     def get_damage_ticks(self):
         if self.NAME is WHIRLWIND:
             return 5
@@ -246,6 +258,14 @@ class Projectile(pygame.sprite.Sprite):
     def deal_aoe_damage(self):
         if util.elipses_intersect(self.map_position,entity_manager.hero.map_position,(80,44), entity_manager.hero.size):
             entity_manager.hero.take_damage(self.damage//2)
+        for character in entity_manager.far_proximity_character_sprites_list:
+            if character is not entity_manager.hero and not character.is_dead and not character.is_overkilled:
+                 if util.elipses_intersect(self.map_position,character.map_position,(100,55), character.size):
+                    character.take_damage(self.damage//2)
+
+        for item in self.direct_proximity_coolidable_items:
+            if item.is_destructible:
+                item.destroy_item()
 
     def rotate_speed_vector(self):
         self.angle+= random.choice(range(10))

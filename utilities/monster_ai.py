@@ -22,7 +22,7 @@ class Ai():
         self.attack_decision_timer_limit = 0.5
 
         self.los_emision_timer = 0
-        self.los_emision_timer_limit = 120
+        self.los_emision_timer_limit = 60
 
         self.waking_up_timer = 0
         self.waking_up_timer_limit = 30
