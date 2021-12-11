@@ -5,6 +5,8 @@ from utilities.constants import *
 SFX_VOLUME = 0.1
 MUSIC_VOLUME = 0.05
 
+ambient_sound_timer_limit = 45
+ambient_sound_timer = 0
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
@@ -98,6 +100,8 @@ water_drop1_sound = pygame.mixer.Sound('sounds/ambient/drops/DROP1.wav')
 water_drop2_sound = pygame.mixer.Sound('sounds/ambient/drops/DROP2.wav')
 rocks1_sound = pygame.mixer.Sound('sounds/ambient/rocks/ROCKS1.wav')
 rocks2_sound = pygame.mixer.Sound('sounds/ambient/rocks/ROCKS2.wav')
+
+ambient_sounds = [water_drop1_sound,water_drop2_sound,rocks1_sound,rocks2_sound]
 
 player_overkill_sounds = [player_overkill_sound1, player_overkill_sound2, player_overkill_sound3]
 all_sounds = [menu_select, menu_push, menu_new_game, 
@@ -258,4 +262,15 @@ def play_consumable_use_sound(consumable_name):
 def play_music(track_no):
     pygame.mixer.music.load(music_tracks[track_no])
     pygame.mixer.music.play(-1)
+
+def increment_ambient_sound_timer():
+    global ambient_sound_timer
+    global ambient_sound_timer_limit
+
+    if ambient_sound_timer >= ambient_sound_timer_limit:
+        ambient_sound_timer = 0
+        ambient_sound_timer_limit = 30+random.randrange(30)
+        random.choice(ambient_sounds).play()
+    ambient_sound_timer += 0.0167
+        
 

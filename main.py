@@ -129,7 +129,7 @@ def switch_weapon(weapon_index):
             entity_manager.hero.character_attack_index[1] = 1
 
 def use_consumable():
-    if entity_manager.hero.selected_consumable and entity_manager.hero.consumables[entity_manager.hero.selected_consumable].is_ready_to_use:
+    if entity_manager.hero.selected_consumable and entity_manager.hero.consumables[entity_manager.hero.selected_consumable].is_ready_to_use and entity_manager.hero.is_living:
         entity_manager.use_consumable_item()
 
 def pause_mouse_input():
@@ -173,6 +173,11 @@ def order_sprites():
 def draw_sprites():
     screen.blit(level_painter.level_surface,(level_painter.get_level_surface_translation_vector()))
     
+    for tile in entity_manager.far_proximity_level_water_sprites_list:
+        if tile.is_animated:
+            tile.update()
+            screen.blit(tile.image,tile.position)
+
     if wall_drawing_mode == VISIBLE:
         for tile in entity_manager.far_proximity_primary_wall_sprites_list:
             screen.blit(tile.image,tile.position)
@@ -221,9 +226,10 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    entity_manager.initialize_game()
+    level_painter.level_layout = level_painter.levels[0]
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
+    entity_manager.initialize_game()
     cutscene_manager.playing_cutscene = False
     main_game_loop()
 
@@ -287,11 +293,11 @@ def main_game_loop():
         ################
         ####Debuging####
         ################
-        #debug_text(f"{entity_manager.hero.map_position}")wwwwwwwwwwssssssssssss
+        #debug_text(f"{entity_manager.hero.map_position}")
         #debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
         #debug_text(f"109 pos: {entity_manager.hero.direct_proximity_collision_tiles[1].map_position}",x = 10, y = 30)
-        debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
-        debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
+        #debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
+        #debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
         # debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(0).position}",x = 10, y = 60)
         # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
         # debug_text(f"mon 0 current_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).current_tile_position}",x = 10, y = 60)
@@ -304,6 +310,7 @@ def main_game_loop():
         #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix, "S")
 
         #Other
+        increment_ambient_sound_timer()
         pygame.display.update()
         clock.tick(60)
         if entity_manager.hero.tile_index in level_painter.cutscene_tile_indices and level_painter.level_layout is level_painter.level_04_map and not cutscene_manager.playing_cutscene:

@@ -10,7 +10,7 @@ from utilities.constants import *
 
 TILE_SIZE = 48,48
 levels = [level_01_map, level_02_map, level_03_map, level_04_map]
-level_layout = levels[0]
+level_layout = None
 pathfinding_matrix = []
 pathfinding_flying_matrix = []
 level_surface = None

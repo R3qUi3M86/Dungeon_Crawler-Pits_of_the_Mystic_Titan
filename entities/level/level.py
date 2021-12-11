@@ -5,12 +5,12 @@ test_map = [
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 "X                                                              XX",
 "X                                                               X",
-"X                                                               X",
-"X                                                               X",
-"X                                                               X",
-"X                                                               X",
-"X                                                               X",
-"X                                                               X",
+"X          XXXXXXXX                                             X",
+"X          XXXXXXXX                                             X",
+"X          XXXXXXXX                                             X",
+"X          XXXXXXXX                                             X",
+"X          XXXXXXXX                                             X",
+"X          XXXXXXXX                                             X",
 "X                                                               X",
 "X                                                               X",
 "X                                                               X",
@@ -42,6 +42,8 @@ test_map = [
 "X                                                              XX",
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
 
+test_map_items = []
+test_map_monsters = [[(2,13),ETTIN,SECTOR_W]]
 
 
 level_01_map = [
@@ -246,14 +248,15 @@ level_04_items = [[(12,9), WALL_TORCH],[(12,25), WALL_TORCH],[(28,9), WALL_TORCH
 
 level_04_monsters = []
 
+TEST_MAP = "test_map"
 LEVEL_01 = "level_01"
 LEVEL_02 = "level_02"
 LEVEL_03 = "level_03"
 LEVEL_04 = "level_04"
 
-LEVEL_LAYOUT_DICT = {LEVEL_01: level_01_map, LEVEL_02: level_02_map, LEVEL_03: level_03_map, LEVEL_04: level_04_map}
-LEVEL_ITEMS_DICT = {LEVEL_01:level_01_items, LEVEL_02:level_02_items, LEVEL_03:level_03_items, LEVEL_04:level_04_items}
-LEVEL_MONSTERS_DICT = {LEVEL_01:level_01_monsters, LEVEL_02:level_02_monsters, LEVEL_03:level_03_monsters, LEVEL_04:level_04_monsters}
+LEVEL_LAYOUT_DICT = {LEVEL_01: level_01_map, LEVEL_02: level_02_map, LEVEL_03: level_03_map, LEVEL_04: level_04_map, TEST_MAP:test_map}
+LEVEL_ITEMS_DICT = {LEVEL_01:level_01_items, LEVEL_02:level_02_items, LEVEL_03:level_03_items, LEVEL_04:level_04_items, TEST_MAP:test_map_items}
+LEVEL_MONSTERS_DICT = {LEVEL_01:level_01_monsters, LEVEL_02:level_02_monsters, LEVEL_03:level_03_monsters, LEVEL_04:level_04_monsters, TEST_MAP:test_map_monsters}
 
 # Legend
 ENTRANCE = "E" 

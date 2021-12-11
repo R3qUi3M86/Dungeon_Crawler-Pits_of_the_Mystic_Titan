@@ -105,11 +105,12 @@ def projectile_vs_entity_collision(projectile_sprite):
                 projectile_sprite.has_impacted = True
                 character.take_damage(projectile_sprite.damage)
 
-    for item in projectile_sprite.direct_proximity_coolidable_items:
-        if util.elipses_intersect(item.map_position, projectile_sprite.map_position, item.size, projectile_sprite.size) and not projectile_sprite.is_disintegrating and not projectile_sprite.has_impacted:
-            projectile_sprite.has_impacted = True
-            if item.is_destructible and not item.NAME is VASE:
-                item.destroy_item()
+    if projectile_sprite.NAME is not WHIRLWIND:
+        for item in projectile_sprite.direct_proximity_coolidable_items:
+            if util.elipses_intersect(item.map_position, projectile_sprite.map_position, item.size, projectile_sprite.size) and not projectile_sprite.is_disintegrating and not projectile_sprite.has_impacted:
+                projectile_sprite.has_impacted = True
+                if item.is_destructible and not item.NAME is VASE:
+                    item.destroy_item()
 
 def player_vs_item_collision(item_sprite):
     hero = entity_manager.hero

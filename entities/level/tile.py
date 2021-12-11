@@ -19,15 +19,30 @@ class Tile(pygame.sprite.Sprite):
         self.vicinity_matrix = vicinity_matrix
         self.passable = self.get_passable()
         self.wall_mode = wall_mode
+
+        self.animation_timer = 0
+        self.animation_timer_limit = 0
         
         self.is_convex = False
         self.is_hiding_player = False
         self.is_exit_tile = False
+        self.is_animated = False
         self.image_unscaled = self.get_tile_image()
         self.image = pygame.transform.scale(self.image_unscaled, size)
         self.cluster_x_y = self.get_cluster_x_y()
         self.mask = self.get_tile_mask()
         self.rect = self.image.get_rect(topleft = (self.position))
+
+
+    def update(self):
+        if self.image_unscaled in blue_water_images:
+            if self.animation_timer >= self.animation_timer_limit:
+                self.image_unscaled = random.choice(blue_water_images)
+                tile_size = self.image.get_size()
+                self.image = pygame.transform.scale(self.image_unscaled, tile_size)
+                self.animation_timer_limit = 1+random.choice([0.1,0.2,0.3,0.4])
+                self.animation_timer = 0
+            self.animation_timer += 0.0167
 
 
     def update_position(self):
@@ -76,6 +91,7 @@ class Tile(pygame.sprite.Sprite):
                 
                 elif self.TYPE is WATER:
                     if self.deep_water():
+                        self.is_animated = True
                         return random.choice(blue_water_images)
                     if self.water_under_wall_middle():
                         return random.choice(blue_water_under_wall_images)

@@ -247,6 +247,9 @@ class Projectile(pygame.sprite.Sprite):
             self.is_destroyed = True
         else:
             self.image = self.projectile_destuction_image_list[int(self.projectile_destruction_index)]
+            if self.NAME is RED_ORB:
+                image_size = self.image.get_size()
+                self.image = pygame.transform.scale(self.image,(2*image_size[0], 2*image_size[1]))
             self.projectile_destruction_index += 0.075
         self.rect = self.image.get_rect(midbottom = (self.image_position))
 

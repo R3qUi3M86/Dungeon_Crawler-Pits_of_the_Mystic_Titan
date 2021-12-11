@@ -201,15 +201,15 @@ class Monster(pygame.sprite.Sprite):
             self.deactivate()
 
     def update_position(self, vector=None):
-        if not self.leaving_far_proximity_matrix_margin():
-            if vector:
-                self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
-            else:
-                self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
+        #if not self.leaving_far_proximity_matrix_margin():
+        if vector:
+            self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
             self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
-            self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
-            self.rect = self.image.get_rect(midbottom = (self.image_position))
-            self.update_owned_sprites_position()
+        else:
+            self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
+        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
+        self.rect = self.image.get_rect(midbottom = (self.image_position))
+        self.update_owned_sprites_position()
     
     def update_decisions(self):
         if self.is_living:
@@ -548,6 +548,9 @@ class Monster(pygame.sprite.Sprite):
         self.speed_vector = 0,0
         self.can_collide = False
         self.active = False
+        self.is_attacking = False
+        self.is_preparing_attack = False
+        self.weapons[self.selected_weapon].is_ready_to_use = False
 
         if not self.monster_ai.is_idle:
             self.monster_ai.end_pathfinding()
