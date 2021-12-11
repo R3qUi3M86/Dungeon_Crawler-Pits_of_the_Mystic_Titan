@@ -16,6 +16,7 @@ settings_text = pygame.image.load("images/menu/settings.png").convert_alpha()
 sound_volume_text = pygame.image.load("images/menu/sound_volume.png").convert_alpha()
 leave_question_text = pygame.image.load("images/menu/leave_game_question.png").convert_alpha()
 quit_question_text = pygame.image.load("images/menu/quit_question.png").convert_alpha()
+scores_text = pygame.image.load("images/menu/scores.png").convert_alpha()
 
 #Buttons
 new_game_button_01 = pygame.image.load("images/menu/buttons/new_game/new_game_01.png").convert_alpha()

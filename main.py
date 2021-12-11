@@ -22,6 +22,8 @@ sorting_timer = 20
 sorting_timer_limit = 20
 sorted_entity_matrix = None
 wall_drawing_mode = VISIBLE
+game_won_delay = 0
+game_won_delay_limit = 2
 
 set_volume_for_all_sfx(SFX_VOLUME)
 set_music_volume(MUSIC_VOLUME)
@@ -137,6 +139,33 @@ def pause_mouse_input():
 
     mouse_input_pause = True
 
+def check_next_level_travel():
+    if collision_manager.moving_to_next_level and not ui_elements.fading_out and not ui_elements.fading_in:
+        ui_elements.fading_out = True
+    elif collision_manager.moving_to_next_level and ui_elements.fading_in:
+        collision_manager.moving_to_next_level = False
+        start_next_level()
+
+def check_win_conditions():
+    global game_won_delay
+
+    if menu.game_won and not ui_elements.fading_out and not ui_elements.fading_in:
+        if game_won_delay >= game_won_delay_limit:
+            ui_elements.fading_out = True
+            game_won_delay = 0
+            fadeout_music()
+        else:
+            game_won_delay += 0.0167
+
+    elif menu.game_won and ui_elements.fading_in:
+        play_music(-1)
+        menu.pause_menu = False
+        menu.scores_menu = True
+        menu.in_game = False
+        menu.menu()
+        if settings.starting_new_game:
+            start_new_game()
+
 #Visuals drawing and sorting
 def increment_sprite_sorting_timer():
     global sorting_timer
@@ -223,6 +252,10 @@ def draw_ui():
 
 #Game initialization
 def start_new_game():
+    global game_won_delay
+
+    menu.game_won = False
+    game_won_delay = 0
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
@@ -261,7 +294,7 @@ def main_game_loop():
                 pygame.quit()
                 exit()
             
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN and not collision_manager.moving_to_next_level and not menu.game_won:
                 if event.key == pygame.K_TAB:
                     toggle_wall_drawing_mode()
                 elif event.key == pygame.K_1:
@@ -270,6 +303,8 @@ def main_game_loop():
                     switch_weapon(1)
                 elif event.key == pygame.K_3:
                     switch_weapon(2)
+                elif event.key == pygame.K_f:
+                    entity_manager.use_puzzle()
                 elif event.key == pygame.K_SPACE:
                     use_consumable()
                 elif event.key == pygame.K_ESCAPE:
@@ -278,11 +313,8 @@ def main_game_loop():
                     if settings.starting_new_game:
                         start_new_game()
         
-        if collision_manager.moving_to_next_level and not ui_elements.fading_out and not ui_elements.fading_in:
-            ui_elements.fading_out = True
-        elif collision_manager.moving_to_next_level and ui_elements.fading_in:
-            collision_manager.moving_to_next_level = False
-            start_next_level()
+        check_win_conditions()
+        check_next_level_travel()
         
         #Drawing
         increment_sprite_sorting_timer()
@@ -307,7 +339,7 @@ def main_game_loop():
 
         #util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")
         #util.increment_print_matrix_timer(entity_manager.level_sprites_matrix, "S", True)
-        #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_and_shadow_sprite_group_matrix, "S")
+        #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_sprite_group_matrix, "S")
 
         #Other
         increment_ambient_sound_timer()

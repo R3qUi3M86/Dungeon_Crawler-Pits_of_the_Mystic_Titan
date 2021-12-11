@@ -13,10 +13,12 @@ clock = pygame.time.Clock()
 pygame.event.set_allowed([pygame.QUIT])
 
 #Global variables
+game_won = False
 main_menu = True
 settings_menu = False
 pause_menu = False
 yes_or_no_menu = False
+scores_menu = False
 selected_button = None
 
 in_game = False
@@ -54,6 +56,10 @@ quit_question_img = quit_question_text
 quit_question_rect = quit_question_img.get_rect()
 quit_question_rect.center = (screen_width//2, 300)
 
+scores_img = scores_text
+scores_rect = scores_img.get_rect()
+scores_rect.center = (screen_width//2, screen_height//2)
+
 #Button images and rects
 new_game_button_img = new_game_button[0]
 new_game_rect = new_game_button_img.get_rect()
@@ -77,7 +83,7 @@ music_rect.center = (screen_width//2-400,490)
 
 back_button_img = back_button[0]
 back_rect = back_button_img.get_rect()
-back_rect.center = (screen_width-250,screen_height-150)
+back_rect.center = (screen_width-120,screen_height-80)
 
 resume_button_img = resume_button[0]
 resume_rect = resume_button_img.get_rect()
@@ -180,6 +186,10 @@ def draw_menu_elements():
         screen.blit(game_paused_img,game_paused_rect)
         draw_pause_menu_buttons()
 
+    elif scores_menu:
+        screen.blit(scores_img,scores_rect)
+        draw_scores_menu_buttons()
+
 def draw_main_menu_buttons():
     screen.blit(BUTTON_IMAGES[NEW_GAME_BUTTON],new_game_rect)
     screen.blit(BUTTON_IMAGES[SETTINGS_BUTTON],settings_rect)
@@ -210,6 +220,9 @@ def draw_pause_menu_buttons():
     screen.blit(BUTTON_IMAGES[RESUME_BUTTON],resume_rect)
     screen.blit(BUTTON_IMAGES[SETTINGS_BUTTON],settings_rect)
     screen.blit(BUTTON_IMAGES[LEAVE_GAME_BUTTON],leave_game_rect)
+
+def draw_scores_menu_buttons():
+    screen.blit(BUTTON_IMAGES[BACK_BUTTON], back_rect)
 
 def animate_button(button_name, direction):
     index = BUTTON_ANIM_INDICES[button_name]
@@ -483,9 +496,11 @@ def enter_selected_option(used_button):
     global pause_menu
     global settings_menu
     global yes_or_no_menu
+    global scores_menu
     global in_game
     global entering_game
     global going_to_main_menu
+    global game_won
 
     if used_button == NEW_GAME_BUTTON:
         sound_player.play_menu_push_sound(new_game=True)
@@ -509,6 +524,9 @@ def enter_selected_option(used_button):
     
     elif used_button == BACK_BUTTON:
         settings_menu = False
+        scores_menu = False
+        game_won = False
+        
         if not in_game:
             main_menu = True
         else:
@@ -703,6 +721,15 @@ def menu():
                     selected_button = None
                     if click:
                         enter_selected_option(NO_BUTTON)
+
+            elif scores_menu:
+                if back_rect.collidepoint(m_x, m_y):
+                    if BUTTON_ANIM_INDICES[BACK_BUTTON] == 0:
+                        sound_player.play_menu_select_sound()
+                    animate_button(BACK_BUTTON, ASCENDING)
+                    selected_button = None
+                    if click:
+                        enter_selected_option(BACK_BUTTON)    
 
             if dragging_sfx_pip or dragging_music_pip:
                 zero_volume_pos = sfx_slider_bar_rect.center[0]-665/2

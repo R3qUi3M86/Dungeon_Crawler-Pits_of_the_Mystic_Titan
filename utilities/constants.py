@@ -121,8 +121,16 @@ WALL_TORCH = "wall torch"
 VASE = "vase"
 SCULPTURE1 = "sculpture 1"
 FLAME_PEDESTAL1 = "flame pedestal 1"
+STALAG_S = "stalagmite small"
+STALAG_L = "stalagmite large"
+LICH_EYE = "The Iron Lich Eye"
+RUBY_PEDESTAL_EMPTY = "ruby pedestal empty"
+RUBY_PEDESTAL_FULL = "ruby pedestal full"
+CORPSE1 = "corpse1"
+CORPSE2 = "corpse2"
+BANNER = "banner"
 
-DECORATIONS = [WALL_TORCH, VASE, SCULPTURE1, FLAME_PEDESTAL1]
+DECORATIONS = [WALL_TORCH, VASE, SCULPTURE1, FLAME_PEDESTAL1, STALAG_S, STALAG_L, LICH_EYE, RUBY_PEDESTAL_EMPTY, RUBY_PEDESTAL_FULL, CORPSE1, CORPSE2, BANNER]
 
 ##### Projectiles #####
 CROSSBOW_BOLT = "crossbow bolt"

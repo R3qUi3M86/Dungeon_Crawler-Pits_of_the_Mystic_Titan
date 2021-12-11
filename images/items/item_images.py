@@ -81,6 +81,23 @@ flame_pedestal1_images = [flame_pedestal1_01,flame_pedestal1_02,flame_pedestal1_
 ### Sculpture1
 sculpture1 = pygame.image.load("images/items/decor/sculpture1/sculpture_01.png").convert_alpha()
 
+### Stalagmites
+stalagmite_small = pygame.image.load("images/items/decor/stalagmite/small_stalagmite.png").convert_alpha()
+stalagmite_large = pygame.image.load("images/items/decor/stalagmite/large_stalagmite.png").convert_alpha()
+
+### Corspes
+corpse1 = pygame.image.load("images/items/decor/corpses/corpse1.png").convert_alpha()
+corpse2 = pygame.image.load("images/items/decor/corpses/corpse2.png").convert_alpha()
+
+### Ruby puzzle
+iron_lich_eye = pygame.image.load("images/items/decor/ruby_puzzle/ruby.png").convert_alpha()
+ruby_pedestal_empty = pygame.image.load("images/items/decor/ruby_puzzle/pedestal_emtpy.png").convert_alpha()
+ruby_pedestal_full = pygame.image.load("images/items/decor/ruby_puzzle/pedestal_full.png").convert_alpha()
+ruby_pedestal_images = [ruby_pedestal_empty,ruby_pedestal_full]
+
+###
+banner = pygame.image.load("images/items/decor/banner/banner.png").convert_alpha()
+
 ### Vase
 vase_01 = pygame.image.load("images/items/decor/vase/vase_01.png").convert_alpha()
 vase_02 = pygame.image.load("images/items/decor/vase/vase_02.png").convert_alpha()
@@ -104,7 +121,7 @@ STATIC_IMAGE_DICT = {SWORD:sword, EMERALD_CROSSBOW:emerald_crossbow, NECROLIGHT:
                      #Consumables
                      QUARTZ_FLASK:quartz_flask_01,
                      #Decor
-                     WALL_TORCH:torch_01, VASE:vase_01, FLAME_PEDESTAL1:flame_pedestal1_01, SCULPTURE1:sculpture1,
+                     WALL_TORCH:torch_01, VASE:vase_01, FLAME_PEDESTAL1:flame_pedestal1_01, SCULPTURE1:sculpture1, STALAG_S:stalagmite_small, STALAG_L:stalagmite_large, CORPSE1:corpse1, CORPSE2:corpse2, LICH_EYE:iron_lich_eye, RUBY_PEDESTAL_EMPTY:ruby_pedestal_empty, RUBY_PEDESTAL_FULL:ruby_pedestal_full, BANNER:banner,
                      #Currency
                      GOLD_COINS:gold_01}
 

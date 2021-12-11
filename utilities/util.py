@@ -242,6 +242,8 @@ def print_matrix(matrix, mode="S", add_monsters=False, add_items=False):
                                 row_string = row_string+"P"
                             elif object.sprite.TYPE == MONSTER:
                                 row_string = row_string+"M"
+                            elif object.sprite.TYPE == ITEM:
+                                row_string = row_string+"i"
                             else:
                                 row_string = row_string+"."
                             break

@@ -39,6 +39,7 @@ consumable_pickup = pygame.mixer.Sound('sounds/pickups/CONSUM_PICUP.wav')
 consumable_artifact_use = pygame.mixer.Sound('sounds/pickups/ARTIUSE.wav')
 consumable_potion_use = pygame.mixer.Sound('sounds/pickups/ARTACT1.wav')
 vase_break = pygame.mixer.Sound('sounds/pickups/POTBRK1.wav')
+puzzle_pickup = pygame.mixer.Sound('sounds/pickups/PUZZLE_PICK.wav')
 coin = [coin_01,coin_02,coin_03]
 
 #Melee attacks
@@ -90,6 +91,8 @@ lich_death_sound = pygame.mixer.Sound('sounds/iron_lich/DEATH.wav')
 #Effects
 portal_open_sound = pygame.mixer.Sound('sounds/effects/TPORT1.wav')
 spell_chant_sound = pygame.mixer.Sound('sounds/effects/SPELL_CHANT.wav')
+puzzle_solved_sound = pygame.mixer.Sound('sounds/effects/PUZSLV.wav')
+hmm_sound = pygame.mixer.Sound('sounds/effects/FGTHMM.wav')
 
 #Narrator
 game_too_long_sound = pygame.mixer.Sound('sounds/narrator/GAME1.wav')
@@ -105,7 +108,7 @@ ambient_sounds = [water_drop1_sound,water_drop2_sound,rocks1_sound,rocks2_sound]
 
 player_overkill_sounds = [player_overkill_sound1, player_overkill_sound2, player_overkill_sound3]
 all_sounds = [menu_select, menu_push, menu_new_game, 
-              weapon_pickup, ammo_pickup, consumable_pickup, coin_01, coin_02, coin_03, consumable_artifact_use, consumable_potion_use, vase_break, 
+              weapon_pickup, ammo_pickup, consumable_pickup, coin_01, coin_02, coin_03, consumable_artifact_use, consumable_potion_use, vase_break, puzzle_pickup,
               hero_melee_miss_sound,hero_melee_hit_sound,monster_melee_miss_sound,monster_melee_hit_sound,
               crossbow_attack_sound,crossbow_bolt_hit_sound,
               necrolight_attack_sound, necrolight_hit_sound,
@@ -117,7 +120,7 @@ all_sounds = [menu_select, menu_push, menu_new_game,
               ettin_noise1_sound,ettin_pain_sound,ettin_death_sound,ettin_overkill_sound, 
               bishop_noise1_sound,bishop_noise2_sound,bishop_pain_sound,bishop_death_sound,bishop_overkill_sound,bishop_atkprep_sound,bishop_tele_blur_sound,
               lich_noise1_sound, lich_noise2_sound, lich_pain_sound, lich_death_sound,
-              portal_open_sound, spell_chant_sound,
+              portal_open_sound, spell_chant_sound, puzzle_solved_sound, hmm_sound,
               game_too_long_sound, ready_to_die_sound,
               water_drop1_sound, water_drop2_sound, rocks1_sound, rocks2_sound]
 
@@ -206,6 +209,8 @@ def play_item_picked_sound(item):
         consumable_pickup.play()
     elif item.is_currency:
         random.choice(coin).play()
+    elif item.NAME is LICH_EYE:
+        puzzle_pickup.play()
 
 def play_vase_break_sound():
     vase_break.play()

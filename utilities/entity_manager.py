@@ -7,6 +7,7 @@ from utilities.constants import *
 from utilities import level_painter
 from utilities import level_painter
 from utilities.level_painter import TILE_SIZE
+from utilities import menu
 from entities.level.level import WATER
 from entities.level.level import *
 from entities.characters.monster import Monster
@@ -15,6 +16,7 @@ from entities.items.item import Item
 
 entities_id = []
 picked_up_item_names = []
+usable_objects = []
 
 ##### Entities #####
 ### Whole level ###
@@ -53,6 +55,7 @@ far_proximity_level_water_sprites_list = [] #For faster update_position - animat
 def clear_all_lists():
     global entities_id
     global picked_up_item_names
+    global usable_objects
     global all_monsters
     global far_proximity_entity_sprites_list
     global far_proximity_character_sprites_list
@@ -66,6 +69,7 @@ def clear_all_lists():
 
     entities_id = []
     picked_up_item_names = []
+    usable_objects = []
     all_monsters = []
     far_proximity_entity_sprites_list = []
     far_proximity_character_sprites_list = []
@@ -1194,6 +1198,7 @@ def generate_items():
 
 def generate_item(tile_index, item_name):
     global all_entity_and_shadow_sprite_group_matrix
+    global usable_objects
 
     item = Item(tile_index, item_name)
 
@@ -1203,6 +1208,16 @@ def generate_item(tile_index, item_name):
     if item.can_collide and not item.is_destructible and not item.is_pickable:
         level_painter.pathfinding_matrix[tile_index[0]][tile_index[1]] = 0
         level_painter.pathfinding_flying_matrix[tile_index[0]][tile_index[1]] = 0
+
+    if item.NAME is RUBY_PEDESTAL_EMPTY:
+        usable_objects.append(item)
+
+def drop_item(dropping_entity, dropped_item):
+    item = Item(dropping_entity.tile_index,dropped_item)
+    item.position = dropping_entity.position[0], dropping_entity.position[1]+1
+    item.map_position = dropping_entity.map_position[0], dropping_entity.map_position[1]+1
+    item.update_position()
+    put_item_in_matrices_and_lists(item)
 
 def put_item_in_matrices_and_lists(new_item):
     tile_index = new_item.tile_index
@@ -1219,11 +1234,8 @@ def put_item_in_matrices_and_lists(new_item):
     far_proximity_entity_sprites_list.append(new_item)
     far_proximity_item_sprites_list.append(new_item)
 
-def remove_item_from_the_map_and_give_to_player(item):
+def remove_item_from_the_map(item):
     tile_index = item.tile_index
-
-    give_item_to_player(item)
-    append_picked_item_names_list(item)
 
     far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
 
@@ -1237,6 +1249,8 @@ def remove_item_from_the_map_and_give_to_player(item):
     far_proximity_item_sprites_list.remove(item)
 
 def give_item_to_player(item):
+    append_picked_item_names_list(item)
+
     if item.is_weapon:
         hero.ammo[item.NAME] += item.ammo
         if hero.ammo[item.NAME] > 200:
@@ -1260,6 +1274,9 @@ def give_item_to_player(item):
     elif item.is_currency:
         hero.currency[item.NAME] += item.quantity
 
+    elif item.NAME is LICH_EYE:
+        hero.items.append(item)
+
 def append_picked_item_names_list(item):
     text = item.NAME
     if item.is_ammo:
@@ -1282,6 +1299,27 @@ def use_consumable_item():
     if item.quantity == 0:
         hero.selected_consumable = None
         del hero.consumables[item.NAME]
+
+def use_puzzle():
+    puzzle_object = None
+
+    for usable_object in usable_objects:
+        if usable_object.NAME is RUBY_PEDESTAL_EMPTY:
+            puzzle_object = usable_object
+    
+    if puzzle_object and util.elipses_intersect(hero.map_position,puzzle_object.map_position, hero.melee_range, puzzle_object.size):
+        puzzle_key = None
+        for item in hero.items:
+            if item.NAME is LICH_EYE:
+                puzzle_key = item
+        
+        if puzzle_key:
+            puzzle_object.image = puzzle_object.item_animation_images[1]
+            puzzle_object.rect = puzzle_object.image.get_rect(midbottom = (puzzle_object.image_position))
+            sound_player.puzzle_solved_sound.play()
+            menu.game_won = True
+        else:
+            sound_player.hmm_sound.play()
 
 def apply_consumable_effect(item):
     if item.NAME is QUARTZ_FLASK:
@@ -1344,6 +1382,18 @@ def set_entity_screen_position(entity):
     position_y = player_position[1] + entity.sprite.map_position[1] - hero.map_position[1]
 
     entity.sprite.position = position_x,position_y
+
+def print_all_matrices_and_lists():
+    print(all_monsters)
+    print(far_proximity_shadow_sprite_group_list)
+    print(far_proximity_entity_sprites_list)
+    print(far_proximity_character_sprites_list)
+    print(far_proximity_item_sprites_list)
+    print(far_proximity_projectile_sprites_list)
+    print(far_proximity_level_collider_sprites_list)
+    print(far_proximity_primary_wall_sprites_list)
+    print(far_proximity_secondary_wall_sprites_list)
+    print(far_proximity_level_water_sprites_list)
 
 #Conditions
 def entity_is_in_far_proximity_matrix(new_tile_index):

@@ -98,7 +98,8 @@ class Item(pygame.sprite.Sprite):
     #Updates
     def update(self):
         if self.is_picked:
-            entity_manager.remove_item_from_the_map_and_give_to_player(self)
+            entity_manager.give_item_to_player(self)
+            entity_manager.remove_item_from_the_map(self)
             sound_player.play_item_picked_sound(self)
         
         if self.is_animated:
@@ -143,7 +144,19 @@ class Item(pygame.sprite.Sprite):
 
         elif self.NAME is SCULPTURE1:
             return 6
+
+        elif self.NAME is STALAG_S:
+            return 2
+
+        elif self.NAME is STALAG_L:
+            return 3
         
+        elif self.NAME is RUBY_PEDESTAL_FULL or self.NAME is RUBY_PEDESTAL_EMPTY:
+            return 3
+
+        elif self.NAME is CORPSE1:
+            return 3
+
         else:
             return 0
 
@@ -162,6 +175,9 @@ class Item(pygame.sprite.Sprite):
             return True
         elif self.is_currency:
             return True
+        elif self.NAME is LICH_EYE:
+            return True
+
         return False       
 
     def get_is_destructible(self):
@@ -172,14 +188,17 @@ class Item(pygame.sprite.Sprite):
     def get_item_animation_images(self):
         if self.NAME in ANIMATED_ITEMS:
             return ANIMATED_ITEM_IMAGES[self.NAME]
+        elif self.NAME in [RUBY_PEDESTAL_EMPTY, RUBY_PEDESTAL_FULL]:
+            return ruby_pedestal_images
 
     def get_item_destruction_images(self):
         if self.NAME in DESTRUCTIBLE_ITEMS:
             return DESTRUCTIBLE_ITEM_IMAGES[self.NAME]
 
     def get_shadow_size(self):
-        if self.NAME is FLAME_PEDESTAL1 or self.NAME is SCULPTURE1:
+        if self.NAME in [FLAME_PEDESTAL1, SCULPTURE1, RUBY_PEDESTAL_EMPTY, RUBY_PEDESTAL_FULL, STALAG_L, CORPSE2, BANNER, CORPSE1]:
             return SIZE_SMALL
+
         else:
             return SIZE_TINY
 
@@ -245,19 +264,20 @@ class Item(pygame.sprite.Sprite):
     def get_item_size(self):
         if self.is_pickable or self.is_weapon:
             return 15, 8
-        elif self.NAME is VASE:
+        elif self.NAME in [VASE, RUBY_PEDESTAL_EMPTY, RUBY_PEDESTAL_FULL, STALAG_L]:
             return 18, 10
 
-        elif self.NAME is SCULPTURE1 or self.NAME is FLAME_PEDESTAL1:
+        elif self.NAME in [SCULPTURE1, FLAME_PEDESTAL1]:
             return 20, 11
+
+        elif self.NAME in [CORPSE2, BANNER, STALAG_S]:
+            return 8,4
 
     def get_can_collide(self):
         if self.is_pickable:
             return True
-        elif self.NAME is VASE or self.NAME is FLAME_PEDESTAL1 or self.NAME is SCULPTURE1:
+        elif self.NAME in [VASE, FLAME_PEDESTAL1, SCULPTURE1, RUBY_PEDESTAL_EMPTY, RUBY_PEDESTAL_FULL, STALAG_S,STALAG_L]:
             return True
-        elif self.NAME is WALL_TORCH:
-            return False
         return False
 
     def get_attack_speed(self):
@@ -352,11 +372,7 @@ class Item(pygame.sprite.Sprite):
             self.animation_index = len(self.item_destruction_images)-1
             self.is_destroyed = True
             self.is_falling_apart = False
-            item = Item(self.tile_index,GOLD_COINS)
-            item.position = self.position[0], self.position[1]+1
-            item.map_position = self.map_position[0], self.map_position[1]+1
-            item.update_position()
-            entity_manager.put_item_in_matrices_and_lists(item)
+            entity_manager.drop_item(self, GOLD_COINS)
             entity_manager.fix_all_dead_objects_to_pixel_accuracy()
         self.image = self.item_destruction_images[int(self.animation_index)]
 

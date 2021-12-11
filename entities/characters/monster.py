@@ -192,6 +192,8 @@ class Monster(pygame.sprite.Sprite):
                     else:
                         entity_manager.fix_all_dead_objects_to_pixel_accuracy()
                         entity_manager.fix_player_position_to_pixel_accuracy()
+                        if self.NAME is IRON_LICH:
+                            entity_manager.drop_item(self, LICH_EYE)
             
             if not self.monster_ai.is_using_ability:
                 self.update_animation()
