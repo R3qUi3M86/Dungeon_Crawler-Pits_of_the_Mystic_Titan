@@ -88,6 +88,7 @@ class Hero(pygame.sprite.Sprite):
         self.is_dead = False
         self.is_corpse = False
         self.can_collide = True
+        self.is_summoned = False
 
         ###Character properties###
         #General

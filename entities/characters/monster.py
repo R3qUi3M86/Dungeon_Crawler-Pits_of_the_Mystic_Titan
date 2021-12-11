@@ -463,32 +463,33 @@ class Monster(pygame.sprite.Sprite):
                 self.interrupt_attack()
 
     def take_damage(self, damage):
-        self.health -= damage
-        
-        if self.monster_ai.is_idle:
-            self.monster_ai.is_waking_up = True
-        
-        if self.health > 0:
-            self.is_in_pain = True
-            if random.choice(range(4)) == 0:
-                sound_player.play_monster_pain_sound(self.NAME)
-        else:
-            sound_player.stop_monster_pain_sound(self.NAME)
-            if not self.is_dying:
-                sound_player.play_monster_death_sound(self.NAME)
-                self.is_living = False
-                self.is_in_pain = False
-                self.is_dying = True
+        if not self.is_summoned:
+            self.health -= damage
             
-            if -(self.maxhealth//2) >= self.health:
-                sound_player.stop_monster_death_sound(self.NAME)
-                if not self.is_overkilled:
-                    sound_player.play_monster_overkill_sound(self.NAME)
+            if self.monster_ai.is_idle:
+                self.monster_ai.is_waking_up = True
+            
+            if self.health > 0:
+                self.is_in_pain = True
+                if random.choice(range(4)) == 0:
+                    sound_player.play_monster_pain_sound(self.NAME)
+            else:
+                sound_player.stop_monster_pain_sound(self.NAME)
+                if not self.is_dying:
+                    sound_player.play_monster_death_sound(self.NAME)
+                    self.is_living = False
+                    self.is_in_pain = False
+                    self.is_dying = True
                 
-                self.is_living = False
-                self.is_in_pain = False
-                self.is_dying = False
-                self.is_overkilled = True
+                if -(self.maxhealth//2) >= self.health:
+                    sound_player.stop_monster_death_sound(self.NAME)
+                    if not self.is_overkilled:
+                        sound_player.play_monster_overkill_sound(self.NAME)
+                    
+                    self.is_living = False
+                    self.is_in_pain = False
+                    self.is_dying = False
+                    self.is_overkilled = True
 
     def interrupt_attack(self):
         self.is_attacking = False
