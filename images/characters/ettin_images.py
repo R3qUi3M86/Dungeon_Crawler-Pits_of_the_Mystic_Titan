@@ -110,7 +110,7 @@ ettin_death = [ettin_death1,ettin_death2,ettin_death3,ettin_death4,ettin_death5,
 
 ettin_overkill = [ettin_overkill1,ettin_overkill2,ettin_overkill3,ettin_overkill4,ettin_overkill5,ettin_overkill6,ettin_overkill7,ettin_overkill8,ettin_overkill9,ettin_overkill10]
 
-ettin_pain = [ettin_pain_east,ettin_pain_north_east,ettin_pain_north,ettin_pain_north_west,ettin_pain_west,ettin_pain_south_east,ettin_pain_south,ettin_pain_south_east]
+ettin_pain = [ettin_pain_east,ettin_pain_north_east,ettin_pain_north,ettin_pain_north_west,ettin_pain_west,ettin_pain_south_west,ettin_pain_south,ettin_pain_south_east]
 
 for row in ettin_walk:
     for img in row:

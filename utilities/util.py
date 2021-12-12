@@ -170,12 +170,15 @@ def get_tile_offset(prevous_tile_index, tile_index):
 def get_tile_index(map_pos):
     return int(map_pos[1]-screen_height//2)//level_painter.TILE_SIZE[Y] , int(map_pos[0]-screen_width//2)//level_painter.TILE_SIZE[X]
 
-def monster_has_line_of_sight(monster_map_pos, particle_speed = 10, max_travel_x = screen_width//2, max_travel_y = screen_height//2):
+def monster_has_line_of_sight(monster_map_pos, 
+                              particle_speed = 10, 
+                              max_travel_x = screen_width//2, 
+                              max_travel_y = screen_height//2):
+    
     hero_map_pos = entity_manager.hero.map_position
     angle = get_total_angle(monster_map_pos,hero_map_pos)
     particle_map_pos = monster_map_pos
     current_tile_index = get_tile_index(monster_map_pos)
-    previous_tile_index = current_tile_index
     traveled_distance_x = 0
     traveled_distance_y = 0
 
@@ -188,13 +191,10 @@ def monster_has_line_of_sight(monster_map_pos, particle_speed = 10, max_travel_x
         traveled_distance_x = int(traveled_distance_x + x_speed)
         traveled_distance_y = int(traveled_distance_y + y_speed)
         
-        if current_tile_index != previous_tile_index:
-            previous_tile_index = current_tile_index
-            
-            if particle_collided_with_wall(current_tile_index):
-                return False
+        if particle_collided_with_wall(current_tile_index):
+            return False
 
-        if particle_collided_with_player(hero_map_pos, particle_map_pos, particle_speed):
+        elif particle_collided_with_player(hero_map_pos, particle_map_pos, particle_speed):
             return True
     
     return False
