@@ -1,6 +1,5 @@
 import pygame
-from pygame.constants import BLEND_ALPHA_SDL2, BLEND_RGB_ADD
-from entities.level.level import TEST_MAP
+from pygame.constants import BLEND_ALPHA_SDL2
 from sounds.sound_player import *
 from utilities.text_printer import *
 from utilities.constants import *
