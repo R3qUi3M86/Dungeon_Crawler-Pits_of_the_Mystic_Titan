@@ -1,4 +1,6 @@
 import pygame
+from pygame.constants import BLEND_ALPHA_SDL2, BLEND_RGB_ADD
+from entities.level.level import TEST_MAP
 from sounds.sound_player import *
 from utilities.text_printer import *
 from utilities.constants import *
@@ -200,8 +202,9 @@ def order_sprites():
     return sorted_entity_matrix
 
 def draw_sprites():
-    screen.blit(level_painter.level_surface,(level_painter.get_level_surface_translation_vector()))
-    
+    translation_vector = level_painter.get_level_surface_translation_vector()
+    screen.blit(level_painter.level_surface, (0,0), (-translation_vector[0],-translation_vector[1],screen_width,screen_height))
+
     for tile in entity_manager.far_proximity_level_water_sprites_list:
         if tile.is_animated:
             tile.update()
@@ -212,13 +215,15 @@ def draw_sprites():
             screen.blit(tile.image,tile.position)
 
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
-        shadow.draw(screen)
+        #shadow.draw(screen)
+        #screen.blit(shadow.sprite.image,shadow.sprite.position, special_flags=BLEND_RGB_ADD)
+        screen.blit(shadow.sprite.image,shadow.sprite.rect, special_flags=BLEND_ALPHA_SDL2)
 
     if cutscene_manager.playing_cutscene:
         cutscene_manager.play_cutscene(BOSS_ENTRY)
 
     sorted_entity_matrix = order_sprites()
-    for row in sorted_entity_matrix:
+    for row in sorted_entity_matrix: 
         for entity in row:
             entity.draw(screen)
             # if entity.sprite.TYPE is PROJECTILE:
@@ -227,11 +232,14 @@ def draw_sprites():
 
     if wall_drawing_mode == VISIBLE:
         for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
-            if tile.is_hiding_player:
-                tile.image.set_alpha(150)
+            if tile.is_hiding_player_prim:
+                screen.blit(tile.alpha_image1,tile.position)
+            elif tile.is_hiding_player_sec:
+                screen.blit(tile.alpha_image2,tile.position)
+            elif tile.is_hiding_player_tert:
+                screen.blit(tile.alpha_image3,tile.position)
             else:
-                tile.image.set_alpha(255)
-            screen.blit(tile.image,tile.position)
+                screen.blit(tile.image,tile.position)
                   
 def draw_ui():
     screen.blit(ui_elements.central_light,(0,0))
@@ -259,7 +267,7 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.levels[0]
+    level_painter.level_layout = level_painter.levels[0] #level_painter.test_map
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()

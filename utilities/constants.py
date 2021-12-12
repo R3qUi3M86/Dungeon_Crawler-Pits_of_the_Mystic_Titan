@@ -35,7 +35,9 @@ BLUE_GLOW = "blue glow"
 ENTITY_OMNI = "movement omni"
 ENTITY_SECTOR = "movement sector"
 SQUARE = "square"
-WALL_HIDER = "wall hider"
+WALL_HIDER1 = "wall hider1"
+WALL_HIDER2 = "wall hider2"
+WALL_HIDER3 = "wall hider3"
 
 #Sector names
 SECTOR_E = 0

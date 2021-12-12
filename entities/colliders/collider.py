@@ -47,8 +47,14 @@ class Collider(pygame.sprite.Sprite):
             elif self.size == SIZE_MEDIUM:
                 return medium_square_collider
 
-        elif self.type == WALL_HIDER:
-            return wall_hider_coolider
+        elif self.type == WALL_HIDER1:
+            return wall_hider_coolider_primary
+
+        elif self.type == WALL_HIDER2:
+            return wall_hider_coolider_secondary
+
+        elif self.type == WALL_HIDER3:
+            return wall_hider_coolider_tertiary
 
         elif self.type == PROJECTILE:
             return projectile_collider

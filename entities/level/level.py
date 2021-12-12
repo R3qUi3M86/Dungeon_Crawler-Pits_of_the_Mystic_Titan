@@ -3,6 +3,8 @@ from utilities.constants import BANNER, CORPSE1, CORPSE2, DARK_BISHOP, EMERALD_C
 
 test_map = [
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 "X                                                              XX",
 "X                                                               X",
 "X          XXXXXXXX                                             X",
@@ -39,7 +41,7 @@ test_map = [
 "X                                                               X",
 "X                                                               X",
 "X                                                               X",
-"X                                                              XX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
 
 test_map_items = [[(25,19), STALAG_S],[(25,17), STALAG_L], [(25,16), RUBY_PEDESTAL_EMPTY], [(23,17), RUBY_PEDESTAL_FULL], [(26,17), CORPSE1], [(26,21), CORPSE2], [(26,20), BANNER], [(24,22), LICH_EYE], [(24,25),EMERALD_CROSSBOW]]

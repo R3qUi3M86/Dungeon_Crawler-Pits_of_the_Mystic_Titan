@@ -24,11 +24,19 @@ class Tile(pygame.sprite.Sprite):
         self.animation_timer_limit = 0
         
         self.is_convex = False
-        self.is_hiding_player = False
+        self.is_hiding_player_prim = False
+        self.is_hiding_player_sec = False
+        self.is_hiding_player_tert = False
         self.is_exit_tile = False
         self.is_animated = False
         self.image_unscaled = self.get_tile_image()
         self.image = pygame.transform.scale(self.image_unscaled, size)
+        self.alpha_image1 = self.image.convert_alpha()
+        self.alpha_image1.set_alpha(150)
+        self.alpha_image2 = self.image.convert_alpha()
+        self.alpha_image2.set_alpha(185)
+        self.alpha_image3 = self.image.convert_alpha()
+        self.alpha_image3.set_alpha(220)
         self.cluster_x_y = self.get_cluster_x_y()
         self.mask = self.get_tile_mask()
         self.rect = self.image.get_rect(topleft = (self.position))

@@ -73,14 +73,25 @@ def character_vs_level_collision(character):
 
 def wall_hider_vs_obscuring_walls_collision():
     for secondary_wall_sprite in entity_manager.far_proximity_secondary_wall_sprites_list:
-        if entity_manager.hero.wall_hider_collider.rect.colliderect(secondary_wall_sprite):
-            
-            if hero_is_above_wall_grid(secondary_wall_sprite.tile_index):
-                secondary_wall_sprite.is_hiding_player = True
+        if hero_is_above_wall_grid(secondary_wall_sprite.tile_index):
+            if entity_manager.hero.wall_hider_collider_primary.rect.colliderect(secondary_wall_sprite):
+                secondary_wall_sprite.is_hiding_player_prim = True
             else:
-                secondary_wall_sprite.is_hiding_player = False
+                secondary_wall_sprite.is_hiding_player_prim = False
+
+            if entity_manager.hero.wall_hider_collider_secondary.rect.colliderect(secondary_wall_sprite):
+                secondary_wall_sprite.is_hiding_player_sec = True
+            else:
+                secondary_wall_sprite.is_hiding_player_sec = False
+        
+            if entity_manager.hero.wall_hider_collider_tertiary.rect.colliderect(secondary_wall_sprite):
+                secondary_wall_sprite.is_hiding_player_tert = True
+            else:
+                secondary_wall_sprite.is_hiding_player_tert = False
         else:
-            secondary_wall_sprite.is_hiding_player = False
+            secondary_wall_sprite.is_hiding_player_prim = False
+            secondary_wall_sprite.is_hiding_player_sec = False
+            secondary_wall_sprite.is_hiding_player_tert = False
 
 def monster_vs_monster_collision(monster):
     for character in monster.direct_proximity_monsters:
@@ -642,12 +653,12 @@ def hero_is_above_wall_grid(tile_index):
     hero = entity_manager.hero
     wall_grid_index = None
 
-    if level_painter.level_layout[tile_index[0]+1][tile_index[1]] in WALL_LIKE:
-        wall_grid_index = tile_index[0]+1, tile_index[1]
-    elif level_painter.level_layout[tile_index[0]+2][tile_index[1]] in WALL_LIKE:
-        wall_grid_index = tile_index[0]+2, tile_index[1]
+    if tile_index[0]+2 <= len(level_painter.level_layout)-1 and level_painter.level_layout[tile_index[0]+2][tile_index[1]] in WALL_LIKE:
+            wall_grid_index = tile_index[0]+2, tile_index[1]
+    elif tile_index[0]+1 <= len(level_painter.level_layout)-1 and level_painter.level_layout[tile_index[0]+1][tile_index[1]] in WALL_LIKE:
+            wall_grid_index = tile_index[0]+1, tile_index[1]
     elif level_painter.level_layout[tile_index[0]][tile_index[1]] in WALL_LIKE:
         wall_grid_index = tile_index
 
-    if tile_index[0]+2 >= hero.tile_index[0] <= wall_grid_index[0]:
+    if hero.tile_index[0] <= wall_grid_index[0]:
         return True

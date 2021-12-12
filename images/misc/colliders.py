@@ -16,7 +16,9 @@ entity_collider_sector_se = pygame.image.load("images/misc/colliders/entity_coll
 projectile_collider = pygame.image.load("images/misc/colliders/projectile_collider.png").convert_alpha()
 
 ###Misc
-wall_hider_coolider = pygame.image.load("images/misc/colliders/wall_hider_coolider.png").convert_alpha()
+wall_hider_coolider_primary = pygame.image.load("images/misc/colliders/wall_hider_coolider_primary.png").convert()
+wall_hider_coolider_secondary = pygame.image.load("images/misc/colliders/wall_hider_coolider_secondary.png").convert()
+wall_hider_coolider_tertiary = pygame.image.load("images/misc/colliders/wall_hider_coolider_tertiary.png").convert()
 small_square_collider = pygame.image.load("images/misc/colliders/small_square.png").convert_alpha()
 medium_square_collider = pygame.image.load("images/misc/colliders/medium_square.png").convert_alpha()
 
