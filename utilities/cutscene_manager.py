@@ -141,3 +141,13 @@ def play_boss_entry_cutscene():
 def deactivate_all_monsters():
     for monster in entity_manager.far_proximity_character_sprites_list:
         monster.deactivate()
+
+def overkill_kill_all_monsters():
+    for monster in entity_manager.far_proximity_character_sprites_list:
+        if not monster.is_dead:
+            monster.take_damage(2*monster.maxhealth)
+
+def destroy_all_projectiles():
+    for projectile in entity_manager.far_proximity_projectile_sprites_list:
+        if not projectile.is_disintegrating:
+            projectile.is_disintegrating = True

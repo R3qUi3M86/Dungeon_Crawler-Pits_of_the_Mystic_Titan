@@ -157,6 +157,9 @@ def check_win_conditions():
             game_won_delay = 0
             fadeout_music()
         else:
+            if game_won_delay == 0:
+                cutscene_manager.overkill_kill_all_monsters()
+                cutscene_manager.destroy_all_projectiles()
             game_won_delay += 0.0167
 
     elif menu.game_won and ui_elements.fading_in:
