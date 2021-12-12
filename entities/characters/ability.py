@@ -12,7 +12,7 @@ USABLE_ABILITIES_DICT = {FLYING:False, TELEPORT_BLUR: True, SUMMON_MONSTER: True
 
 class Ability():
     def __init__(self, owner, name):
-        ABILITIES_COOLDOWN_DICT = {FLYING:0, TELEPORT_BLUR: 4 + random.choice(np.arange(0,1,0.05)), SUMMON_MONSTER: 10}
+        ABILITIES_COOLDOWN_DICT = {FLYING:0, TELEPORT_BLUR: 4 + random.choice(np.arange(0,1,0.05)), SUMMON_MONSTER: 9}
 
         self.monster = owner
         self.NAME = name
