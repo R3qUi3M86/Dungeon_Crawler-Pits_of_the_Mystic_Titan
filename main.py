@@ -140,6 +140,16 @@ def pause_mouse_input():
 
     mouse_input_pause = True
 
+def resurrect_player():
+    if not entity_manager.hero.is_living:
+        entity_manager.hero.is_living = True
+        entity_manager.hero.is_dying = False
+        entity_manager.hero.is_overkilled = False
+        entity_manager.hero.is_in_pain = False
+        entity_manager.hero.is_dead = False
+        entity_manager.hero.is_corpse = False
+        entity_manager.hero.health = entity_manager.hero.maxhealth
+
 def check_next_level_travel():
     if collision_manager.moving_to_next_level and not ui_elements.fading_out and not ui_elements.fading_in:
         ui_elements.fading_out = True
@@ -318,6 +328,8 @@ def main_game_loop():
                     entity_manager.use_puzzle()
                 elif event.key == pygame.K_SPACE:
                     use_consumable()
+                elif event.key == pygame.K_p:
+                    resurrect_player()
                 elif event.key == pygame.K_ESCAPE:
                     menu.menu()
                     pause_mouse_input()
