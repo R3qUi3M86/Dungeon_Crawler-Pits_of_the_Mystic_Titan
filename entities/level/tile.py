@@ -326,17 +326,17 @@ class Tile(pygame.sprite.Sprite):
                     return pygame.mask.from_surface(floor_pit_collider)
                 elif self.TYPE is WATER:
                     if self.image_unscaled is blue_water_border_right:
-                        return pygame.mask.from_surface(blue_water_border_right_collider)
+                        return pygame.mask.from_surface(liquid_border_right_collider)
                     elif self.image_unscaled is blue_water_border_left:
-                        return pygame.mask.from_surface(blue_water_border_left_collider)
+                        return pygame.mask.from_surface(liquid_border_left_collider)
                     elif self.image_unscaled in blue_water_border_top_images:
-                        return pygame.mask.from_surface(blue_water_border_top_collider)
+                        return pygame.mask.from_surface(liquid_border_top_collider)
                     elif self.image_unscaled in blue_water_border_bottom_images:
-                        return pygame.mask.from_surface(blue_water_border_bottom_collider)
+                        return pygame.mask.from_surface(liquid_border_bottom_collider)
                     elif self.image_unscaled in blue_water_border_convex_images[0] or self.image_unscaled in blue_water_border_convex_images[1]:
-                        return pygame.mask.from_surface(blue_water_border_convex_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]])
+                        return pygame.mask.from_surface(liquid_border_convex_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]])
                     elif self.image_unscaled in blue_water_border_concave_images[0] or self.image_unscaled in blue_water_border_concave_images[1]:
-                        return pygame.mask.from_surface(blue_water_border_concave_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]])
+                        return pygame.mask.from_surface(liquid_border_concave_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]])
                 elif self.TYPE is WALL:
                     if self.image_unscaled in wall_bottom_lower_hidden or self.image_unscaled is wall_corner_bottom_lower_left_water_bottom_border_hidden or self.image_unscaled is wall_corner_bottom_lower_right_water_bottom_border_hidden:
                         return pygame.mask.from_surface(wall_bottom_mid_floor_collider)

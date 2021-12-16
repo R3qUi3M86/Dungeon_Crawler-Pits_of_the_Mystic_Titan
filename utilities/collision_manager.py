@@ -55,7 +55,7 @@ def character_vs_level_collision(character):
     global moving_to_next_level
 
     for level_collision_sprite in character.direct_proximity_collision_tiles:        
-        if character.can_collide and not (level_collision_sprite.TYPE is WATER and FLYING in character.abilities) and character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
+        if character.can_collide and not (level_collision_sprite.TYPE in LIQUIDS and FLYING in character.abilities) and character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
             if character is entity_manager.hero and level_collision_sprite.is_exit_tile and not moving_to_next_level:
                 moving_to_next_level = True
             

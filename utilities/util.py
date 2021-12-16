@@ -4,7 +4,7 @@ from copy import deepcopy
 from utilities.constants import *
 from utilities import entity_manager
 from utilities import level_painter
-from entities.level.level import ENTRANCE, WALL, WATER
+from entities.level.level import ENTRANCE, WALL, WATER, LAVA
 from settings import *
 
 center_x = 0
@@ -228,10 +228,12 @@ def print_matrix(matrix, mode="S", add_monsters=False, add_items=False):
             for col, cell in enumerate(matrix_row):
                 
                 if matrix == entity_manager.far_proximity_level_sprite_matrix:
-                    if cell.TYPE in IMPASSABLE_TILES and cell.TYPE is not WATER:
+                    if cell.TYPE in IMPASSABLE_TILES and cell.TYPE is not WATER and cell.TYPE is not LAVA:
                         row_string = row_string+"X"
                     elif cell.TYPE == WATER:
                         row_string = row_string+"~"
+                    elif cell.TYPE == LAVA:
+                        row_string = row_string+"L"
                     else:
                         row_string = row_string+"."
 
@@ -251,10 +253,12 @@ def print_matrix(matrix, mode="S", add_monsters=False, add_items=False):
                         row_string = row_string+"."
                 
                 elif matrix == entity_manager.level_sprites_matrix:
-                    if cell.TYPE in IMPASSABLE_TILES and cell.TYPE is not WATER:
+                    if cell.TYPE in IMPASSABLE_TILES and cell.TYPE is not WATER and cell.TYPE is not LAVA:
                         row_string = row_string+"X"
                     elif cell.TYPE == WATER:
                         row_string = row_string+"~"
+                    elif cell.TYPE == LAVA:
+                        row_string = row_string+"L"
                     else:
                         if add_monsters == True:
                             if row == entity_manager.hero.tile_index[0] and col == entity_manager.hero.tile_index[1]:

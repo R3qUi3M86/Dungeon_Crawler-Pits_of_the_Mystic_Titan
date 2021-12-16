@@ -217,7 +217,7 @@ def draw_sprites():
     translation_vector = level_painter.get_level_surface_translation_vector()
     screen.blit(level_painter.level_surface, (0,0), (-translation_vector[0],-translation_vector[1],screen_width,screen_height))
 
-    for tile in entity_manager.far_proximity_level_water_sprites_list:
+    for tile in entity_manager.far_proximity_level_liquids_sprites_list:
         if tile.is_animated:
             tile.update()
             screen.blit(tile.image,tile.position)

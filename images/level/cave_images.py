@@ -135,14 +135,8 @@ blue_water_border_top_left_concave = pygame.image.load("images/level/cave/blue_w
 blue_water_border_top_right_concave = pygame.image.load("images/level/cave/blue_water/coastal/concave/blue_water_border_top_right_concave.png").convert()
 blue_water_border_bottom_left_concave = pygame.image.load("images/level/cave/blue_water/coastal/concave/blue_water_border_bottom_left_concave.png").convert()
 blue_water_border_bottom_right_concave = pygame.image.load("images/level/cave/blue_water/coastal/concave/blue_water_border_bottom_right_concave.png").convert()
-blue_water_border_top_left_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_top_left_concave_collider.png").convert()
-blue_water_border_top_right_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_top_right_concave_collider.png").convert()
-blue_water_border_bottom_left_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_bottom_left_concave_collider.png").convert()
-blue_water_border_bottom_right_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_bottom_right_concave_collider.png").convert()
 blue_water_border_concave_images = [[blue_water_border_top_left_concave,blue_water_border_top_right_concave],
                                    [blue_water_border_bottom_left_concave,blue_water_border_bottom_right_concave]]
-blue_water_border_concave_colliders = [[blue_water_border_top_left_concave_collider,blue_water_border_top_right_concave_collider],
-                                      [blue_water_border_bottom_left_concave_collider,blue_water_border_bottom_right_concave_collider]]
 
 ########################
 ###### Lava images #####
@@ -160,19 +154,19 @@ lava_09 = pygame.image.load("images/level/cave/lava/lava_09.png").convert()
 lava_10 = pygame.image.load("images/level/cave/lava/lava_10.png").convert()
 lava_11 = pygame.image.load("images/level/cave/lava/lava_11.png").convert()
 lava_12 = pygame.image.load("images/level/cave/lava/lava_12.png").convert()
-lava_under_wall_01 = pygame.image.load("images/level/cave/lava/under_wall/lava_06.png").convert()
-lava_under_wall_02 = pygame.image.load("images/level/cave/lava/under_wall/lava_07.png").convert()
-lava_under_wall_left = pygame.image.load("images/level/cave/lava/under_wall/lava_06.png").convert()
-lava_under_wall_right = pygame.image.load("images/level/cave/lava/under_wall/lava_07.png").convert()
+lava_under_wall_01 = pygame.image.load("images/level/cave/lava/lava_06.png").convert()
+lava_under_wall_02 = pygame.image.load("images/level/cave/lava/lava_07.png").convert()
+lava_under_wall_left = pygame.image.load("images/level/cave/lava/lava_06.png").convert()
+lava_under_wall_right = pygame.image.load("images/level/cave/lava/lava_07.png").convert()
 lava_images = [lava_01,lava_02,lava_03,lava_04,lava_05,lava_06,lava_07,lava_08,lava_09,lava_10,lava_11,lava_12]
 lava_under_wall_images = [lava_under_wall_01,lava_under_wall_02]
 
 ###Coastal###
 #Straight
-lava_border_bottom_01 = pygame.image.load("images/level/cave/lava/coastal/blue_water_border_bottom_01.png").convert()
+lava_border_bottom_01 = pygame.image.load("images/level/cave/lava/coastal/lava_border_bottom_01.png").convert()
 lava_border_bottom_images = [lava_border_bottom_01]
 
-lava_border_top_01 = pygame.image.load("images/level/cave/lava/coastal/blue_water_border_top_01.png").convert()
+lava_border_top_01 = pygame.image.load("images/level/cave/lava/coastal/lava_border_top_01.png").convert()
 lava_border_top_images = [lava_border_top_01]
 
 lava_border_left = pygame.image.load("images/level/cave/lava/coastal/lava_border_left.png").convert()

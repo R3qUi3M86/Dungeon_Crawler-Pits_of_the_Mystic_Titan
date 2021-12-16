@@ -31,18 +31,26 @@ level_tile_collider = pygame.image.load("images/misc/colliders/level_tile_collid
 floor_pit_collider = pygame.image.load("images/level/cave/floors/pits/colliders/floor_pit_collider.png").convert_alpha()
 
 ### Water colliders
-blue_water_border_bottom_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_bottom_collider.png").convert_alpha()
-blue_water_border_top_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_top_collider.png").convert_alpha()
-blue_water_border_left_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_left_collider.png").convert_alpha()
-blue_water_border_right_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_right_collider.png").convert_alpha()
+liquid_border_bottom_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_bottom_collider.png").convert_alpha()
+liquid_border_top_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_top_collider.png").convert_alpha()
+liquid_border_left_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_left_collider.png").convert_alpha()
+liquid_border_right_collider = pygame.image.load("images/level/cave/blue_water/coastal/colliders/blue_water_border_right_collider.png").convert_alpha()
 
-blue_water_border_top_left_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_top_left_convex_collider.png").convert_alpha()
-blue_water_border_top_right_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_top_right_convex_collider.png").convert_alpha()
-blue_water_border_bottom_left_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_bottom_left_convex_collider.png").convert_alpha()
-blue_water_border_bottom_right_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_bottom_right_convex_collider.png").convert_alpha()
+liquid_border_top_left_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_top_left_convex_collider.png").convert_alpha()
+liquid_border_top_right_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_top_right_convex_collider.png").convert_alpha()
+liquid_border_bottom_left_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_bottom_left_convex_collider.png").convert_alpha()
+liquid_border_bottom_right_convex_collider = pygame.image.load("images/level/cave/blue_water/coastal/convex/colliders/blue_water_border_bottom_right_convex_collider.png").convert_alpha()
 
-blue_water_border_convex_colliders = [[blue_water_border_top_left_convex_collider,blue_water_border_top_right_convex_collider],
-                                      [blue_water_border_bottom_left_convex_collider,blue_water_border_bottom_right_convex_collider]]
+liquid_border_convex_colliders = [[liquid_border_top_left_convex_collider,liquid_border_top_right_convex_collider],
+                                      [liquid_border_bottom_left_convex_collider,liquid_border_bottom_right_convex_collider]]
+
+liquid_border_top_left_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_top_left_concave_collider.png").convert()
+liquid_border_top_right_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_top_right_concave_collider.png").convert()
+liquid_border_bottom_left_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_bottom_left_concave_collider.png").convert()
+liquid_border_bottom_right_concave_collider = pygame.image.load("images/level/cave/blue_water/coastal/concave/colliders/blue_water_border_bottom_right_concave_collider.png").convert()
+
+liquid_border_concave_colliders = [[liquid_border_top_left_concave_collider,liquid_border_top_right_concave_collider],
+                                      [liquid_border_bottom_left_concave_collider,liquid_border_bottom_right_concave_collider]]
 
 ### Wall colliders
 #Bottom ending
