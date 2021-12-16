@@ -31,7 +31,6 @@ portal_animation_rect = portal_animation[0].get_rect()
 portal_is_opening = True
 portal_is_closing = False
 boss_entering = False
-boss_has_entered_game = False
 
 def play_cutscene(cutscene_type):
     if cutscene_type == BOSS_ENTRY:
@@ -61,6 +60,7 @@ def play_boss_entry_cutscene():
     global portal_is_closing
 
     global portal_animation_rect  
+    global boss_has_entered_game
 
     if init_cutscene_animation == False:
         if voice_line_timer == 0:
@@ -123,20 +123,7 @@ def play_boss_entry_cutscene():
             portal_animation_timer -= 0.0167
             portal_animation_index = (len(portal_animation)-1)*portal_animation_timer/portal_animation_timer_limit
             if portal_animation_index < 0:
-                playing_cutscene = False
-                init_cutscene_animation = False
-                portal_is_opening = True
-                portal_is_closing = False
-                cutscene_tile_index = None
-                cutscene_position = None
-                cutscene_map_pos = None
-                portal_animation_index = 0
-                portal_animation_timer = 0
-                boss_entry_animation_index = 0
-                boss_entry_animation_timer = 0
-                voice_line_timer = 0
-                portal_tick = 0
-                narrator_text = ["You have played this game too long mortal!","Are you ready to die???", "(Spell Chanting)"]
+                reset_cutscene_flags()
 
 def deactivate_all_monsters():
     for monster in entity_manager.far_proximity_character_sprites_list:
@@ -151,3 +138,41 @@ def destroy_all_projectiles():
     for projectile in entity_manager.far_proximity_projectile_sprites_list:
         if not projectile.is_disintegrating:
             projectile.is_disintegrating = True
+
+def reset_cutscene_flags():
+    global narrator_text
+    global playing_cutscene
+    global init_cutscene_animation
+    global voice_line_timer
+    global portal_tick
+    global boss_entering
+    global cutscene_tile_index
+    global cutscene_position
+    global cutscene_map_pos
+    global portal_animation_index
+    global portal_animation_timer
+    global boss_entry_animation_index
+    global boss_entry_animation_timer
+    global portal_is_opening
+    global portal_is_closing
+    global boss_has_entered_game
+
+    narrator_text = ["You have played this game too long mortal!","Are you ready to die???", "(Spell Chanting)"]
+    playing_cutscene = False
+    init_cutscene_animation = False
+    voice_line_timer = 0
+    portal_tick = 0
+    boss_entering = False
+    cutscene_tile_index = None
+    cutscene_position = None
+    cutscene_map_pos = None
+    portal_animation_index = 0
+    portal_animation_timer = 0
+    boss_entry_animation_index = 0
+    boss_entry_animation_timer = 0
+    portal_is_opening = True
+    portal_is_closing = False
+    boss_has_entered_game = False
+
+
+

@@ -23,6 +23,7 @@ usable_objects = []
 hero = Hero(player_position)
 hero_sprite_group = pygame.sprite.GroupSingle(hero)
 all_monsters = []
+boss = None
 
 level_sprites_matrix = [[]]
 primary_wall_sprites_matrix = [[]]
@@ -57,6 +58,7 @@ def clear_all_lists():
     global picked_up_item_names
     global usable_objects
     global all_monsters
+    global boss
     global far_proximity_entity_sprites_list
     global far_proximity_character_sprites_list
     global far_proximity_item_sprites_list
@@ -80,6 +82,8 @@ def clear_all_lists():
     far_proximity_secondary_wall_sprites_list = []
     far_proximity_level_water_sprites_list = []
     far_proximity_shadow_sprite_group_list = [pygame.sprite.GroupSingle(hero.shadow)]
+
+    boss = None
 
 def create_new_player():
     global hero
@@ -105,6 +109,7 @@ def initialize_player():
     hero.map_position = TILE_SIZE[X]//2+(48*hero.tile_index[1])+screen_width//2, TILE_SIZE[Y]//2+(48*hero.tile_index[0]+screen_height//2)
     if hero.weapons[SWORD] == None:
         give_item_to_player(Item((0,0),SWORD))
+        picked_up_item_names.pop(0)
 
 def initialize_level_matrices():
     initialize_level_sprites_matrix(level_sprites_matrix)
@@ -1147,6 +1152,7 @@ def get_new_monster(monster_type):
 def summon_new_monster(monster_type, tile_index, summon_mode=SUMMON_MONSTER):
     global all_entity_and_shadow_sprite_group_matrix
     global all_monsters
+    global boss
     global far_proximity_entity_sprite_group_matrix
     global far_proximity_shadow_sprite_group_list
     global far_proximity_entity_sprites_list
@@ -1155,9 +1161,13 @@ def summon_new_monster(monster_type, tile_index, summon_mode=SUMMON_MONSTER):
     new_monster = Monster(tile_index, monster_type)
     new_monster.update_position()
     new_monster.facing_direction = util.get_facing_direction(new_monster.map_position, hero.map_position)
+    
     if summon_mode == SUMMON_MONSTER:
         sound_player.portal_open_sound.play()
         new_monster.is_summoned = True
+    
+    elif summon_mode == BOSS_ENTRY:
+        boss = new_monster
     
     monster_sprite_group = pygame.sprite.GroupSingle(new_monster)
     shadow_sprite_group = pygame.sprite.GroupSingle(new_monster.shadow)

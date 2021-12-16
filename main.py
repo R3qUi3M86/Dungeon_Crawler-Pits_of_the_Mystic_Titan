@@ -249,6 +249,8 @@ def draw_ui():
     ui_elements.draw_health_bar()
     ui_elements.draw_weapon_ammo_counter()
     ui_elements.draw_consumable_counter()
+    if entity_manager.boss and entity_manager.boss.health > 0:
+        ui_elements.draw_boss_hp_bar()
 
     if len(entity_manager.picked_up_item_names) != 0 and not cutscene_manager.playing_cutscene:
         ui_elements.display_pickup_text()
@@ -264,16 +266,15 @@ def draw_ui():
 def start_new_game():
     global game_won_delay
 
-    menu.game_won = False
+    cutscene_manager.reset_cutscene_flags()
     game_won_delay = 0
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.levels[0] #level_painter.test_map
+    level_painter.level_layout = level_painter.levels[3] #level_painter.test_map
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
-    cutscene_manager.playing_cutscene = False
     main_game_loop()
 
 def start_next_level():

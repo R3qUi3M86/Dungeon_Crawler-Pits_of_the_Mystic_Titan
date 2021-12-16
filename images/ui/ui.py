@@ -27,6 +27,11 @@ health_bar_health = pygame.image.load("images/ui/health_bar/health.png").convert
 health_bar_health_mask = pygame.image.load("images/ui/health_bar/health_mask.png").convert_alpha()
 inner_shadow = pygame.image.load("images/ui/health_bar/inner_shadow.png").convert_alpha()
 
+#Boss hp bar
+boss_hp_bar_empty = pygame.image.load("images/ui/boss_hp_bar/boss_hp_bar.png").convert_alpha()
+boss_hp_bar_health = pygame.image.load("images/ui/boss_hp_bar/boss_hp_fill.png").convert_alpha()
+boss_hp_bar_mask = pygame.image.load("images/ui/boss_hp_bar/boss_hp_mask.png").convert_alpha()
+
 #Ammo counter
 ammo_counter_overlay = pygame.image.load("images/ui/ammo_counter/ammo_counter.png").convert_alpha()
 ammo_counter_overlay2 = pygame.image.load("images/ui/ammo_counter/ammo_counter2.png").convert_alpha()

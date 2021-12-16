@@ -518,9 +518,10 @@ def enter_selected_option(used_button):
     elif used_button == NEW_GAME_BUTTON:
         sound_player.fadeout_music()
         settings.starting_new_game = True
+        ui_elements.fading_out = True
+        game_won = False
         entering_game = True
         in_game = True
-        ui_elements.fading_out = True
     
     elif used_button == BACK_BUTTON:
         settings_menu = False
