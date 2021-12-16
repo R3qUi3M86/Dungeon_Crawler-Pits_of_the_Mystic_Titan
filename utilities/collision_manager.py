@@ -407,7 +407,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         if current_entity_sprite == entity_manager.hero:
             adjust_player_speed_scalar(original_speed_scalar,speed_correction_vector,15)
             entity_manager.hero.update_position(correction_vector)
-            entity_manager.update_far_proximity_non_player_entities_position(entity_manager.far_proximity_entity_sprites_list, correction_vector)
+            entity_manager.update_far_proximity_non_player_entities_position(entity_manager.far_proximity_entity_sprites_list)
             entity_manager.update_far_proximity_level_colliders_position()
             entity_manager.update_far_proximity_primary_walls_position()
             entity_manager.update_far_proximity_secondary_walls_position()
