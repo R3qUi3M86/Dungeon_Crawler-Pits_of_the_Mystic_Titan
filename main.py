@@ -1,6 +1,5 @@
 import pygame
 from pygame.constants import BLEND_ALPHA_SDL2
-from sounds.sound_player import *
 from utilities.text_printer import *
 from utilities.constants import *
 from utilities import entity_manager
@@ -13,6 +12,7 @@ from utilities import cutscene_manager
 from sys import exit
 import settings
 from entities import cursor
+from sounds.sound_player import *
 
 pygame.init()
 clock = pygame.time.Clock()

@@ -174,10 +174,19 @@ class Ability():
         possible_summon_tiles = []
         for row in idices_matrix:
             for cell in row:
-                if FLYING in summon_monster.abilities and entity_manager.level_sprites_matrix[cell[0]][cell[1]].TYPE not in WALL_LIKE:
-                    possible_summon_tiles.append(cell)
-                elif entity_manager.level_sprites_matrix[cell[0]][cell[1]].TYPE not in IMPASSABLE_TILES:
-                    possible_summon_tiles.append(cell)
+                legal_tile = True
+                
+                for entity in entity_manager.all_entity_and_shadow_sprite_group_matrix[cell[0]][cell[1]]:
+                    if entity.sprite.TYPE is ITEM and entity.sprite.NAME in [FLAME_PEDESTAL1, SCULPTURE1, STALAG_S, STALAG_L, RUBY_PEDESTAL_EMPTY]:
+                        legal_tile = False
+                        break
+                
+                if legal_tile:
+                    if FLYING in summon_monster.abilities and entity_manager.level_sprites_matrix[cell[0]][cell[1]].TYPE not in WALL_LIKE:
+                        possible_summon_tiles.append(cell)
+                
+                    elif entity_manager.level_sprites_matrix[cell[0]][cell[1]].TYPE not in IMPASSABLE_TILES:
+                        possible_summon_tiles.append(cell)
 
         if self.monster.tile_index in possible_summon_tiles:
             possible_summon_tiles.remove(self.monster.tile_index)

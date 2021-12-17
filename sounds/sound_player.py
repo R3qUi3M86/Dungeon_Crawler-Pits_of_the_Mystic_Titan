@@ -1,11 +1,12 @@
 import pygame
 import random
+from utilities import level_painter
 from utilities.constants import *
 
 SFX_VOLUME = 0.1
 MUSIC_VOLUME = 0.05
 
-ambient_sound_timer_limit = 45
+ambient_sound_timer_limit = 40
 ambient_sound_timer = 0
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
@@ -103,8 +104,12 @@ water_drop1_sound = pygame.mixer.Sound('sounds/ambient/drops/DROP1.wav')
 water_drop2_sound = pygame.mixer.Sound('sounds/ambient/drops/DROP2.wav')
 rocks1_sound = pygame.mixer.Sound('sounds/ambient/rocks/ROCKS1.wav')
 rocks2_sound = pygame.mixer.Sound('sounds/ambient/rocks/ROCKS2.wav')
+lava1_sound = pygame.mixer.Sound('sounds/ambient/lava/LAVA1.wav')
+lava2_sound = pygame.mixer.Sound('sounds/ambient/lava/LAVA2.wav')
 
-ambient_sounds = [water_drop1_sound,water_drop2_sound,rocks1_sound,rocks2_sound]
+ambient_water_sounds = [water_drop1_sound,water_drop2_sound]
+ambient_rocks_sounds = [rocks1_sound,rocks2_sound]
+ambient_lava_sounds = [lava1_sound,lava2_sound]
 
 player_overkill_sounds = [player_overkill_sound1, player_overkill_sound2, player_overkill_sound3]
 all_sounds = [menu_select, menu_push, menu_new_game, 
@@ -122,7 +127,7 @@ all_sounds = [menu_select, menu_push, menu_new_game,
               lich_noise1_sound, lich_noise2_sound, lich_pain_sound, lich_death_sound,
               portal_open_sound, spell_chant_sound, puzzle_solved_sound, hmm_sound,
               game_too_long_sound, ready_to_die_sound,
-              water_drop1_sound, water_drop2_sound, rocks1_sound, rocks2_sound]
+              water_drop1_sound, water_drop2_sound, rocks1_sound, rocks2_sound, lava1_sound, lava2_sound]
 
 MONSTER_NOISE_SOUNDS = {ETTIN:[ettin_noise1_sound], DARK_BISHOP:[bishop_noise1_sound,bishop_noise2_sound], IRON_LICH:[lich_noise1_sound, lich_noise2_sound]}
 MONSTER_PAIN_SOUND = {ETTIN:ettin_pain_sound, DARK_BISHOP:bishop_pain_sound, IRON_LICH:lich_pain_sound}
@@ -274,8 +279,15 @@ def increment_ambient_sound_timer():
 
     if ambient_sound_timer >= ambient_sound_timer_limit:
         ambient_sound_timer = 0
-        ambient_sound_timer_limit = 30+random.randrange(30)
-        random.choice(ambient_sounds).play()
+        ambient_sound_timer_limit = 25+random.randrange(30)
+        sound_group_choice = random.choice([0,1])
+        if sound_group_choice == 0:
+            random.choice(ambient_rocks_sounds).play()
+        elif level_painter.level_layout != level_painter.levels[3]:
+            random.choice(ambient_water_sounds).play()
+        else:
+            random.choice(ambient_lava_sounds).play()
+
     ambient_sound_timer += 0.0167
         
 
