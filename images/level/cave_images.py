@@ -164,7 +164,8 @@ lava_under_wall_images = [lava_under_wall_01,lava_under_wall_02]
 ###Coastal###
 #Straight
 lava_border_bottom_01 = pygame.image.load("images/level/cave/lava/coastal/lava_border_bottom_01.png").convert()
-lava_border_bottom_images = [lava_border_bottom_01]
+lava_border_bottom_02 = pygame.image.load("images/level/cave/lava/coastal/lava_border_bottom_02.png").convert()
+lava_border_bottom_images = [lava_border_bottom_01, lava_border_bottom_02]
 
 lava_border_top_01 = pygame.image.load("images/level/cave/lava/coastal/lava_border_top_01.png").convert()
 lava_border_top_images = [lava_border_top_01]
