@@ -2,6 +2,7 @@ import pygame
 import random
 from settings import *
 from sounds import sound_player
+from utilities import t_ctrl
 from utilities import combat_manager
 from utilities import util
 from utilities.text_printer import *
@@ -83,6 +84,7 @@ class Hero(pygame.sprite.Sprite):
         #Status flags
         self.is_monster = False
         self.is_attacking = False
+        self.has_attacked = False
         self.is_living = True
         self.is_dying = False
         self.is_overkilled = False
@@ -207,24 +209,24 @@ class Hero(pygame.sprite.Sprite):
             self.is_in_pain = False
             self.character_pain_timer = 0
         else:
-            self.character_pain_timer += 0.05
-            self.image = character_pain[self.character_pain_index]
+            self.character_pain_timer += 0.05 * t_ctrl.dt
             if int(self.character_pain_timer) >= 1:
                 self.is_in_pain = False
                 self.character_pain_timer = 0
+            self.image = character_pain[self.character_pain_index]
 
     def character_death_animation(self):
         if self.is_overkilled == False:
-            self.character_death_index += 0.1
-            if int(self.character_death_index) == 7:
+            self.character_death_index += 0.1 * t_ctrl.dt
+            if self.character_death_index >= 7:
                 self.character_death_index = 6
                 self.is_dying = False
                 self.is_dead = True
             self.image = self.character_death[int(self.character_death_index)]
 
     def character_overkill_animation(self):
-        self.character_overkill_index += 0.1
-        if int(self.character_overkill_index) == 10:
+        self.character_overkill_index += 0.1 * t_ctrl.dt
+        if self.character_overkill_index >= 10:
             self.character_overkill_index = 9
             self.is_overkilled = False
             self.is_dead = True
@@ -232,27 +234,29 @@ class Hero(pygame.sprite.Sprite):
 
     def character_walk_forward_animation(self):
         if self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
-            self.character_walk_index[1] += 0.1
-            if int(self.character_walk_index[1]) == 4:
+            self.character_walk_index[1] += 0.1 * t_ctrl.dt
+            if self.character_walk_index[1] >= 4:
                 self.character_walk_index[1] = 0
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_walk_backward_animation(self):
         if self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
-            self.character_walk_index[1] -= 0.1
-            if int(self.character_walk_index[1]) == -4:
+            self.character_walk_index[1] -= 0.1 * t_ctrl.dt
+            if self.character_walk_index[1] <= -4:
                 self.character_walk_index[1] = 0
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
     def character_melee_attack_animation(self):
         weapon = self.weapons[self.selected_weapon]
-        self.character_attack_index[1] += 0.05*weapon.attack_speed
+        self.character_attack_index[1] += 0.05 * weapon.attack_speed * t_ctrl.dt
         
-        if round(self.character_attack_index[1],2) == 1.00:
+        if not self.has_attacked and self.character_attack_index[1] >= 1:
+            self.has_attacked = True
             combat_manager.attack_monster_with_melee_attack(weapon, self.melee_damage_modifier)
         
-        if int(self.character_attack_index[1]) == 2:
+        if self.character_attack_index[1] >= 2:
             self.is_attacking = False
+            self.has_attacked = False
             self.character_attack_index[1] = 0
             self.weapons[self.selected_weapon].is_ready_to_use = False
             if self.ammo[weapon.NAME] != -1:
@@ -264,7 +268,7 @@ class Hero(pygame.sprite.Sprite):
     def character_ranged_attack_animation(self):
         weapon = self.weapons[self.selected_weapon]
 
-        if round(self.character_attack_index[1],3) == 1:
+        if weapon.chainfire != 0 and self.character_attack_index[1] >= 1:
             self.character_attack_index[1] = 1
             if weapon.chainfire_cooldown >= weapon.chainfire_cooldown_limit:
                 combat_manager.attack_monsters_with_ranged_weapon(weapon, self.ranged_damage_modifier)
@@ -273,9 +277,9 @@ class Hero(pygame.sprite.Sprite):
             else:
                 weapon.increment_chainfire_cooldown()
 
-        if weapon.chainfire == 0:
-            self.character_attack_index[1] += 0.025*weapon.attack_speed
-            if int(self.character_attack_index[1]) == 2:
+        elif weapon.chainfire == 0:
+            self.character_attack_index[1] += 0.025 * weapon.attack_speed * t_ctrl.dt
+            if self.character_attack_index[1] >= 2:
                 self.is_attacking = False
                 self.character_attack_index[1] = 1
                 self.weapons[self.selected_weapon].is_ready_to_use = False

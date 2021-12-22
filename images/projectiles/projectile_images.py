@@ -55,11 +55,10 @@ spike_ball = [spike_ball_01, spike_ball_02, spike_ball_03]
 spike_ball_destruct = [spike_ball_destruct_01, spike_ball_destruct_02, spike_ball_destruct_03, spike_ball_destruct_04]
 
 #Spike shard
-spike_shard_01 = pygame.image.load("images/projectiles/spike_shard/shard_01.png").convert_alpha()
-spike_shard_02 = pygame.image.load("images/projectiles/spike_shard/shard_02.png").convert_alpha()
-spike_shard_03 = pygame.image.load("images/projectiles/spike_shard/shard_03.png").convert_alpha()
+spike_shard_01 = pygame.image.load("images/projectiles/spike_shard/shard_01.png").convert()
+spike_shard_01.set_colorkey((255,0,0))
 spike_shard_destruct = pygame.image.load("images/projectiles/spike_shard/destruct_01.png").convert_alpha()
-spike_shard = [spike_shard_01,spike_shard_02,spike_shard_03]
+spike_shard = [spike_shard_01]
 
 #Red orb
 red_orb_01 = pygame.image.load("images/projectiles/red_orb/red_orb_01.png").convert_alpha()

@@ -15,8 +15,8 @@ screen_height = 800
 screen = pygame.display.set_mode((screen_width, screen_height))
 screen_info = pygame.display.Info()
 driver = pygame.display.get_driver()
-print(screen_info)
-print(driver)
+#print(screen_info)
+#print(driver)
 
 far_matrix_offset_x = 4
 far_matrix_offset_y = 5

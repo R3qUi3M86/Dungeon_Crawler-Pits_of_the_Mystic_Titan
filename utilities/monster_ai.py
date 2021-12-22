@@ -3,6 +3,7 @@ from utilities import util
 from utilities import pathfinder
 from utilities import level_painter
 from utilities import entity_manager
+from utilities import t_ctrl
 from utilities.constants import *
 
 class Ai():
@@ -45,32 +46,29 @@ class Ai():
     
     #Movement directional change timer
     def increment_direction_change_decision_timer(self):
-        self.direction_change_decision_timer += 1
-        if self.direction_change_decision_timer == self.direction_change_decision_timer_limit:
+        self.direction_change_decision_timer += 1 * t_ctrl.dt
+        if self.direction_change_decision_timer >= self.direction_change_decision_timer_limit:
             self.direction_change()
             self.direction_change_decision_timer = 0
             if self.is_roaming:
                 self.direction_change_decision_timer_limit = 60
-                self.randomize_direction_change_decision_timer_limit() 
-
-    def randomize_direction_change_decision_timer_limit(self):
-        self.direction_change_decision_timer_limit += random.choice(range(12))
+                self.direction_change_decision_timer_limit += random.choice(range(12))
 
     def increment_path_follow_dir_change_timer(self):
         if len(self.pathfinder.path) > 0:
-            if int(self.monster_path_follow_dir_change_timer) == self.monster_path_follow_dir_change_timer_limit:
+            if self.monster_path_follow_dir_change_timer >= self.monster_path_follow_dir_change_timer_limit:
                 self.monster_path_follow_dir_change_timer = 0
                 self.monster.facing_direction = util.get_facing_direction(self.monster.map_position,(self.next_tile_pos_x,self.next_tile_pos_y))
                 self.monster.set_speed_vector()
             else:
-                self.monster_path_follow_dir_change_timer += 1
+                self.monster_path_follow_dir_change_timer += 1 * t_ctrl.dt
         else:
             self.end_pathfinding()
 
     def increment_pathfinding_prepare_timer(self):
         if not self.path_finding_is_ready:
-            self.pathfinding_prepare_timer += 1
-        if int(self.pathfinding_prepare_timer) == self.pathfinding_prepare_timer_limit:
+            self.pathfinding_prepare_timer += 1 * t_ctrl.dt
+        if self.pathfinding_prepare_timer >= self.pathfinding_prepare_timer_limit:
             self.path_finding_is_ready = True
             self.pathfinding_prepare_timer = 0
 
@@ -259,7 +257,7 @@ class Ai():
 
     #Combat decisions timer
     def increment_attack_decision_timer(self):
-        self.attack_decision_timer += 0.0167*self.monster.reflex
+        self.attack_decision_timer += 0.0167 * self.monster.reflex * t_ctrl.dt
         if self.attack_decision_timer >= self.attack_decision_timer_limit:
             self.monster.is_preparing_attack = False
             self.monster.is_attacking = True
@@ -267,14 +265,14 @@ class Ai():
             self.attack_decision_timer = 0
 
     def increment_los_emmision_timer(self):
-        self.los_emision_timer += 1
-        if self.los_emision_timer == self.los_emision_timer_limit:
+        self.los_emision_timer += 1 * t_ctrl.dt
+        if self.los_emision_timer >= self.los_emision_timer_limit:
             self.monster.emit_los_particle_and_wake_up_if_player_is_seen()
             self.los_emision_timer = 0
 
     def increment_waking_up_timer(self):
-        self.waking_up_timer += 1
-        if self.waking_up_timer == self.waking_up_timer_limit:
+        self.waking_up_timer += 1 * t_ctrl.dt
+        if self.waking_up_timer >= self.waking_up_timer_limit:
             self.is_waking_up = False
             self.is_idle = False
             self.is_roaming = True

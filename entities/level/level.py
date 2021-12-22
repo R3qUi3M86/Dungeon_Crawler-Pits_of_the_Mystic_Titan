@@ -6,7 +6,6 @@ test_map = [
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 "X                                                              XX",
-"X                                                               X",
 "X          XXXXXXXX                                             X",
 "X          XXXXXXXX                                             X",
 "X          XXXXXXXX                                             X",
@@ -45,7 +44,7 @@ test_map = [
 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
 
 test_map_items = [[(25,19), STALAG_S],[(25,17), STALAG_L], [(25,16), RUBY_PEDESTAL_EMPTY], [(23,17), RUBY_PEDESTAL_FULL], [(26,17), CORPSE1], [(26,21), CORPSE2], [(26,20), BANNER], [(24,22), LICH_EYE], [(24,25),EMERALD_CROSSBOW]]
-test_map_monsters = [[(2,13),ETTIN,SECTOR_W], [(21,12),IRON_LICH,SECTOR_W]]
+test_map_monsters = [[(3,13),ETTIN,SECTOR_W], [(21,12),IRON_LICH,SECTOR_W]]
 
 
 level_01_map = [

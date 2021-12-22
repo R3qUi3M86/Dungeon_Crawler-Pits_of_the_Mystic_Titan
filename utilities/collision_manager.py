@@ -3,6 +3,7 @@ from utilities.constants import *
 from utilities import entity_manager
 from utilities import util
 from utilities import level_painter
+from utilities import t_ctrl
 from utilities.profile import profile
 
 moving_to_next_level = False
@@ -17,11 +18,11 @@ def detect_all_collisions():
     character_vs_level_collision(entity_manager.hero)
     
     if entity_manager.hero.speed_vector != 0:
-        if wall_hider_timer == wall_hider_timer_limit:
+        if wall_hider_timer >= wall_hider_timer_limit:
             wall_hider_vs_obscuring_walls_collision()
             wall_hider_timer = 0
         else:
-            wall_hider_timer += 1
+            wall_hider_timer += 1 * t_ctrl.dt
 
     for character in entity_manager.far_proximity_character_sprites_list:
         monster_vs_monster_collision(character)
@@ -134,7 +135,7 @@ def player_vs_item_collision(item_sprite):
             collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
             bump_entity_back(hero, item_sprite, collision_matrix)
             item_sprite.destroy_item()
-        elif pygame.sprite.collide_mask(hero.entity_collider_omni, item_sprite.entity_collider_omni):
+        elif not item_sprite.is_falling_apart and pygame.sprite.collide_mask(hero.entity_collider_omni, item_sprite.entity_collider_omni):
             collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
             bump_entity_back(hero, item_sprite, collision_matrix)
 

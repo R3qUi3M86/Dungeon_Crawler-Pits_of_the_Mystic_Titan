@@ -5,6 +5,7 @@ from utilities.constants import *
 from utilities import entity_manager
 from utilities.text_printer import *
 from utilities import cutscene_manager
+from utilities import t_ctrl
 
 pickup_text_display_timer = 0
 pickup_text_display_timer_limit = 210
@@ -86,7 +87,7 @@ def draw_damage_overlay():
     if entity_manager.hero.has_taken_damage == True:
         index = int(entity_manager.hero.damage_timer/(entity_manager.hero.damage_timer_limit/4))
         screen.blit(damage_overlay[index],(0,0))
-        entity_manager.hero.damage_timer += 0.0167
+        entity_manager.hero.damage_timer += 0.0167 * t_ctrl.dt
     if entity_manager.hero.damage_timer >= entity_manager.hero.damage_timer_limit:
         entity_manager.hero.damage_timer = 0
         entity_manager.hero.has_taken_damage = False
@@ -140,7 +141,7 @@ def draw_consumable_counter():
 
         screen.blit(selected_consumable_image, CONSUMABLE_IMAGE_POS)
         if cooldown != 0 and cooldown < 0.4:
-            consumable_use_image_index += 0.1667
+            consumable_use_image_index += 0.1667 * t_ctrl.dt
             screen.blit(consumable_use_image, CONSUMABLE_IMAGE_POS)
         else:
             consumable_use_image_index = 0
@@ -162,7 +163,7 @@ def display_pickup_text():
 
     if pickup_text_display_timer < pickup_text_display_timer_limit:
         display_pickup_runic_text(displayed_text, PALE_ORANGE_COLOR, PICKUP_TEXT_POS[0], PICKUP_TEXT_POS[1])
-        pickup_text_display_timer += 1
+        pickup_text_display_timer += 1 * t_ctrl.dt
     
     else:
         pickup_text_display_timer = 0
@@ -175,7 +176,7 @@ def display_narrator_text():
 
     if narrator_text_display_timer < narrator_text_display_timer_limit:
         display_pickup_runic_text(text, PALE_ORANGE_COLOR, PICKUP_TEXT_POS[0], PICKUP_TEXT_POS[1])
-        narrator_text_display_timer += 1
+        narrator_text_display_timer += 1 * t_ctrl.dt
     
     else:
         narrator_text_display_timer = 0

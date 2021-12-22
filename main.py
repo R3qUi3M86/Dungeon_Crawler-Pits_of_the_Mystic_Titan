@@ -1,4 +1,4 @@
-import pygame
+import pygame, time
 from pygame.constants import BLEND_ALPHA_SDL2
 from utilities.text_printer import *
 from utilities.constants import *
@@ -9,6 +9,7 @@ from utilities import util
 from utilities import ui_elements
 from utilities import menu
 from utilities import cutscene_manager
+from utilities import t_ctrl
 from sys import exit
 import settings
 from entities import cursor
@@ -34,40 +35,40 @@ def get_player_wsad_input():
 
     if entity_manager.hero.is_living and not collision_manager.moving_to_next_level and not cutscene_manager.playing_cutscene:
         if keys[pygame.K_s] and entity_manager.hero.speed_scalar[Y] < 30.0:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+1
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+1 * t_ctrl.dt
 
         if (not keys[pygame.K_s] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[Y] > 0:
-            if entity_manager.hero.speed_scalar[Y] < 3:
+            if entity_manager.hero.speed_scalar[Y] < 3 * t_ctrl.dt:
                 entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],0
             else:
-                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]-3
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]-3 * t_ctrl.dt
         
         if keys[pygame.K_w] and entity_manager.hero.speed_scalar[Y] > -30.0:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]-1
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]-1 * t_ctrl.dt
 
         if (not keys[pygame.K_w] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[Y] < 0:
-            if entity_manager.hero.speed_scalar[Y] > -3:
+            if entity_manager.hero.speed_scalar[Y] > -3 * t_ctrl.dt:
                 entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],0
             else:
-                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+3
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X],entity_manager.hero.speed_scalar[Y]+3 * t_ctrl.dt
 
         if keys[pygame.K_a] and entity_manager.hero.speed_scalar[X] > -30.0:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]-1,entity_manager.hero.speed_scalar[1]
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]-1 * t_ctrl.dt,entity_manager.hero.speed_scalar[1]
 
         if (not keys[pygame.K_a] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[X] < 0:
-            if entity_manager.hero.speed_scalar[X] > -3:
+            if entity_manager.hero.speed_scalar[X] > -3 * t_ctrl.dt:
                 entity_manager.hero.speed_scalar = 0,entity_manager.hero.speed_scalar[Y]
             else:
-                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]+3,entity_manager.hero.speed_scalar[Y]
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]+3 * t_ctrl.dt,entity_manager.hero.speed_scalar[Y]
         
         if keys[pygame.K_d] and entity_manager.hero.speed_scalar[X] < 30.0:
-            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]+1,entity_manager.hero.speed_scalar[Y]
+            entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]+1 * t_ctrl.dt,entity_manager.hero.speed_scalar[Y]
 
         if (not keys[pygame.K_d] or entity_manager.hero.is_attacking) and entity_manager.hero.speed_scalar[X] > 0:
-            if entity_manager.hero.speed_scalar[X] < 3:
+            if entity_manager.hero.speed_scalar[X] < 3 * t_ctrl.dt:
                 entity_manager.hero.speed_scalar = 0,entity_manager.hero.speed_scalar[Y]
             else:
-                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]-3,entity_manager.hero.speed_scalar[Y]
+                entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X]-3 * t_ctrl.dt,entity_manager.hero.speed_scalar[Y]
 
         if entity_manager.hero.speed_scalar[X] > 21.2 and entity_manager.hero.speed_scalar[Y] > 22.54:
             entity_manager.hero.speed_scalar = 21.2,22.54
@@ -88,7 +89,7 @@ def get_player_wsad_input():
             entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X], -30.0
 
         entity_manager.hero.speed_scalar = round(entity_manager.hero.speed_scalar[0],2),round(entity_manager.hero.speed_scalar[1],2)
-        entity_manager.hero.speed_vector = round((entity_manager.hero.speed_scalar[X]/30)*entity_manager.hero.speed,2), round((entity_manager.hero.speed_scalar[Y]/30)*entity_manager.hero.speed*0.55,2)
+        entity_manager.hero.speed_vector = round((entity_manager.hero.speed_scalar[X]/30)*entity_manager.hero.speed * t_ctrl.dt,2), round((entity_manager.hero.speed_scalar[Y]/30)*entity_manager.hero.speed*0.55 * t_ctrl.dt,2)
     
     else:
         entity_manager.hero.speed_scalar = 0,0
@@ -107,8 +108,8 @@ def get_player_mouse_input():
             entity_manager.hero.is_attacking = True
 
     if mouse_input_pause:
-        mouse_input_pause_timer += 1
-        if mouse_input_pause_timer == 10:
+        mouse_input_pause_timer += 1 * t_ctrl.dt
+        if mouse_input_pause_timer >= 10:
             mouse_input_pause_timer = 0
             mouse_input_pause = False
 
@@ -167,7 +168,7 @@ def check_win_conditions():
             if game_won_delay == 0:
                 cutscene_manager.overkill_kill_all_monsters()
                 cutscene_manager.destroy_all_projectiles()
-            game_won_delay += 0.0167
+            game_won_delay += 0.0167 * t_ctrl.dt
 
     elif menu.game_won and ui_elements.fading_in:
         play_music(-1)
@@ -180,7 +181,7 @@ def check_win_conditions():
 
 #Visuals drawing and sorting
 def increment_sprite_sorting_timer():
-    entity_manager.sorting_timer += 1
+    entity_manager.sorting_timer += 1 * t_ctrl.dt
     if entity_manager.sorting_timer >= entity_manager.sorting_timer_limit:
         entity_manager.order_sprites()
         entity_manager.sorting_timer = 0
@@ -254,7 +255,7 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.levels[3] #level_painter.test_map
+    level_painter.level_layout = level_painter.test_map #level_painter.levels[3] #
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
@@ -338,6 +339,7 @@ def main_game_loop():
         #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_sprite_group_matrix, "S")
 
         #Other
+        t_ctrl.adjust_delta_time()
         increment_ambient_sound_timer()
         pygame.display.flip()
         clock.tick(60)

@@ -7,6 +7,7 @@ from utilities.constants import *
 from utilities import util
 from utilities import level_painter
 from utilities import entity_manager
+from utilities import t_ctrl
 from sounds import sound_player
 
 WEAPON_DAMAGE_DICT = {SWORD:2, EMERALD_CROSSBOW:2, NECROLIGHT:15, ETTIN_MACE:1, BISHOP_MAGIC_MISSILE:1, SPIKE_BALL_SPELL:6, WHIRLWIND_SPELL:1, RED_ORB_SPELL:8}
@@ -322,20 +323,20 @@ class Item(pygame.sprite.Sprite):
         x_speed = self.speed[0]
         y_speed = self.speed[1]
         if x_speed > 0:
-            x_speed -= 0.05
+            x_speed -= 0.05 * t_ctrl.dt
             if x_speed < 0:
                 x_speed = 0
         else:
-            x_speed += 0.05
+            x_speed += 0.05 * t_ctrl.dt
             if x_speed > 0:
                 x_speed = 0
         
         if y_speed > 0:
-            y_speed -= 0.05
+            y_speed -= 0.05 * t_ctrl.dt
             if y_speed < 0:
                 y_speed = 0
         else:
-            y_speed += 0.05
+            y_speed += 0.05 * t_ctrl.dt
             if y_speed > 0:
                 y_speed = 0
         
@@ -343,17 +344,17 @@ class Item(pygame.sprite.Sprite):
 
     #Timers
     def increment_animation_timer(self):
-        self.animation_index += 0.1
-        if int(self.animation_index) >= len(self.item_animation_images):
+        self.animation_index += 0.1 * t_ctrl.dt
+        if self.animation_index >= len(self.item_animation_images):
             self.animation_index = 0
         
         if self.NAME is WALL_TORCH or self.NAME is FLAME_PEDESTAL1:
-            if int(self.animation_index) >= 1:
+            if self.animation_index >= 1:
                 self.animation_index = 0
                 self.image = self.item_animation_images[random.choice(range(len(self.item_animation_images)))]
         
         elif self.NAME is GOLD_COINS:
-            if int(self.animation_index) >= 5:
+            if self.animation_index >= 5:
                 spark_decision = random.choice(range(3))
                 spark_choice = None
                 if spark_decision > 1:
@@ -367,8 +368,8 @@ class Item(pygame.sprite.Sprite):
             self.image = self.item_animation_images[int(self.animation_index)]
 
     def increment_destruction_animation_timer(self):
-        self.animation_index += 0.2
-        if int(self.animation_index) >= len(self.item_destruction_images):
+        self.animation_index += 0.2 * t_ctrl.dt
+        if self.animation_index >= len(self.item_destruction_images):
             self.animation_index = len(self.item_destruction_images)-1
             self.is_destroyed = True
             self.is_falling_apart = False
@@ -380,12 +381,12 @@ class Item(pygame.sprite.Sprite):
         if not self.is_ready_to_use:
             if self.is_weapon:
                 if self.attack_type is MELEE:
-                    self.use_cooldown += 0.05
+                    self.use_cooldown += 0.05 * t_ctrl.dt
                 elif self.attack_type is RANGED:
-                    self.use_cooldown += 0.025
+                    self.use_cooldown += 0.025 * t_ctrl.dt
             
             elif self.is_consumable:
-                self.use_cooldown += 0.01667
+                self.use_cooldown += 0.01667 * t_ctrl.dt
         
         if self.use_cooldown >= self.use_cooldown_limit:
             self.is_ready_to_use = True
@@ -395,4 +396,4 @@ class Item(pygame.sprite.Sprite):
                 self.chainfire = WEAPON_CHAINFIRE_DICT[self.NAME]
 
     def increment_chainfire_cooldown(self):
-        self.chainfire_cooldown += 0.0167
+        self.chainfire_cooldown += 0.0167 * t_ctrl.dt

@@ -8,6 +8,7 @@ from utilities import entity_manager
 from utilities import level_painter
 from utilities import monster_ai
 from utilities import cutscene_manager
+from utilities import t_ctrl
 from utilities.constants import *
 from utilities.level_painter import TILE_SIZE
 from images.characters.ettin_images import *
@@ -198,7 +199,7 @@ class Monster(pygame.sprite.Sprite):
             
             if not self.monster_ai.is_using_ability:
                 self.update_animation()
-            self.rect.midbottom = self.image_position
+            self.rect = self.image.get_rect(midbottom = self.image_position)
 
         else:
             self.deactivate()
@@ -277,7 +278,6 @@ class Monster(pygame.sprite.Sprite):
     def update_owned_sprites_position(self):
         for auxilary_sprites_row in self.entity_auxilary_sprites:
             for auxilary_sprite in auxilary_sprites_row:
-                auxilary_sprite.position = self.position
                 auxilary_sprite.tile_index = self.tile_index
                 auxilary_sprite.update_position(self.position)
     
@@ -326,18 +326,19 @@ class Monster(pygame.sprite.Sprite):
 
     #Animations
     def character_pain_animation(self):
-        self.character_pain_timer += 0.05
-        if int(self.character_pain_timer) >= 1:
+        self.character_pain_timer += 0.05 * t_ctrl.dt
+        if self.character_pain_timer >= 1:
             self.is_in_pain = False
             self.character_pain_timer = 0
-        self.image = self.character_pain[self.character_pain_index]
+        if self.is_in_pain:
+            self.image = self.character_pain[self.character_pain_index]
 
     def character_death_animation(self):
         if self.NAME is DARK_BISHOP and self.character_death_index == 0:
             entity_manager.remove_entity_shadow_from_the_game(self)
 
-        self.character_death_index += 0.1
-        if int(self.character_death_index) == len(self.character_death)-1:
+        self.character_death_index += 0.1 * t_ctrl.dt
+        if self.character_death_index >= len(self.character_death)-1:
             self.character_death_index = len(self.character_death)-1
             self.is_dying = False
             self.is_dead = True
@@ -347,8 +348,8 @@ class Monster(pygame.sprite.Sprite):
         if self.NAME is DARK_BISHOP and self.character_overkill_index == 0:
             entity_manager.remove_entity_shadow_from_the_game(self)
         
-        self.character_overkill_index += 0.1
-        if int(self.character_overkill_index) == len(self.character_overkill)-1:
+        self.character_overkill_index += 0.1 * t_ctrl.dt
+        if self.character_overkill_index >= len(self.character_overkill)-1:
             self.character_overkill_index = len(self.character_overkill)-1
             self.is_overkilled = False
             self.is_dead = True
@@ -356,8 +357,8 @@ class Monster(pygame.sprite.Sprite):
 
     def character_walk_forward_animation(self):
         if self.speed_vector[0] != 0 or self.speed_vector[1] != 0:
-            self.character_walk_index[1] += 0.1
-            if int(self.character_walk_index[1]) == len(self.character_walk[0]):
+            self.character_walk_index[1] += 0.1 * t_ctrl.dt
+            if self.character_walk_index[1] >= len(self.character_walk[0]):
                 self.character_walk_index[1] = 0
         self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]
 
@@ -366,14 +367,14 @@ class Monster(pygame.sprite.Sprite):
             sound_player.play_monster_atk_prep_sound(self.NAME)
         
         weapon = self.weapons[self.selected_weapon]
-        self.character_attack_index[1] += 0.1*weapon.attack_speed
+        self.character_attack_index[1] += 0.1 * weapon.attack_speed * t_ctrl.dt
 
-        if int(self.character_attack_index[1]) == 3:
+        if self.character_attack_index[1] >= 3:
             self.interrupt_attack()
             self.image = self.character_walk[self.character_walk_index[0]][int(self.character_walk_index[1])]     
         else:
             self.image = self.character_attack[self.character_attack_index[0]][int(self.character_attack_index[1])]    
-            if round(self.character_attack_index[1],2) >= 2.00 and weapon.chainfire > 0:
+            if self.character_attack_index[1] >= 2 and weapon.chainfire > 0:
                 if weapon.chainfire_cooldown >= weapon.chainfire_cooldown_limit:
                     if self.weapons[self.selected_weapon].attack_type is MELEE:
                         combat_manager.attack_player_with_melee_attack(self, weapon)
@@ -396,7 +397,7 @@ class Monster(pygame.sprite.Sprite):
         new_char_img_surf.set_alpha(int(255*self.summon_flash_timer/self.summon_flash_timer_limit))
         self.image = new_char_img_surf
         
-        self.summon_flash_timer += 0.0167
+        self.summon_flash_timer += 0.0167 * t_ctrl.dt
         self.summon_flash_index = (len(self.summon_flash)-1)*self.summon_flash_timer/self.summon_flash_timer_limit
         if self.summon_flash_timer >= self.summon_flash_timer_limit:
             self.is_summoned = False
@@ -434,21 +435,21 @@ class Monster(pygame.sprite.Sprite):
     def set_speed_vector(self):
         if self.is_living and not self.is_preparing_attack and not self.is_attacking:
             if self.facing_direction == SECTOR_E:
-                self.speed_vector = self.speed,0
+                self.speed_vector = self.speed * t_ctrl.dt,0
             elif self.facing_direction == SECTOR_NE:
-                self.speed_vector = 0.7*self.speed,-0.41*self.speed
+                self.speed_vector = 0.7*self.speed * t_ctrl.dt,-0.41*self.speed * t_ctrl.dt
             elif self.facing_direction == SECTOR_N:
-                self.speed_vector = 0,-0.55*self.speed
+                self.speed_vector = 0,-0.55*self.speed * t_ctrl.dt
             elif self.facing_direction == SECTOR_NW:
-                self.speed_vector = -0.7*self.speed,-0.41*self.speed
+                self.speed_vector = -0.7*self.speed * t_ctrl.dt,-0.41*self.speed * t_ctrl.dt
             elif self.facing_direction == SECTOR_W:
-                self.speed_vector = -self.speed,0
+                self.speed_vector = -self.speed * t_ctrl.dt,0
             elif self.facing_direction == SECTOR_SW:
-                self.speed_vector = -0.7*self.speed,0.41*self.speed
+                self.speed_vector = -0.7*self.speed * t_ctrl.dt,0.41*self.speed * t_ctrl.dt
             elif self.facing_direction == SECTOR_S:
-                self.speed_vector = 0,0.55*self.speed
+                self.speed_vector = 0,0.55*self.speed * t_ctrl.dt
             elif self.facing_direction == SECTOR_SE:
-                self.speed_vector = 0.7*self.speed,0.41*self.speed
+                self.speed_vector = 0.7*self.speed * t_ctrl.dt,0.41*self.speed * t_ctrl.dt
             
     #Combat functions
     def initialize_attack_sequence(self):
@@ -503,6 +504,7 @@ class Monster(pygame.sprite.Sprite):
     def attack_interupted(self):
         if random.choice(range(1,101)) <= self.attack_interruption_chance:
             return True
+        self.is_in_pain = False
         self.attack_can_be_interrupted = False
         return False
     
@@ -563,9 +565,9 @@ class Monster(pygame.sprite.Sprite):
     def increment_make_noise_timer(self):
         if self.noise_timer == 0:
             self.noise_timer_limit += random.choice(range(6))
-        self.noise_timer += 0.0167
+        self.noise_timer += 0.0167 * t_ctrl.dt
 
-        if int(self.noise_timer) == self.noise_timer_limit:
+        if self.noise_timer >= self.noise_timer_limit:
             self.noise_timer_limit = 5
             self.noise_timer = 0
             sound_player.play_monster_noise_sound(self.NAME)

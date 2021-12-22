@@ -1148,7 +1148,7 @@ def fill_map_with_monsters(density):
             if tile.TYPE == FLOOR and tile.tile_index is not hero.tile_index:
                 result = random.choice(range(1,101))
                 if result <= density:
-                    generate_monster((tile.tile_index[0],tile.tile_index[1]),ETTIN,SECTOR_S)
+                    generate_monster((tile.tile_index[0],tile.tile_index[1]),DARK_BISHOP,SECTOR_S)
 
 def generate_monster(tile_index, monster_type, facing_dir):
     global all_entity_and_shadow_sprite_group_matrix
@@ -1242,6 +1242,10 @@ def generate_item(tile_index, item_name):
         usable_objects.append(item)
 
 def drop_item(dropping_entity, dropped_item):
+    global sorting_timer
+
+    sorting_timer = sorting_timer_limit
+
     item = Item(dropping_entity.tile_index,dropped_item)
     item.position = dropping_entity.position[0], dropping_entity.position[1]+1
     item.map_position = dropping_entity.map_position[0], dropping_entity.map_position[1]+1
@@ -1249,6 +1253,10 @@ def drop_item(dropping_entity, dropped_item):
     put_item_in_matrices_and_lists(item)
 
 def put_item_in_matrices_and_lists(new_item):
+    global sorting_timer
+
+    sorting_timer = sorting_timer_limit
+
     tile_index = new_item.tile_index
     far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
 
@@ -1334,6 +1342,10 @@ def use_consumable_item():
         del hero.consumables[item.NAME]
 
 def use_puzzle():
+    global sorting_timer
+
+    sorting_timer = sorting_timer_limit
+
     puzzle_object = None
 
     for usable_object in usable_objects:
@@ -1363,6 +1375,10 @@ def apply_consumable_effect(item):
 
 #Projectiles
 def put_projectile_in_matrices_and_lists(new_projectile):
+    global sorting_timer
+
+    sorting_timer = sorting_timer_limit
+
     tile_index = new_projectile.tile_index
     far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
 

@@ -2,6 +2,7 @@ import pygame
 import random
 from utilities import level_painter
 from utilities.constants import *
+from utilities import t_ctrl
 
 SFX_VOLUME = 0.1
 MUSIC_VOLUME = 0.05
@@ -288,6 +289,6 @@ def increment_ambient_sound_timer():
         else:
             random.choice(ambient_lava_sounds).play()
 
-    ambient_sound_timer += 0.0167
+    ambient_sound_timer += 0.0167 * t_ctrl.dt
         
 

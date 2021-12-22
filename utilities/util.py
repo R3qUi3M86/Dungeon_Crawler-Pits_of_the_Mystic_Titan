@@ -1,10 +1,9 @@
 import numpy as np
 import math
-from copy import deepcopy
 from utilities.constants import *
 from utilities import entity_manager
 from utilities import level_painter
-from entities.level.level import ENTRANCE, WALL, WATER, LAVA
+from entities.level.level import WALL, WATER, LAVA
 from settings import *
 
 center_x = 0
@@ -89,12 +88,20 @@ def get_travel_speed(angle, speed):
     x_factored_speed = x_factor*speed
     y_factored_speed = y_factor*speed
 
-    total_factored_speed = math.sqrt((x_factored_speed*x_factored_speed) + (y_factored_speed*y_factored_speed))
+    total_factored_speed = math.sqrt((x_factored_speed*x_factored_speed)+(y_factored_speed*y_factored_speed))
 
     x_factor_travel = math.cos(math.radians(angle))
     y_factor_travel = math.sin(math.radians(angle))
 
     travel_speed = x_factor_travel*total_factored_speed, -y_factor_travel*total_factored_speed
+
+    return travel_speed
+
+def get_elipse_travel_speed(angle, speed):
+    x_factor = math.cos(math.radians(angle))
+    y_factor = 0.55*math.sin(math.radians(angle))
+
+    travel_speed = x_factor*speed, -y_factor*speed
 
     return travel_speed
 

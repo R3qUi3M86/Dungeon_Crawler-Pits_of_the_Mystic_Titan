@@ -6,6 +6,7 @@ from utilities import util
 from utilities import entity_manager
 from utilities.constants import *
 from sounds import sound_player
+from utilities import t_ctrl
 
 USABLE_ABILITIES_DICT = {FLYING:False, TELEPORT_BLUR: True, SUMMON_MONSTER: True}
 
@@ -155,7 +156,7 @@ class Ability():
         elif 300 < distance_to_player or distance_to_player < 48:
             random_angle = random.choice(range(-45,46)) + angle_to_player
         
-        movement_speed = 7
+        movement_speed = 7 * t_ctrl.dt
         travel_speed = util.get_travel_speed(random_angle, movement_speed)
         self.travel_speed = travel_speed
         self.monster.speed_vector = travel_speed
@@ -207,10 +208,10 @@ class Ability():
                 self.monster.image = self.monster_original_image
                 self.monster.rect = self.monster.image.get_rect(midbottom = (self.monster.image_position))
                 self.monster.can_collide_with_player = True
-        self.use_speed_timer += 0.0167
+        self.use_speed_timer += 0.0167 * t_ctrl.dt
 
     def increment_cooldown_timer(self):
         if self.cooldown_timer >= self.cooldown:
             self.is_ready_to_use = True
             self.cooldown_timer = 0
-        self.cooldown_timer += 0.0167
+        self.cooldown_timer += 0.0167 * t_ctrl.dt
