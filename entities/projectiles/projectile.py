@@ -129,17 +129,35 @@ class Projectile(pygame.sprite.Sprite):
              self.disintegration_animation()
         
         else:
-            #Relative speed projectile
-            if self.speed != -1:
-                self.map_position = round((self.map_position[0] + (self.travel_speed[0] + self.delta_travel_speed[0]) * t_ctrl.dt),2), round((self.map_position[1] + (self.travel_speed[1]+ self.delta_travel_speed[1]) * t_ctrl.dt),2)
+            traveled_distance_x = 0
+            traveled_distance_y = 0
+            frame_travel_x = (self.travel_speed[0] + self.delta_travel_speed[0]) * t_ctrl.dt
+            frame_travel_y = (self.travel_speed[1] + self.delta_travel_speed[1]) * t_ctrl.dt
+            x_travel = self.travel_speed[0] + self.delta_travel_speed[0]
+            y_travel = self.travel_speed[1] + self.delta_travel_speed[1]
+
+            if x_travel > 25 and x_travel > y_travel:
+                proportion = y_travel/x_travel
+                x_travel = 25
+                y_travel = x_travel * proportion
+            elif y_travel > 15 and y_travel > x_travel:
+                proportion = x_travel/y_travel
+                y_travel = 15
+                x_travel = y_travel * proportion
+            
+            while not self.has_impacted and (abs(traveled_distance_x) < abs(frame_travel_x) or abs(traveled_distance_y) < abs(frame_travel_y)):
+                if abs(frame_travel_x) - abs(traveled_distance_x) <= abs(x_travel):
+                    x_travel = frame_travel_x - traveled_distance_x
+                if abs(frame_travel_y) - abs(traveled_distance_y) <= abs(y_travel):
+                    y_travel = frame_travel_y - traveled_distance_y
+
+                traveled_distance_x += x_travel
+                traveled_distance_y += y_travel
+
+                self.map_position = round(self.map_position[0] + x_travel,2), round(self.map_position[1] + y_travel,2)
                 self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
-                self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
-                self.rect = self.image.get_rect(midbottom = (self.image_position))
                 self.update_owned_sprites_position()
                 self.tile_index = util.get_tile_index(self.map_position)
-
-                if self.is_outside_of_map():
-                    self.has_impacted = True
 
                 if self.tile_index != self.prevous_tile_index:
                     self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
@@ -148,35 +166,19 @@ class Projectile(pygame.sprite.Sprite):
                     self.direct_proximity_coolidable_items = self.get_direct_proximity_colidable_items()
                     entity_manager.move_entity_in_all_matrices(self.id, PROJECTILE, self.prevous_tile_index, self.tile_index)
                     self.prevous_tile_index = self.tile_index
+              
+                if self.leaving_far_proximity_matrix_margin():
+                    self.has_impacted = True
+                    entity_manager.remove_projectile_from_from_matrices_and_lists(self)
 
-                if len(self.projectile_dynamic_images) >= 2:
-                    self.travel_animation()
+                collision_manager.projectile_vs_entity_collision(self)
+                collision_manager.projectile_vs_level_collision(self)
+
+            if len(self.projectile_dynamic_images) >= 2:
+                self.travel_animation()
             
-            #Light speed projectile
-            else:
-                while not self.has_impacted:
-                    self.map_position = round((self.map_position[0] + self.travel_speed[0] + self.delta_travel_speed[0]),2), round((self.map_position[1] + self.travel_speed[1] + self.delta_travel_speed[1]),2)
-                    self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
-                    self.update_owned_sprites_position()
-                    self.tile_index = util.get_tile_index(self.map_position)
-
-                    if self.tile_index != self.prevous_tile_index:
-                        self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-                        self.direct_proximity_wall_like_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, WALL_LIKE)
-                        self.direct_proximity_characters = self.get_direct_proximity_characters_list()
-                        self.direct_proximity_coolidable_items = self.get_direct_proximity_colidable_items()
-                        entity_manager.move_entity_in_all_matrices(self.id, PROJECTILE, self.prevous_tile_index, self.tile_index)
-                        self.prevous_tile_index = self.tile_index
-                
-                    self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
-                    self.rect.midbottom = self.image_position
-                    collision_manager.projectile_vs_entity_collision(self)
-                    collision_manager.projectile_vs_level_collision(self)
-                    if self.leaving_far_proximity_matrix_margin():
-                        self.has_impacted = True
-                        entity_manager.remove_projectile_from_from_matrices_and_lists(self)
-
-                self.image = self.projectile_destuction_image_list[int(self.projectile_destruction_index)]
+            self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
+            self.rect.midbottom = self.image_position
 
     def update_position(self, vector=None):
         self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)

@@ -28,10 +28,6 @@ def detect_all_collisions():
         monster_vs_monster_collision(character)
         character_vs_level_collision(character)
 
-    for projectile in entity_manager.far_proximity_projectile_sprites_list:   
-        projectile_vs_entity_collision(projectile)
-        projectile_vs_level_collision(projectile)
-
     for item in entity_manager.far_proximity_item_sprites_list:
         player_vs_item_collision(item)
         if item.is_falling_apart:
