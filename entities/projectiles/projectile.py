@@ -136,13 +136,20 @@ class Projectile(pygame.sprite.Sprite):
             x_travel = self.travel_speed[0] + self.delta_travel_speed[0]
             y_travel = self.travel_speed[1] + self.delta_travel_speed[1]
 
-            if x_travel > 25 and x_travel > y_travel:
+            if abs(x_travel) > 25 and abs(x_travel) > abs(y_travel):
                 proportion = y_travel/x_travel
-                x_travel = 25
+                if x_travel > 0:
+                    x_travel = 25
+                else:
+                    x_travel = -25
                 y_travel = x_travel * proportion
-            elif y_travel > 15 and y_travel > x_travel:
+            
+            elif abs(y_travel) > 15 and abs(y_travel) > abs(x_travel):
                 proportion = x_travel/y_travel
-                y_travel = 15
+                if y_travel > 0:
+                    y_travel = 15
+                else:
+                    y_travel = -15
                 x_travel = y_travel * proportion
             
             while not self.has_impacted and (abs(traveled_distance_x) < abs(frame_travel_x) or abs(traveled_distance_y) < abs(frame_travel_y)):
