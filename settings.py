@@ -11,7 +11,12 @@ starting_new_game = False
 #Windowed mode
 screen_width = 1200
 screen_height = 800
-screen = pygame.display.set_mode((screen_width, screen_height), DOUBLEBUF)
+
+screen = pygame.display.set_mode((screen_width, screen_height))
+screen_info = pygame.display.Info()
+driver = pygame.display.get_driver()
+print(screen_info)
+print(driver)
 
 far_matrix_offset_x = 4
 far_matrix_offset_y = 5

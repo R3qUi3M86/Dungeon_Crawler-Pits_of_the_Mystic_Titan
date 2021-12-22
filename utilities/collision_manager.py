@@ -3,6 +3,7 @@ from utilities.constants import *
 from utilities import entity_manager
 from utilities import util
 from utilities import level_painter
+from utilities.profile import profile
 
 moving_to_next_level = False
 wall_hider_timer = 0

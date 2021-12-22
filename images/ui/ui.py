@@ -22,10 +22,11 @@ wall_hider_mask = pygame.image.load("images/ui/wall_hider_mask.png").convert_alp
 wall_hider_mask2 = pygame.image.load("images/ui/wall_hider_mask2.png").convert_alpha()
 
 #Health bar
-health_bar_empty = pygame.image.load("images/ui/health_bar/empty_bar.png").convert_alpha()
-health_bar_health = pygame.image.load("images/ui/health_bar/health.png").convert_alpha()
-health_bar_health_mask = pygame.image.load("images/ui/health_bar/health_mask.png").convert_alpha()
+health_bar_empty = pygame.image.load("images/ui/health_bar/empty_bar.png").convert()
+health_bar_health = pygame.image.load("images/ui/health_bar/health.png").convert()
+health_bar_health_mask = pygame.image.load("images/ui/health_bar/health_mask.png").convert()
 inner_shadow = pygame.image.load("images/ui/health_bar/inner_shadow.png").convert_alpha()
+outer_shadow = pygame.image.load("images/ui/health_bar/outer_shadow.png").convert_alpha()
 
 #Boss hp bar
 boss_hp_bar_empty = pygame.image.load("images/ui/boss_hp_bar/boss_hp_bar.png").convert_alpha()

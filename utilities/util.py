@@ -125,7 +125,7 @@ def get_vicinity_matrix_indices_for_index(index_x_y, size=(3,3)):
         for j in range(size[1]):
             vicinity_matrix_row.append((tile_index[0]+i-size[0]//2,tile_index[1]+j-size[1]//2))
         
-        vicinity_matrix.append(deepcopy(vicinity_matrix_row))
+        vicinity_matrix.append(vicinity_matrix_row)
 
     return vicinity_matrix
 
@@ -159,7 +159,7 @@ def elipses_intersect(entity1_map_pos,entity2_map_pos,entity1_a_b,entity2_a_b):
         if distance < reach:
             return True
     
-    return False
+        return False
 
 def get_tile_offset(prevous_tile_index, tile_index):
     offset_x = tile_index[X] - prevous_tile_index[X]

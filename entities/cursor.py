@@ -9,6 +9,6 @@ class Cursor(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = (position))
 
     def update(self):
-        self.rect = self.image.get_rect(center = (pygame.mouse.get_pos()))
+        self.rect.center = pygame.mouse.get_pos()
 
 cursor = pygame.sprite.GroupSingle(Cursor(pygame.mouse.get_pos()))

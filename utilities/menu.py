@@ -767,5 +767,5 @@ def menu():
             ui_elements.fade_in()
 
         #Other
-        pygame.display.update()
+        pygame.display.flip()
         clock.tick(60)

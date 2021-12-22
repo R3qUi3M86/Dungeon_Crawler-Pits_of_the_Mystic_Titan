@@ -13,6 +13,7 @@ from sys import exit
 import settings
 from entities import cursor
 from sounds.sound_player import *
+from utilities.profile import profile
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -21,7 +22,7 @@ mouse_input_pause_timer = 0
 playing_cutscene = False
 sorting_timer = 20
 sorting_timer_limit = 20
-sorted_entity_matrix = None
+sorted_entity_matrix = [[]]
 wall_drawing_mode = VISIBLE
 game_won_delay = 0
 game_won_delay_limit = 2
@@ -185,7 +186,7 @@ def increment_sprite_sorting_timer():
     global sorting_timer
 
     sorting_timer += 1
-    if sorting_timer == sorting_timer_limit:
+    if sorting_timer >= sorting_timer_limit:
         order_sprites()
         sorting_timer = 0
 
@@ -211,7 +212,7 @@ def order_sprites():
                     sorted_entities_row[j], sorted_entities_row[j+1] = sorted_entities_row[j+1], sorted_entities_row[j]
         sorted_entity_matrix.append(sorted_entities_row)
 
-    return sorted_entity_matrix
+    #return sorted_entity_matrix
 
 def draw_sprites():
     translation_vector = level_painter.get_level_surface_translation_vector()
@@ -234,7 +235,7 @@ def draw_sprites():
     if cutscene_manager.playing_cutscene:
         cutscene_manager.play_cutscene(BOSS_ENTRY)
 
-    sorted_entity_matrix = order_sprites()
+    #sorted_entity_matrix = order_sprites()
     for row in sorted_entity_matrix: 
         for entity in row:
             entity.draw(screen)
@@ -252,7 +253,8 @@ def draw_sprites():
                 screen.blit(tile.alpha_image3,tile.position)
             else:
                 screen.blit(tile.image,tile.position)
-                  
+
+              
 def draw_ui():
     screen.blit(ui_elements.central_light,(0,0))
     ui_elements.draw_damage_overlay()
@@ -281,7 +283,7 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.levels[0] #level_painter.test_map
+    level_painter.level_layout = level_painter.test_map #level_painter.levels[0]
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
@@ -298,7 +300,7 @@ def start_next_level():
 
 #Main game loop
 def main_game_loop():
-    while True:
+    while 1:
         #Inputs
         get_player_wsad_input()
         get_player_mouse_input()

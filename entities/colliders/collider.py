@@ -18,7 +18,7 @@ class Collider(pygame.sprite.Sprite):
     #Update functions
     def update_position(self,position):
         self.position = position
-        self.rect = self.image.get_rect(center = (self.position))
+        self.rect.center = self.position
 
     #Misc
     def get_image(self):

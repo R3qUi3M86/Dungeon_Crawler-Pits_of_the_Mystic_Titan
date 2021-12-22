@@ -59,7 +59,7 @@ class Tile(pygame.sprite.Sprite):
 
     def update_position(self):
         self.position = math.floor(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0] - level_painter.TILE_SIZE[X]//2), math.floor(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1] - level_painter.TILE_SIZE[Y]//2)
-        self.rect = self.image.get_rect(topleft = (self.position))
+        self.rect.topleft = self.position
 
     ###############
     ### Getters ###

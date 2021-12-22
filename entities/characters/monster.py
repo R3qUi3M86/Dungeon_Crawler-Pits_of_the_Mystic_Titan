@@ -18,6 +18,7 @@ from entities.characters.ability import Ability
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
 from entities.items.item import Item
+from utilities.profile import profile
 
 MONSTER_IMAGE_DISPLAY_CORRECTION = {ETTIN:12, DARK_BISHOP:0, IRON_LICH:19}
 MONSTER_SHADOW_SIZE = {ETTIN:SIZE_MEDIUM, DARK_BISHOP:SIZE_SMALL, IRON_LICH:SIZE_LARGE}
@@ -210,9 +211,10 @@ class Monster(pygame.sprite.Sprite):
         else:
             self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
-        self.rect = self.image.get_rect(midbottom = (self.image_position))
+        self.rect.center = self.image_position
         self.update_owned_sprites_position()
     
+
     def update_decisions(self):
         if self.is_living:
             

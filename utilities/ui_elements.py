@@ -28,9 +28,16 @@ HEALTH_BAR_SIZE = 654,35
 HEALTH_LENGTH = 644
 EMPTY_HEALH_BAR_X_POS = -654
 
+health_surface = pygame.Surface(HEALTH_BAR_SIZE)
+health_surface.set_colorkey((0,0,255))
+ui.health_bar_health_mask.set_colorkey((0,255,0))
+ui.health_bar_empty.set_colorkey((0,0,255))
+
 BOSS_HP_BAR_POS = screen_width//2, 35
 BOSS_HP_BAR_SIZE = 734, 46
 BOSS_HP_LENGTH = 666
+
+boss_health_surface = pygame.Surface(BOSS_HP_BAR_SIZE, pygame.SRCALPHA)
 
 boss_hp_bar_rect = ui.boss_hp_bar_empty.get_rect()
 boss_hp_bar_rect.center = BOSS_HP_BAR_POS
@@ -85,27 +92,24 @@ def draw_damage_overlay():
         entity_manager.hero.has_taken_damage = False
 
 def draw_health_bar():
-    health_surface = pygame.Surface(HEALTH_BAR_SIZE, pygame.SRCALPHA)
-
     health_step = HEALTH_LENGTH / (entity_manager.hero.maxhealth)
     missing_health = entity_manager.hero.maxhealth - entity_manager.hero.health
 
+    health_surface.fill((0,0,255))
     health_surface.blit(ui.health_bar_health,(-health_step*missing_health,0))
     health_surface.blit(ui.health_bar_health_mask,(0,0))
-    health_surface.set_colorkey((0,0,255,255))
+    screen.blit(ui.outer_shadow, HEALTH_BAR_POS)
     screen.blit(ui.health_bar_empty, HEALTH_BAR_POS)
     screen.blit(health_surface, HEALTH_BAR_POS)
     screen.blit(ui.inner_shadow,HEALTH_BAR_POS)
 
 def draw_boss_hp_bar():
-    health_surface = pygame.Surface(BOSS_HP_BAR_SIZE, pygame.SRCALPHA)
-
     health_step = BOSS_HP_LENGTH / (entity_manager.boss.maxhealth)
     missing_health = entity_manager.boss.maxhealth - entity_manager.boss.health
 
-    health_surface.blit(ui.boss_hp_bar_health,(-health_step*missing_health,0))
-    health_surface.blit(ui.boss_hp_bar_mask,(0,0))
-    health_surface.set_colorkey((0,0,255))
+    boss_health_surface.blit(ui.boss_hp_bar_health,(-health_step*missing_health,0))
+    boss_health_surface.blit(ui.boss_hp_bar_mask,(0,0))
+    boss_health_surface.set_colorkey((0,0,255))
     screen.blit(ui.boss_hp_bar_empty, boss_hp_bar_rect)
     screen.blit(health_surface, boss_hp_bar_rect)
 

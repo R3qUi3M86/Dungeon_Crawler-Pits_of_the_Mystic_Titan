@@ -12,6 +12,7 @@ from entities.level.level import *
 from entities.characters.monster import Monster
 from entities.characters.player import Hero
 from entities.items.item import Item
+from utilities.profile import profile
 
 entities_id = []
 picked_up_item_names = []
@@ -97,8 +98,8 @@ def initialize_game():
     initialize_player()
     initialize_all_entities_and_shadows_sprite_group_matrix()
     generate_items()
-    #fill_map_with_monsters(3)
-    generate_monsters()
+    fill_map_with_monsters(20)
+    #generate_monsters()
     update_far_proximity_matrices_and_lists()
     finish_init()
 
@@ -299,6 +300,9 @@ def finish_init():
     hero.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(hero.tile_index)
     hero.direct_proximity_collision_tiles = get_direct_proximity_objects_list(hero.direct_proximity_index_matrix)
     hero.direct_proximity_monsters = get_direct_proximity_objects_list(hero.direct_proximity_index_matrix, MONSTER)
+    update_far_proximity_non_player_entities_position(far_proximity_character_sprites_list)
+    update_far_proximity_non_player_entities_position(far_proximity_item_sprites_list)
+    update_far_proximity_non_player_entities_position(far_proximity_projectile_sprites_list)
 
 #Getters
 def get_entity_sprite_group_by_id_from_matrix_cell(entity_id, tile_index, type=SHADOW):
@@ -408,6 +412,7 @@ def update_all_objects_in_far_proximity():
 
     for liquid_sprite in far_proximity_level_liquids_sprites_list:
         liquid_sprite.update()
+
 
 def update_all_objects_position_in_far_proximity():
     if round(hero.speed_scalar[0],2) != 0.00 or round(hero.speed_scalar[1],2) != 0.00:
@@ -1133,7 +1138,7 @@ def fill_map_with_monsters(density):
             if tile.TYPE == FLOOR and tile.tile_index is not hero.tile_index:
                 result = random.choice(range(1,101))
                 if result <= density:
-                    generate_monster((tile.tile_index[0],tile.tile_index[1]),DARK_BISHOP,SECTOR_S)
+                    generate_monster((tile.tile_index[0],tile.tile_index[1]),ETTIN,SECTOR_S)
 
 def generate_monster(tile_index, monster_type, facing_dir):
     global all_entity_and_shadow_sprite_group_matrix
