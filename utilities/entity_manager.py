@@ -30,6 +30,12 @@ primary_wall_sprites_matrix = [[]]
 secondary_wall_sprites_matrix = [[]]
 all_entity_and_shadow_sprite_group_matrix = [[[]]]
 
+
+### Sprite Sorting ###
+sorting_timer = 20
+sorting_timer_limit = 20
+sorted_entity_matrix = [[]]
+
 ### Far proximity ###
 #Matrices
 far_proximity_index_matrix = [[]] #Only indices
@@ -98,8 +104,8 @@ def initialize_game():
     initialize_player()
     initialize_all_entities_and_shadows_sprite_group_matrix()
     generate_items()
-    fill_map_with_monsters(20)
-    #generate_monsters()
+    #fill_map_with_monsters(20)
+    generate_monsters()
     update_far_proximity_matrices_and_lists()
     finish_init()
 
@@ -1113,6 +1119,10 @@ def move_entity_in_all_matrices(entity_id, entity_type, old_tile_index, new_tile
 
 #Shadow objects
 def remove_entity_shadow_from_the_game(entity):
+    global sorting_timer
+
+    sorting_timer = sorting_timer_limit
+
     tile_index = entity.tile_index
 
     shadow_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(entity.id, tile_index, type=SHADOW)
@@ -1169,6 +1179,7 @@ def summon_new_monster(monster_type, tile_index, summon_mode=SUMMON_MONSTER):
     if summon_mode == SUMMON_MONSTER:
         sound_player.portal_open_sound.play()
         new_monster.is_summoned = True
+        order_sprites()
     
     elif summon_mode == BOSS_ENTRY:
         boss = new_monster
@@ -1189,6 +1200,10 @@ def summon_new_monster(monster_type, tile_index, summon_mode=SUMMON_MONSTER):
         far_proximity_character_sprites_list.append(new_monster)
 
 def remove_monster_from_the_game(monster):
+    global sorting_timer
+
+    sorting_timer = sorting_timer_limit
+
     tile_index = monster.tile_index
 
     monster_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(monster.id, tile_index, type=MONSTER)
@@ -1249,6 +1264,10 @@ def put_item_in_matrices_and_lists(new_item):
     far_proximity_item_sprites_list.append(new_item)
 
 def remove_item_from_the_map(item):
+    global sorting_timer
+
+    sorting_timer = sorting_timer_limit
+
     tile_index = item.tile_index
 
     far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
@@ -1361,6 +1380,10 @@ def put_projectile_in_matrices_and_lists(new_projectile):
     far_proximity_projectile_sprites_list.append(new_projectile)
 
 def remove_projectile_from_from_matrices_and_lists(projectile):
+    global sorting_timer
+
+    sorting_timer = sorting_timer_limit
+
     tile_index = projectile.tile_index
     far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
 
@@ -1408,6 +1431,28 @@ def print_all_matrices_and_lists():
     print(far_proximity_primary_wall_sprites_list)
     print(far_proximity_secondary_wall_sprites_list)
     print(far_proximity_level_liquids_sprites_list)
+
+def order_sprites():
+    global sorted_entity_matrix
+
+    sorted_entity_matrix = []
+    hero_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(hero.tile_index)
+
+    for i, row in enumerate(far_proximity_entity_sprite_group_matrix):
+        sorted_entities_row = []
+        
+        for j, cell in enumerate(row):
+            if (i,j) == hero_matrix_index:
+                sorted_entities_row.append(hero_sprite_group)
+            for entity in cell:
+                sorted_entities_row.append(entity)
+                
+        
+        for _ in range(len(sorted_entities_row)-1):
+            for j in range(len(sorted_entities_row)-1):
+                if sorted_entities_row[j].sprite.map_position[Y] > sorted_entities_row[j+1].sprite.map_position[Y]:
+                    sorted_entities_row[j], sorted_entities_row[j+1] = sorted_entities_row[j+1], sorted_entities_row[j]
+        sorted_entity_matrix.append(sorted_entities_row)
 
 #Conditions
 def entity_is_in_far_proximity_matrix(new_tile_index):

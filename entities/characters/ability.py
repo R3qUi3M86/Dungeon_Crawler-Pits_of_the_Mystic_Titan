@@ -29,6 +29,7 @@ class Ability():
         self.is_being_used = False
 
         #Blur visual effect variables
+        self.blur_image_surf = pygame.Surface((161, 145), SRCALPHA)
         self.monster_original_img_disp_corr = owner.IMAGE_DISPLAY_CORRECTION
         self.monster_original_image = pygame.Surface(self.monster.image.get_size(),SRCALPHA)
         self.monster_1_blur_image = pygame.Surface(self.monster.image.get_size(),SRCALPHA)
@@ -95,8 +96,6 @@ class Ability():
         self.monster_current_pos = self.monster.map_position
         self.monster.IMAGE_DISPLAY_CORRECTION = 38
 
-        new_image_surf = pygame.Surface((161, 145), SRCALPHA)
-
         x_1_delta = self.monster_1_frame_back_pos[0]-self.monster_current_pos[0]
         x_2_delta = self.monster_2_frame_back_pos[0]-self.monster_current_pos[0]
         x_3_delta = self.monster_3_frame_back_pos[0]-self.monster_current_pos[0]
@@ -113,32 +112,34 @@ class Ability():
         blur_4_pos = 35+x_4_delta, 35+y_4_delta
         blur_5_pos = 35+x_5_delta, 35+y_5_delta
 
+        self.blur_image_surf.fill((0,0,0,0))
+
         if y_1_delta <= 0:
             if self.use_speed_timer <= self.use_speed-0.0167*5:
-                new_image_surf.blit(self.monster_2_blur_image,(blur_5_pos))
+                self.blur_image_surf.blit(self.monster_2_blur_image,(blur_5_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*4:
-                new_image_surf.blit(self.monster_1_blur_image,(blur_4_pos))
+                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_4_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*3:
-                new_image_surf.blit(self.monster_1_blur_image,(blur_3_pos))
+                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_3_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*2:
-                new_image_surf.blit(self.monster_2_blur_image,(blur_2_pos))
+                self.blur_image_surf.blit(self.monster_2_blur_image,(blur_2_pos))
             if self.use_speed_timer <= self.use_speed-0.0167:
-                new_image_surf.blit(self.monster_1_blur_image,(blur_1_pos))
-            new_image_surf.blit(self.monster_original_image,(35,35))
+                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_1_pos))
+            self.blur_image_surf.blit(self.monster_original_image,(35,35))
         else:
-            new_image_surf.blit(self.monster_original_image,(35,35))
+            self.blur_image_surf.blit(self.monster_original_image,(35,35))
             if self.use_speed_timer <= self.use_speed-0.0167:
-                new_image_surf.blit(self.monster_1_blur_image,(blur_1_pos))
+                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_1_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*2:
-                new_image_surf.blit(self.monster_2_blur_image,(blur_2_pos))
+                self.blur_image_surf.blit(self.monster_2_blur_image,(blur_2_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*3:
-                new_image_surf.blit(self.monster_1_blur_image,(blur_3_pos))
+                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_3_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*4:
-                new_image_surf.blit(self.monster_1_blur_image,(blur_4_pos))
+                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_4_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*5:
-                new_image_surf.blit(self.monster_2_blur_image,(blur_5_pos))
+                self.blur_image_surf.blit(self.monster_2_blur_image,(blur_5_pos))
 
-        self.monster.image = new_image_surf
+        self.monster.image = self.blur_image_surf
 
     def use_teleport_blur_ability(self):
         self.set_blur_visual_effects()
@@ -158,6 +159,7 @@ class Ability():
         travel_speed = util.get_travel_speed(random_angle, movement_speed)
         self.travel_speed = travel_speed
         self.monster.speed_vector = travel_speed
+        self.monster.rect = self.blur_image_surf.get_rect(midbottom = (self.monster.image_position))
         
         sound_player.play_ability_use_sound(self.NAME)
 
@@ -203,6 +205,7 @@ class Ability():
             if self.NAME is TELEPORT_BLUR:
                 self.monster.IMAGE_DISPLAY_CORRECTION = self.monster_original_img_disp_corr
                 self.monster.image = self.monster_original_image
+                self.monster.rect = self.monster.image.get_rect(midbottom = (self.monster.image_position))
                 self.monster.can_collide_with_player = True
         self.use_speed_timer += 0.0167
 

@@ -198,7 +198,7 @@ class Monster(pygame.sprite.Sprite):
             
             if not self.monster_ai.is_using_ability:
                 self.update_animation()
-            self.rect = self.image.get_rect(midbottom = (self.image_position))
+            self.rect.midbottom = self.image_position
 
         else:
             self.deactivate()
@@ -211,7 +211,7 @@ class Monster(pygame.sprite.Sprite):
         else:
             self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
-        self.rect.center = self.image_position
+        self.rect.midbottom = self.image_position
         self.update_owned_sprites_position()
     
 

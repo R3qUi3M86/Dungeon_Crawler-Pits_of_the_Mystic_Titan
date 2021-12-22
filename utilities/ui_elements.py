@@ -111,7 +111,7 @@ def draw_boss_hp_bar():
     boss_health_surface.blit(ui.boss_hp_bar_mask,(0,0))
     boss_health_surface.set_colorkey((0,0,255))
     screen.blit(ui.boss_hp_bar_empty, boss_hp_bar_rect)
-    screen.blit(health_surface, boss_hp_bar_rect)
+    screen.blit(boss_health_surface, boss_hp_bar_rect)
 
 def draw_weapon_ammo_counter():
     screen.blit(ui.ammo_counter_overlay2, AMMO_COUNTER_BOX_POS)

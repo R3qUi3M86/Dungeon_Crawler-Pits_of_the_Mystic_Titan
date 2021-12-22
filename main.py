@@ -20,9 +20,6 @@ clock = pygame.time.Clock()
 mouse_input_pause = False
 mouse_input_pause_timer = 0
 playing_cutscene = False
-sorting_timer = 20
-sorting_timer_limit = 20
-sorted_entity_matrix = [[]]
 wall_drawing_mode = VISIBLE
 game_won_delay = 0
 game_won_delay_limit = 2
@@ -183,36 +180,11 @@ def check_win_conditions():
 
 #Visuals drawing and sorting
 def increment_sprite_sorting_timer():
-    global sorting_timer
+    entity_manager.sorting_timer += 1
+    if entity_manager.sorting_timer >= entity_manager.sorting_timer_limit:
+        entity_manager.order_sprites()
+        entity_manager.sorting_timer = 0
 
-    sorting_timer += 1
-    if sorting_timer >= sorting_timer_limit:
-        order_sprites()
-        sorting_timer = 0
-
-def order_sprites():
-    global sorted_entity_matrix
-    
-    sorted_entity_matrix = []
-    hero_matrix_index = entity_manager.get_far_proximity_entity_and_shadow_matrix_index(entity_manager.hero.tile_index)
-
-    for i, row in enumerate(entity_manager.far_proximity_entity_sprite_group_matrix):
-        sorted_entities_row = []
-        
-        for j, cell in enumerate(row):
-            if (i,j) == hero_matrix_index:
-                sorted_entities_row.append(entity_manager.hero_sprite_group)
-            for entity in cell:
-                sorted_entities_row.append(entity)
-                
-        
-        for _ in range(len(sorted_entities_row)-1):
-            for j in range(len(sorted_entities_row)-1):
-                if sorted_entities_row[j].sprite.map_position[Y] > sorted_entities_row[j+1].sprite.map_position[Y]:
-                    sorted_entities_row[j], sorted_entities_row[j+1] = sorted_entities_row[j+1], sorted_entities_row[j]
-        sorted_entity_matrix.append(sorted_entities_row)
-
-    #return sorted_entity_matrix
 
 def draw_sprites():
     translation_vector = level_painter.get_level_surface_translation_vector()
@@ -235,8 +207,7 @@ def draw_sprites():
     if cutscene_manager.playing_cutscene:
         cutscene_manager.play_cutscene(BOSS_ENTRY)
 
-    #sorted_entity_matrix = order_sprites()
-    for row in sorted_entity_matrix: 
+    for row in entity_manager.sorted_entity_matrix: 
         for entity in row:
             entity.draw(screen)
             # if entity.sprite.TYPE is PROJECTILE:
@@ -283,7 +254,7 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.test_map #level_painter.levels[0]
+    level_painter.level_layout = level_painter.levels[3] #level_painter.test_map
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
@@ -368,7 +339,7 @@ def main_game_loop():
 
         #Other
         increment_ambient_sound_timer()
-        pygame.display.update()
+        pygame.display.flip()
         clock.tick(60)
         if entity_manager.hero.tile_index in level_painter.cutscene_tile_indices and level_painter.level_layout is level_painter.level_04_map and not cutscene_manager.playing_cutscene:
             cutscene_manager.playing_cutscene = True

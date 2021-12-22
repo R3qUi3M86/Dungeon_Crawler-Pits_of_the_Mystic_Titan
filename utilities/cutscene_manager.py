@@ -113,6 +113,7 @@ def play_boss_entry_cutscene():
             boss_entry_animation_index = (len(boss_entry_animation)-1)*boss_entry_animation_timer/boss_entry_animation_timer_limit
             if boss_entry_animation_timer >= boss_entry_animation_timer_limit:
                 entity_manager.summon_new_monster(IRON_LICH,(cutscene_tile_index[0], cutscene_tile_index[1]),BOSS_ENTRY)
+                entity_manager.order_sprites()
                 deactivate_all_monsters()
                 portal_animation_index = len(portal_animation)-1
                 portal_animation_timer = portal_animation_timer_limit
