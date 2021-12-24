@@ -16,7 +16,7 @@ from sounds import sound_player
 
 PROJECTILE_DISPLAY_CORRECTION = {CROSSBOW_BOLT:-30, NECRO_BALL:-5, MAGIC_MISSILE:-30, SPIKE_BALL:-15, SPIKE_SHARD:-30, WHIRLWIND:0, RED_ORB:-5}
 PROJECTILE_SPEED_DICT = {CROSSBOW_BOLT:13, NECRO_BALL:8, MAGIC_MISSILE:6, SPIKE_BALL:8, SPIKE_SHARD:13, WHIRLWIND:4, RED_ORB:5}
-PROJECTILE_SIZE_DICT = {CROSSBOW_BOLT:(15, 8), NECRO_BALL:(20, 11), MAGIC_MISSILE:(13, 7), SPIKE_BALL:(15, 8), SPIKE_SHARD:(9, 5), WHIRLWIND:(60, 34), RED_ORB:(18, 10)}
+PROJECTILE_SIZE_DICT = {CROSSBOW_BOLT:(15, 8), NECRO_BALL:(20, 11), MAGIC_MISSILE:(13, 7), SPIKE_BALL:(15, 8), SPIKE_SHARD:(9, 5), WHIRLWIND:(60, 34), RED_ORB:(20, 11)}
 PROJECTILE_STATIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot[0], NECRO_BALL:necrolight_ball_shot[0], MAGIC_MISSILE:bishop_magic_missile_shot[0], SPIKE_BALL:spike_ball[0], SPIKE_SHARD:spike_shard[0], WHIRLWIND:whirlwind[0], RED_ORB:red_orb[0]}
 PROJECTILE_DYNAMIC_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_shot, NECRO_BALL:necrolight_ball_shot, MAGIC_MISSILE:bishop_magic_missile_shot, SPIKE_BALL:spike_ball, SPIKE_SHARD:spike_shard, WHIRLWIND:whirlwind, RED_ORB:red_orb}
 PROJECTILE_DESTRUCT_IMG_DICT = {CROSSBOW_BOLT:emerald_crossbow_bolt_destruct, NECRO_BALL:necrolight_ball_destruct, MAGIC_MISSILE:bishop_magic_missile_destruct, SPIKE_BALL:spike_ball_destruct, SPIKE_SHARD:[spike_shard_destruct], WHIRLWIND:whirlwind_destruct, RED_ORB:red_orb_destruct}
@@ -270,7 +270,7 @@ class Projectile(pygame.sprite.Sprite):
     #Special behaviours
     def launch_spike_shards(self):
         for i in range(12):
-            combat_manager.launch_projectile(self.tile_index,self.position,self.map_position,i*30,self,MONSTER,-3)
+            combat_manager.launch_projectile(self.tile_index,self.position,self.map_position,i*30,self,MONSTER,-2)
 
     def deal_aoe_damage(self):
         if not entity_manager.hero.is_dead and not entity_manager.hero.is_overkilled and util.elipses_intersect(self.map_position,entity_manager.hero.map_position,(80,44), entity_manager.hero.size):

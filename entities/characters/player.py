@@ -8,6 +8,7 @@ from utilities import util
 from utilities.text_printer import *
 from utilities.constants import *
 from utilities import entity_manager
+from utilities import collision_manager
 from images.characters.fighter_images import *
 from entities.shadow import Shadow
 from entities.colliders.collider import Collider
@@ -29,6 +30,8 @@ class Hero(pygame.sprite.Sprite):
         self.direct_proximity_index_matrix = []
         self.direct_proximity_collision_tiles = []
         self.direct_proximity_monsters = []
+        self.direct_proximity_items = []
+        self.direct_proximity_projectiles = []
         self.position = position
         self.map_position = 0,0
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
@@ -92,6 +95,7 @@ class Hero(pygame.sprite.Sprite):
         self.is_dead = False
         self.is_corpse = False
         self.can_collide = True
+        self.has_collided = False
         self.is_summoned = False
 
         ###Character properties###
@@ -136,16 +140,65 @@ class Hero(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom = (self.image_position))
 
     def update_position(self,vector):
-        self.map_position = round(self.map_position[0] + vector[0],2),round(self.map_position[1] + vector[1],2)
-        self.tile_index = util.get_tile_index(self.map_position)
+        traveled_distance_x = 0
+        traveled_distance_y = 0
+        frame_travel_x = self.speed_vector[0] * t_ctrl.dt
+        frame_travel_y = self.speed_vector[1] * t_ctrl.dt
+        x_travel = self.speed_vector[0]
+        y_travel = self.speed_vector[1]
+
+        if abs(x_travel) > 6 and abs(x_travel) > abs(y_travel):
+            proportion = y_travel/x_travel
+            if x_travel > 0:
+                x_travel = 6
+            else:
+                x_travel = -6
+            y_travel = x_travel * proportion
         
-        if self.tile_index != self.prevous_tile_index:
-            self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-            self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
-            self.direct_proximity_monsters = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, MONSTER)
-            entity_manager.update_far_proximity_matrices_and_lists(util.get_tile_offset(self.prevous_tile_index, self.tile_index))
-            #entity_manager.move_entity_in_all_matrices(self.id, self.TYPE, self.prevous_tile_index, self.tile_index)
-            self.prevous_tile_index = self.tile_index
+        elif abs(y_travel) > 4 and abs(y_travel) > abs(x_travel):
+            proportion = x_travel/y_travel
+            if y_travel > 0:
+                y_travel = 4
+            else:
+                y_travel = -4
+            x_travel = y_travel * proportion
+
+        while not self.has_collided and (abs(traveled_distance_x) < abs(frame_travel_x) or abs(traveled_distance_y) < abs(frame_travel_y)):
+            if abs(frame_travel_x) - abs(traveled_distance_x) <= abs(x_travel):
+                x_travel = frame_travel_x - traveled_distance_x
+            if abs(frame_travel_y) - abs(traveled_distance_y) <= abs(y_travel):
+                y_travel = frame_travel_y - traveled_distance_y
+
+            traveled_distance_x += x_travel
+            traveled_distance_y += y_travel
+
+            self.map_position = round(self.map_position[0] + x_travel,2),round(self.map_position[1] + y_travel,2)
+            self.tile_index = util.get_tile_index(self.map_position)
+            
+            if self.tile_index != self.prevous_tile_index:
+                self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+                self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
+                self.direct_proximity_monsters = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, MONSTER)
+                self.direct_proximity_items = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, ITEM)
+                self.direct_proximity_projectiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, PROJECTILE)
+                entity_manager.update_far_proximity_matrices_and_lists(util.get_tile_offset(self.prevous_tile_index, self.tile_index))
+                #entity_manager.move_entity_in_all_matrices(self.id, self.TYPE, self.prevous_tile_index, self.tile_index)
+                self.prevous_tile_index = self.tile_index
+
+            entity_manager.update_far_proximity_level_colliders_position()
+            collision_manager.character_vs_level_collision(self)
+            collision_manager.player_vs_monster_movement_collision()
+            collision_manager.player_vs_item_collision()
+            for projectile in self.direct_proximity_projectiles:
+                if projectile.launched_by == MONSTER:
+                    collision_manager.projectile_vs_entity_collision(projectile)
+
+            print(self.has_collided)
+
+            if not self.is_living:
+                break
+
+        self.has_collided = False
 
     def update_animation(self):
         if not self.is_dead:

@@ -60,6 +60,7 @@ class Monster(pygame.sprite.Sprite):
         self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
         self.direct_proximity_monsters = []
         self.direct_proximity_items = []
+        self.direct_proximity_projectiles = []
         self.position = level_painter.get_tile_position(tile_index)[0]+24, level_painter.get_tile_position(tile_index)[1]+24
         self.map_position = (tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
@@ -196,10 +197,8 @@ class Monster(pygame.sprite.Sprite):
     def update_position(self, vector=None):
         #if not self.leaving_far_proximity_matrix_margin():
         if vector:
-            self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
-            self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
-        else:
-            self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
+            self.map_position = round(self.map_position[0]+vector[0],2), round(self.map_position[1]+vector[1],2)
+        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
         self.rect.midbottom = self.image_position
         self.update_owned_sprites_position()
@@ -212,20 +211,20 @@ class Monster(pygame.sprite.Sprite):
         x_travel = self.speed_vector[0]
         y_travel = self.speed_vector[1]
 
-        if abs(x_travel) > 10 and abs(x_travel) > abs(y_travel):
+        if abs(x_travel) > 6 and abs(x_travel) > abs(y_travel):
             proportion = y_travel/x_travel
             if x_travel > 0:
-                x_travel = 10
+                x_travel = 6
             else:
-                x_travel = -10
+                x_travel = -6
             y_travel = x_travel * proportion
         
-        elif abs(y_travel) > 6 and abs(y_travel) > abs(x_travel):
+        elif abs(y_travel) > 3 and abs(y_travel) > abs(x_travel):
             proportion = x_travel/y_travel
             if y_travel > 0:
-                y_travel = 6
+                y_travel = 3
             else:
-                y_travel = -6
+                y_travel = -3
             x_travel = y_travel * proportion
         
         while not self.has_collided and (abs(traveled_distance_x) < abs(frame_travel_x) or abs(traveled_distance_y) < abs(frame_travel_y)):
@@ -237,10 +236,9 @@ class Monster(pygame.sprite.Sprite):
             traveled_distance_x += x_travel
             traveled_distance_y += y_travel
 
-            self.position = round((self.position[0] + self.speed_vector[0]),2),round((self.position[1] + self.speed_vector[1]),2)
+            self.map_position = round(self.map_position[0]+x_travel,2), round(self.map_position[1]+y_travel,2)
+            self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
             self.update_owned_sprites_position()
-
-            self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
             self.tile_index = util.get_tile_index(self.map_position)
         
             if self.tile_index != self.prevous_tile_index:
@@ -249,16 +247,20 @@ class Monster(pygame.sprite.Sprite):
                 self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
                 self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
                 self.direct_proximity_items = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, ITEM)
+                self.direct_proximity_projectiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, PROJECTILE)
                 entity_manager.update_all_nearby_monsters_and_self_direct_proximity_monsters_lists(self.direct_proximity_index_matrix)
                 entity_manager.move_entity_in_all_matrices(self.id, MONSTER, self.prevous_tile_index, self.tile_index)
                 self.prevous_tile_index = self.tile_index
 
-            if self.leaving_far_proximity_matrix_margin():
+            if self.leaving_far_proximity_matrix_margin() or not self.is_living:
                 break
 
             collision_manager.monster_vs_monster_collision(self)
             collision_manager.character_vs_level_collision(self)
             collision_manager.monster_vs_impassable_item_collison(self)
+            for projectile in self.direct_proximity_projectiles:
+                if projectile.launched_by == PLAYER:
+                    collision_manager.projectile_vs_entity_collision(projectile)
 
         self.has_collided = False
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION

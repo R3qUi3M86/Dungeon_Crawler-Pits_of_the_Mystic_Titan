@@ -376,6 +376,16 @@ def get_direct_proximity_objects_list(matrix, object_type = IMPASSABLE_TILES):
         
         return direct_proximity_item_sprites
 
+    elif object_type == PROJECTILE:
+        direct_proximity_projectile_sprites = []
+        for row in matrix:
+            for tile_index in row:
+                for entity in all_entity_and_shadow_sprite_group_matrix[tile_index[0]][tile_index[1]]:
+                    if entity.sprite.TYPE == PROJECTILE:
+                        direct_proximity_projectile_sprites.append(entity.sprite)
+        
+        return direct_proximity_projectile_sprites
+
 def get_entity_sprite_by_id(entity_id):
     for monster in all_monsters:
         if monster.id == entity_id:
@@ -426,7 +436,6 @@ def update_all_objects_position_in_far_proximity():
         update_far_proximity_non_player_entities_position(far_proximity_character_sprites_list)
         update_far_proximity_non_player_entities_position(far_proximity_item_sprites_list)
         update_far_proximity_non_player_entities_position(far_proximity_projectile_sprites_list)
-        update_far_proximity_level_colliders_position()
         update_far_proximity_primary_walls_position()
         update_far_proximity_secondary_walls_position()
 

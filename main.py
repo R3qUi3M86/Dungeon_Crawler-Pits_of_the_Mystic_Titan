@@ -89,7 +89,7 @@ def get_player_wsad_input():
             entity_manager.hero.speed_scalar = entity_manager.hero.speed_scalar[X], -30.0
 
         entity_manager.hero.speed_scalar = round(entity_manager.hero.speed_scalar[0],2),round(entity_manager.hero.speed_scalar[1],2)
-        entity_manager.hero.speed_vector = round((entity_manager.hero.speed_scalar[X]/30)*entity_manager.hero.speed * t_ctrl.dt,2), round((entity_manager.hero.speed_scalar[Y]/30)*entity_manager.hero.speed*0.55 * t_ctrl.dt,2)
+        entity_manager.hero.speed_vector = round((entity_manager.hero.speed_scalar[X]/30)*entity_manager.hero.speed,2), round((entity_manager.hero.speed_scalar[Y]/30)*entity_manager.hero.speed*0.55,2)
     
     else:
         entity_manager.hero.speed_scalar = 0,0
@@ -255,7 +255,7 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.test_map #level_painter.levels[3] #
+    level_painter.level_layout = level_painter.levels[2] #level_painter.test_map #
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
@@ -281,7 +281,7 @@ def main_game_loop():
         cursor.cursor.update()
         entity_manager.update_all_objects_position_in_far_proximity()
         entity_manager.update_all_objects_in_far_proximity()
-        collision_manager.detect_all_collisions()
+        collision_manager.wall_hider_collision()
 
         #Events
         for event in pygame.event.get():
@@ -319,7 +319,7 @@ def main_game_loop():
         draw_ui()
         cursor.cursor.draw(screen)
 
-        ################
+        ################d
         ####Debuging####
         ################
         #debug_text(f"{entity_manager.hero.map_position}")
@@ -342,7 +342,7 @@ def main_game_loop():
         t_ctrl.adjust_delta_time()
         increment_ambient_sound_timer()
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(10)
         if entity_manager.hero.tile_index in level_painter.cutscene_tile_indices and level_painter.level_layout is level_painter.level_04_map and not cutscene_manager.playing_cutscene:
             cutscene_manager.playing_cutscene = True
             level_painter.cutscene_tile_indices = []

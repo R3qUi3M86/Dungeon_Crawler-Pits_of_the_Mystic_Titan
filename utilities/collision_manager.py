@@ -11,11 +11,8 @@ wall_hider_timer = 0
 wall_hider_timer_limit = 15
 
 #Master function
-def detect_all_collisions():
+def wall_hider_collision():
     global wall_hider_timer
-    
-    player_vs_monster_movement_collision()
-    character_vs_level_collision(entity_manager.hero)
     
     if entity_manager.hero.speed_vector != 0:
         if wall_hider_timer >= wall_hider_timer_limit:
@@ -25,7 +22,6 @@ def detect_all_collisions():
             wall_hider_timer += 1 * t_ctrl.dt
 
     for item in entity_manager.far_proximity_item_sprites_list:
-        player_vs_item_collision(item)
         if item.is_falling_apart:
             item_vs_level_collision(item)
 
@@ -38,6 +34,7 @@ def player_vs_monster_movement_collision():
             collision_matrix = get_collision_matrix(entity_manager.hero, monster)
                        
             if any_sector_collider_collides(collision_matrix):
+                hero.has_collided = True
                 bump_entity_back(entity_manager.hero, monster, collision_matrix)
                 #slow_down_player()
                 if monster.monster_ai.is_idle:
@@ -54,8 +51,8 @@ def character_vs_level_collision(character):
             collision_matrix = get_collision_matrix(character,level_collision_sprite)
 
             if any_sector_collider_collides(collision_matrix):
-                character.has_collided = True
                 correct_character_position_by_vector(character,level_collision_sprite, collision_matrix)
+                character.has_collided = True
                  
                 if character.TYPE == MONSTER and character.monster_ai.is_path_finding == False and character.monster_ai.path_finding_is_ready:
                     character.monster_ai.initialize_monster_path_finding()
@@ -117,19 +114,21 @@ def projectile_vs_entity_collision(projectile_sprite):
                 if item.is_destructible:
                     item.destroy_item()
 
-def player_vs_item_collision(item_sprite):
+def player_vs_item_collision():
     hero = entity_manager.hero
 
-    if item_sprite.can_collide and util.elipses_intersect(hero.map_position, item_sprite.map_position, hero.size, item_sprite.size):
-        if item_sprite.is_pickable:
-            item_sprite.is_picked = True
-        elif item_sprite.is_destructible and not item_sprite.is_falling_apart and not item_sprite.is_destroyed and pygame.sprite.collide_mask(hero.entity_collider_omni, item_sprite.entity_tiny_omni_collider):
-            collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
-            bump_entity_back(hero, item_sprite, collision_matrix)
-            item_sprite.destroy_item()
-        elif not item_sprite.is_falling_apart and pygame.sprite.collide_mask(hero.entity_collider_omni, item_sprite.entity_collider_omni):
-            collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
-            bump_entity_back(hero, item_sprite, collision_matrix)
+    for item_sprite in hero.direct_proximity_items:
+        if item_sprite.can_collide and util.elipses_intersect(hero.map_position, item_sprite.map_position, hero.size, item_sprite.size):
+            if item_sprite.is_pickable:
+                item_sprite.is_picked = True
+            elif item_sprite.is_destructible and not item_sprite.is_falling_apart and not item_sprite.is_destroyed and pygame.sprite.collide_mask(hero.entity_collider_omni, item_sprite.entity_tiny_omni_collider):
+                collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
+                bump_entity_back(hero, item_sprite, collision_matrix)
+                item_sprite.destroy_item()
+            elif not item_sprite.is_falling_apart and pygame.sprite.collide_mask(hero.entity_collider_omni, item_sprite.entity_collider_omni):
+                collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
+                bump_entity_back(hero, item_sprite, collision_matrix)
+                hero.has_collided = True
 
 def monster_vs_impassable_item_collison(monster):
     for item_sprite in monster.direct_proximity_items:
@@ -398,12 +397,14 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
         speed_correction_vector = correction_vector
 
         if current_entity_sprite == entity_manager.hero:
-            adjust_player_speed_scalar(original_speed_scalar,speed_correction_vector,15)
-            entity_manager.hero.update_position(correction_vector)
-            entity_manager.update_far_proximity_non_player_entities_position(entity_manager.far_proximity_entity_sprites_list)
+            adjust_player_speed_scalar(original_speed_scalar,speed_correction_vector,30)
+            map_pos = entity_manager.hero.map_position
+            entity_manager.hero.map_position = round(map_pos[0] + correction_vector[0],2),round(map_pos[1] + correction_vector[1],2)
+            entity_manager.hero.tile_index = util.get_tile_index(entity_manager.hero.map_position)
+            # entity_manager.update_far_proximity_non_player_entities_position(entity_manager.far_proximity_entity_sprites_list)
             entity_manager.update_far_proximity_level_colliders_position()
-            entity_manager.update_far_proximity_primary_walls_position()
-            entity_manager.update_far_proximity_secondary_walls_position()
+            # entity_manager.update_far_proximity_primary_walls_position()
+            # entity_manager.update_far_proximity_secondary_walls_position()
         else:
             current_entity_sprite.update_position((-2*correction_vector[0],-2*correction_vector[1]))
             if entity_manager.level_sprites_matrix[colliding_tile_index[0]][colliding_tile_index[1]].is_convex == False:
