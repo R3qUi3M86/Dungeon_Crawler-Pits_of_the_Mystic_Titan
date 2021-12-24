@@ -208,32 +208,40 @@ def set_music_volume(volume):
 
 def play_item_picked_sound(item):
     if item.is_weapon:
+        weapon_pickup.stop()
         weapon_pickup.play()
     elif item.is_ammo:
+        ammo_pickup.stop()
         ammo_pickup.play()
     elif item.is_consumable:
+        consumable_pickup.stop()
         consumable_pickup.play()
     elif item.is_currency:
         random.choice(coin).play()
     elif item.NAME is LICH_EYE:
+        puzzle_pickup.stop()
         puzzle_pickup.play()
 
 def play_vase_break_sound():
+    vase_break.stop()
     vase_break.play()
 
 def play_monster_pain_sound(monster_name):
+    MONSTER_PAIN_SOUND[monster_name].stop()
     MONSTER_PAIN_SOUND[monster_name].play()
 
 def stop_monster_pain_sound(monster_name):
     MONSTER_PAIN_SOUND[monster_name].stop()
 
 def play_monster_death_sound(monster_name):
+    MONSTER_DEATH_SOUND[monster_name].stop()
     MONSTER_DEATH_SOUND[monster_name].play()
 
 def stop_monster_death_sound(monster_name):
     MONSTER_DEATH_SOUND[monster_name].stop()
 
 def play_monster_overkill_sound(monster_name):
+    MONSTER_OVERKILL_SOUND[monster_name].stop()
     MONSTER_OVERKILL_SOUND[monster_name].play()
 
 def play_monster_noise_sound(monster_name):
@@ -241,27 +249,35 @@ def play_monster_noise_sound(monster_name):
 
 def play_monster_atk_prep_sound(monster_name):
     if MONSTER_ATKPREP_SOUNDS[monster_name]:
+        MONSTER_ATKPREP_SOUNDS[monster_name].stop()
         MONSTER_ATKPREP_SOUNDS[monster_name].play()
 
 def play_melee_attack_sound(attacking_entity_name, hit):
     if hit:
         if attacking_entity_name == PLAYER:
+            hero_melee_hit_sound.stop()
             hero_melee_hit_sound.play()
         elif attacking_entity_name == ETTIN:
+            monster_melee_hit_sound.stop()
             monster_melee_hit_sound.play()
     else:
         if attacking_entity_name == PLAYER:
+            hero_melee_miss_sound.stop()
             hero_melee_miss_sound.play()
         elif attacking_entity_name == ETTIN:
+            monster_melee_miss_sound.stop()
             monster_melee_miss_sound.play()
 
 def play_ranged_attack_sound(weapon_name):
+    RANGED_WEAPON_SOUNDS_DICT[weapon_name].stop()
     RANGED_WEAPON_SOUNDS_DICT[weapon_name].play()
 
 def play_projectile_impact_sound(projectile_name):
+    PROJECTILE_HIT_SOUNDS_DICT[projectile_name].stop()
     PROJECTILE_HIT_SOUNDS_DICT[projectile_name].play()
 
 def play_ability_use_sound(ability_name):
+    ABILITIES_SOUNDS[ability_name].stop()
     ABILITIES_SOUNDS[ability_name].play()
 
 def play_consumable_use_sound(consumable_name):

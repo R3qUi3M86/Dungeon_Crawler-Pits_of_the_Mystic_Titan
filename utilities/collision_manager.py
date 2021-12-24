@@ -24,16 +24,10 @@ def detect_all_collisions():
         else:
             wall_hider_timer += 1 * t_ctrl.dt
 
-    for character in entity_manager.far_proximity_character_sprites_list:
-        monster_vs_monster_collision(character)
-        character_vs_level_collision(character)
-
     for item in entity_manager.far_proximity_item_sprites_list:
         player_vs_item_collision(item)
         if item.is_falling_apart:
             item_vs_level_collision(item)
-
-        character_vs_impassable_item_collison(item)
 
 #Collision types
 def player_vs_monster_movement_collision():
@@ -60,6 +54,7 @@ def character_vs_level_collision(character):
             collision_matrix = get_collision_matrix(character,level_collision_sprite)
 
             if any_sector_collider_collides(collision_matrix):
+                character.has_collided = True
                 correct_character_position_by_vector(character,level_collision_sprite, collision_matrix)
                  
                 if character.TYPE == MONSTER and character.monster_ai.is_path_finding == False and character.monster_ai.path_finding_is_ready:
@@ -99,6 +94,7 @@ def monster_vs_monster_collision(monster):
                 collision_matrix = get_collision_matrix(monster, character)
 
                 if any_sector_collider_collides(collision_matrix):
+                    monster.has_collided = True
                     adjust_monster_movement_vector(monster, collision_matrix)
 
 def projectile_vs_level_collision(projectile_sprite):
@@ -135,18 +131,17 @@ def player_vs_item_collision(item_sprite):
             collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
             bump_entity_back(hero, item_sprite, collision_matrix)
 
-def character_vs_impassable_item_collison(item_sprite):
-    if item_sprite.can_collide and not item_sprite.is_destructible and not item_sprite.is_pickable:
-        for monster in entity_manager.far_proximity_character_sprites_list:
+def monster_vs_impassable_item_collison(monster):
+    for item_sprite in monster.direct_proximity_items:
+        if item_sprite.can_collide and not item_sprite.is_destructible and not item_sprite.is_pickable:
             if util.elipses_intersect(monster.map_position, item_sprite.map_position, monster.size, item_sprite.size):
                 collision_matrix = get_collision_matrix(monster, item_sprite)
                 if any_sector_collider_collides(collision_matrix):
+                    monster.has_collided = True
                     if monster.monster_ai.is_path_finding == False and monster.monster_ai.path_finding_is_ready:
                         monster.monster_ai.initialize_monster_path_finding()
                     else:
                         adjust_monster_movement_vector(monster, collision_matrix)
-        
-
 
 def item_vs_level_collision(item_sprite):
     for collision_tile in item_sprite.direct_proximity_collision_tiles:

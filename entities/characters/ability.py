@@ -81,32 +81,19 @@ class Ability():
         self.monster_4_blur_image.set_alpha(80)
         self.monster_5_blur_image.set_alpha(80)
 
-        self.monster_current_pos = self.monster.map_position
-        self.monster_1_frame_back_pos = self.monster.map_position
-        self.monster_2_frame_back_pos = self.monster.map_position
-        self.monster_3_frame_back_pos = self.monster.map_position
-        self.monster_4_frame_back_pos = self.monster.map_position
-        self.monster_5_frame_back_pos = self.monster.map_position
-
     def apply_blur_visual_effect(self):
-        self.monster_5_frame_back_pos = self.monster_4_frame_back_pos
-        self.monster_4_frame_back_pos = self.monster_3_frame_back_pos
-        self.monster_3_frame_back_pos = self.monster_2_frame_back_pos
-        self.monster_2_frame_back_pos = self.monster_1_frame_back_pos
-        self.monster_1_frame_back_pos = self.monster_current_pos
-        self.monster_current_pos = self.monster.map_position
         self.monster.IMAGE_DISPLAY_CORRECTION = 38
 
-        x_1_delta = self.monster_1_frame_back_pos[0]-self.monster_current_pos[0]
-        x_2_delta = self.monster_2_frame_back_pos[0]-self.monster_current_pos[0]
-        x_3_delta = self.monster_3_frame_back_pos[0]-self.monster_current_pos[0]
-        x_4_delta = self.monster_4_frame_back_pos[0]-self.monster_current_pos[0]
-        x_5_delta = self.monster_5_frame_back_pos[0]-self.monster_current_pos[0]
-        y_1_delta = self.monster_1_frame_back_pos[1]-self.monster_current_pos[1]
-        y_2_delta = self.monster_2_frame_back_pos[1]-self.monster_current_pos[1]
-        y_3_delta = self.monster_3_frame_back_pos[1]-self.monster_current_pos[1]
-        y_4_delta = self.monster_4_frame_back_pos[1]-self.monster_current_pos[1]
-        y_5_delta = self.monster_5_frame_back_pos[1]-self.monster_current_pos[1]
+        x_1_delta = -self.travel_speed[0]
+        x_2_delta = -self.travel_speed[0]*2
+        x_3_delta = -self.travel_speed[0]*3
+        x_4_delta = -self.travel_speed[0]*4
+        x_5_delta = -self.travel_speed[0]*5
+        y_1_delta = -self.travel_speed[1]
+        y_2_delta = -self.travel_speed[1]*2
+        y_3_delta = -self.travel_speed[1]*3
+        y_4_delta = -self.travel_speed[1]*4
+        y_5_delta = -self.travel_speed[1]*5
         blur_1_pos = 35+x_1_delta, 35+y_1_delta
         blur_2_pos = 35+x_2_delta, 35+y_2_delta
         blur_3_pos = 35+x_3_delta, 35+y_3_delta
@@ -156,7 +143,7 @@ class Ability():
         elif 300 < distance_to_player or distance_to_player < 48:
             random_angle = random.choice(range(-45,46)) + angle_to_player
         
-        movement_speed = 7 * t_ctrl.dt
+        movement_speed = 7
         travel_speed = util.get_travel_speed(random_angle, movement_speed)
         self.travel_speed = travel_speed
         self.monster.speed_vector = travel_speed

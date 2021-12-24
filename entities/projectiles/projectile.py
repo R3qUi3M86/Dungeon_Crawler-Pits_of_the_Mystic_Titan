@@ -269,8 +269,8 @@ class Projectile(pygame.sprite.Sprite):
 
     #Special behaviours
     def launch_spike_shards(self):
-        for i in range(72):
-            combat_manager.launch_projectile(self.tile_index,self.position,self.map_position,i*5,self,MONSTER,-3)
+        for i in range(12):
+            combat_manager.launch_projectile(self.tile_index,self.position,self.map_position,i*30,self,MONSTER,-3)
 
     def deal_aoe_damage(self):
         if not entity_manager.hero.is_dead and not entity_manager.hero.is_overkilled and util.elipses_intersect(self.map_position,entity_manager.hero.map_position,(80,44), entity_manager.hero.size):
