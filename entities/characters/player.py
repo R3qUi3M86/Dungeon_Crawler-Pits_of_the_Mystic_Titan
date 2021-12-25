@@ -63,14 +63,14 @@ class Hero(pygame.sprite.Sprite):
         
         ###Owned sprites###
         #Colliders
-        self.entity_collider_nw    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_NW)
-        self.entity_collider_ne    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_NE)
-        self.entity_collider_sw    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_SW)
-        self.entity_collider_se    = Collider(player_position, self.id, ENTITY_SECTOR, SECTOR_SE)
-        self.entity_collider_omni  = Collider(player_position, self.id, ENTITY_OMNI)
-        self.wall_hider_collider_primary = Collider(WALL_HIDER_POSITION, self.id, WALL_HIDER1)
-        self.wall_hider_collider_secondary = Collider(WALL_HIDER_POSITION, self.id, WALL_HIDER2)
-        self.wall_hider_collider_tertiary = Collider(WALL_HIDER_POSITION, self.id, WALL_HIDER3)
+        self.entity_collider_nw    = Collider(self.map_position, self.id, ENTITY_SECTOR, SECTOR_NW)
+        self.entity_collider_ne    = Collider(self.map_position, self.id, ENTITY_SECTOR, SECTOR_NE)
+        self.entity_collider_sw    = Collider(self.map_position, self.id, ENTITY_SECTOR, SECTOR_SW)
+        self.entity_collider_se    = Collider(self.map_position, self.id, ENTITY_SECTOR, SECTOR_SE)
+        self.entity_collider_omni  = Collider(self.map_position, self.id, ENTITY_OMNI)
+        self.wall_hider_collider_primary = Collider((self.map_position[0], self.map_position[1] -48), self.id, WALL_HIDER1)
+        self.wall_hider_collider_secondary = Collider((self.map_position[0], self.map_position[1] -48), self.id, WALL_HIDER2)
+        self.wall_hider_collider_tertiary = Collider((self.map_position[0], self.map_position[1] -48), self.id, WALL_HIDER3)
 
         #Shadow
         self.shadow = Shadow(player_position, self.map_position, PLAYER_ID, SIZE_SMALL)
@@ -100,7 +100,7 @@ class Hero(pygame.sprite.Sprite):
 
         ###Character properties###
         #General
-        self.maxhealth = 25
+        self.maxhealth = 2500
         self.health = self.maxhealth
 
         #Combat
@@ -163,7 +163,7 @@ class Hero(pygame.sprite.Sprite):
                 y_travel = -4
             x_travel = y_travel * proportion
 
-        while not self.has_collided and (abs(traveled_distance_x) < abs(frame_travel_x) or abs(traveled_distance_y) < abs(frame_travel_y)):
+        while 1:
             if abs(frame_travel_x) - abs(traveled_distance_x) <= abs(x_travel):
                 x_travel = frame_travel_x - traveled_distance_x
             if abs(frame_travel_y) - abs(traveled_distance_y) <= abs(y_travel):
@@ -185,7 +185,7 @@ class Hero(pygame.sprite.Sprite):
                 #entity_manager.move_entity_in_all_matrices(self.id, self.TYPE, self.prevous_tile_index, self.tile_index)
                 self.prevous_tile_index = self.tile_index
 
-            entity_manager.update_far_proximity_level_colliders_position()
+            self.update_colliders_position()
             collision_manager.character_vs_level_collision(self)
             collision_manager.player_vs_monster_movement_collision()
             collision_manager.player_vs_item_collision()
@@ -193,12 +193,14 @@ class Hero(pygame.sprite.Sprite):
                 if projectile.launched_by == MONSTER:
                     collision_manager.projectile_vs_entity_collision(projectile)
 
-            print(self.has_collided)
-
-            if not self.is_living:
+            if not self.is_living or self.has_collided or (abs(traveled_distance_x) >= abs(frame_travel_x) and abs(traveled_distance_y) >= abs(frame_travel_y)):
                 break
 
         self.has_collided = False
+
+    def update_colliders_position(self):
+        for collider in self.entity_collider_sprites:
+            collider.update_position(self.map_position)
 
     def update_animation(self):
         if not self.is_dead:

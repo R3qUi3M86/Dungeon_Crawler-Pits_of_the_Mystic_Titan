@@ -194,11 +194,11 @@ def draw_sprites():
     for tile in entity_manager.far_proximity_level_liquids_sprites_list:
         if tile.is_animated:
             tile.update()
-            screen.blit(tile.image,tile.position)
+            screen.blit(tile.image,tile.disp_rect)
 
     if wall_drawing_mode == VISIBLE:
         for tile in entity_manager.far_proximity_primary_wall_sprites_list:
-            screen.blit(tile.image,tile.position)
+            screen.blit(tile.image,tile.disp_rect)
 
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
         #shadow.draw(screen)
@@ -218,13 +218,13 @@ def draw_sprites():
     if wall_drawing_mode == VISIBLE:
         for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
             if tile.is_hiding_player_prim:
-                screen.blit(tile.alpha_image1,tile.position)
+                screen.blit(tile.alpha_image1,tile.disp_rect)
             elif tile.is_hiding_player_sec:
-                screen.blit(tile.alpha_image2,tile.position)
+                screen.blit(tile.alpha_image2,tile.disp_rect)
             elif tile.is_hiding_player_tert:
-                screen.blit(tile.alpha_image3,tile.position)
+                screen.blit(tile.alpha_image3,tile.disp_rect)
             else:
-                screen.blit(tile.image,tile.position)
+                screen.blit(tile.image,tile.disp_rect)
 
               
 def draw_ui():
@@ -255,7 +255,7 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.levels[2] #level_painter.test_map #
+    level_painter.level_layout = level_painter.levels[3] #level_painter.test_map #
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
@@ -319,17 +319,18 @@ def main_game_loop():
         draw_ui()
         cursor.cursor.draw(screen)
 
-        ################d
+        ################
         ####Debuging####
         ################
-        #debug_text(f"{entity_manager.hero.map_position}")
-        #debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
+        debug_text(f"{entity_manager.hero.map_position}")
+        debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
         #debug_text(f"109 pos: {entity_manager.hero.direct_proximity_collision_tiles[1].map_position}",x = 10, y = 30)
         #debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
         #debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
-        # debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(0).position}",x = 10, y = 60)
-        # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).tile_index}",x = 10, y = 90)
-        # debug_text(f"mon 0 current_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).current_tile_position}",x = 10, y = 60)
+        #debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(1).position}",x = 10, y = 45)
+        #debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(1).map_position}",x = 10, y = 60)
+        #debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(1).tile_index}", x=10, y=75)
+        #debug_text(f"mon 0 current_tile_map_pos: {entity_manager.get_entity_sprite_by_id(1).map_position}",x = 10, y = 75)s
         # debug_text(f"mon 0 prvous_tile_map_pos: {entity_manager.get_entity_sprite_by_id(0).previous_tile_position}",x = 10, y = 75)
         # debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(0).map_position}",x = 10, y = 90)
         # debug_text(f"mon 1 map_pos: {entity_manager.get_entity_sprite_by_id(1).tile_index}",x = 10, y = 90)

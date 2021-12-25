@@ -108,6 +108,7 @@ def draw_boss_hp_bar():
     health_step = BOSS_HP_LENGTH / (entity_manager.boss.maxhealth)
     missing_health = entity_manager.boss.maxhealth - entity_manager.boss.health
 
+    boss_health_surface.fill((0,0,255))
     boss_health_surface.blit(ui.boss_hp_bar_health,(-health_step*missing_health,0))
     boss_health_surface.blit(ui.boss_hp_bar_mask,(0,0))
     boss_health_surface.set_colorkey((0,0,255))

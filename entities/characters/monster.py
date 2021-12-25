@@ -54,16 +54,15 @@ class Monster(pygame.sprite.Sprite):
         ###Position variables###
         self.tile_index = tile_index
         self.prevous_tile_index = tile_index
-        self.current_tile_position = (tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
+        self.current_tile_position = int(self.tile_index[1] * level_painter.TILE_SIZE[X]+screen_width//2), int(self.tile_index[0] * level_painter.TILE_SIZE[Y] + screen_height//2)
         self.previous_tile_position = self.current_tile_position
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
         self.direct_proximity_monsters = []
         self.direct_proximity_items = []
         self.direct_proximity_projectiles = []
-        self.position = level_painter.get_tile_position(tile_index)[0]+24, level_painter.get_tile_position(tile_index)[1]+24
-        self.map_position = (tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
-        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
+        self.map_position = int(self.tile_index[1] * level_painter.TILE_SIZE[X]+screen_width//2), int(self.tile_index[0] * level_painter.TILE_SIZE[Y] + screen_height//2)
+        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
         
         ###Object ID###
         self.id = util.generate_entity_id()
@@ -98,11 +97,11 @@ class Monster(pygame.sprite.Sprite):
 
         ###Owned sprites###
         #Colliders
-        self.entity_collider_nw    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NW)
-        self.entity_collider_ne    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_NE)
-        self.entity_collider_sw    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SW)
-        self.entity_collider_se    = Collider(self.position, self.id, ENTITY_SECTOR, SECTOR_SE)
-        self.entity_collider_omni  = Collider(player_position, self.id, ENTITY_OMNI)
+        self.entity_collider_nw    = Collider(self.map_position, self.id, ENTITY_SECTOR, SECTOR_NW)
+        self.entity_collider_ne    = Collider(self.map_position, self.id, ENTITY_SECTOR, SECTOR_NE)
+        self.entity_collider_sw    = Collider(self.map_position, self.id, ENTITY_SECTOR, SECTOR_SW)
+        self.entity_collider_se    = Collider(self.map_position, self.id, ENTITY_SECTOR, SECTOR_SE)
+        self.entity_collider_omni  = Collider(self.map_position, self.id, ENTITY_OMNI)
 
         #Shadow
         self.shadow = Shadow(self.position, self.map_position, self.id, MONSTER_SHADOW_SIZE[name], self.tile_index)
@@ -113,7 +112,7 @@ class Monster(pygame.sprite.Sprite):
 
         ###Initial sprite definition###
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
-        self.rect = self.image.get_rect(midbottom = (self.image_position))
+        self.rect = self.image.get_rect(midbottom = (self.position))
         self.monster_ai = self.get_monster_ai()
 
         #####General variables#####
@@ -174,7 +173,6 @@ class Monster(pygame.sprite.Sprite):
             if not self.is_summoned:
                 if not self.is_dead:
                     self.update_position_and_detect_collisions()
-                    
                     self.update_decisions()
 
                 elif not self.is_corpse:
@@ -189,18 +187,16 @@ class Monster(pygame.sprite.Sprite):
             
             if not self.monster_ai.is_using_ability:
                 self.update_animation()
-            self.rect = self.image.get_rect(midbottom = self.image_position)
+            self.rect = self.image.get_rect(midbottom = self.position)
 
         else:
             self.deactivate()
 
     def update_position(self, vector=None):
-        #if not self.leaving_far_proximity_matrix_margin():
         if vector:
             self.map_position = round(self.map_position[0]+vector[0],2), round(self.map_position[1]+vector[1],2)
-        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
-        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
-        self.rect.midbottom = self.image_position
+        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1] + self.IMAGE_DISPLAY_CORRECTION,2)
+        self.rect.midbottom = self.position
         self.update_owned_sprites_position()
     
     def update_position_and_detect_collisions(self):
@@ -227,7 +223,7 @@ class Monster(pygame.sprite.Sprite):
                 y_travel = -3
             x_travel = y_travel * proportion
         
-        while not self.has_collided and (abs(traveled_distance_x) < abs(frame_travel_x) or abs(traveled_distance_y) < abs(frame_travel_y)):
+        while 1:
             if abs(frame_travel_x) - abs(traveled_distance_x) <= abs(x_travel):
                 x_travel = frame_travel_x - traveled_distance_x
             if abs(frame_travel_y) - abs(traveled_distance_y) <= abs(y_travel):
@@ -237,13 +233,12 @@ class Monster(pygame.sprite.Sprite):
             traveled_distance_y += y_travel
 
             self.map_position = round(self.map_position[0]+x_travel,2), round(self.map_position[1]+y_travel,2)
-            self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
             self.update_owned_sprites_position()
             self.tile_index = util.get_tile_index(self.map_position)
         
             if self.tile_index != self.prevous_tile_index:
-                self.previous_tile_position = (self.prevous_tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.prevous_tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
-                self.current_tile_position = (self.tile_index[Y]+1)*TILE_SIZE[Y]-TILE_SIZE[Y]//2+screen_width//2, (self.tile_index[X]+1)*TILE_SIZE[X]-TILE_SIZE[X]//2+screen_height//2
+                self.previous_tile_position = self.current_tile_position
+                self.current_tile_position = int(self.tile_index[1] * level_painter.TILE_SIZE[X]+screen_width//2), int(self.tile_index[0] * level_painter.TILE_SIZE[Y] + screen_height//2)
                 self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
                 self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
                 self.direct_proximity_items = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, ITEM)
@@ -252,9 +247,6 @@ class Monster(pygame.sprite.Sprite):
                 entity_manager.move_entity_in_all_matrices(self.id, MONSTER, self.prevous_tile_index, self.tile_index)
                 self.prevous_tile_index = self.tile_index
 
-            if self.leaving_far_proximity_matrix_margin() or not self.is_living:
-                break
-
             collision_manager.monster_vs_monster_collision(self)
             collision_manager.character_vs_level_collision(self)
             collision_manager.monster_vs_impassable_item_collison(self)
@@ -262,8 +254,11 @@ class Monster(pygame.sprite.Sprite):
                 if projectile.launched_by == PLAYER:
                     collision_manager.projectile_vs_entity_collision(projectile)
 
+            if self.leaving_far_proximity_matrix_margin() or not self.is_living or self.has_collided or (abs(traveled_distance_x) >= abs(frame_travel_x) and abs(traveled_distance_y) >= abs(frame_travel_y)):
+                break
+
         self.has_collided = False
-        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
+        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1] + self.IMAGE_DISPLAY_CORRECTION,2)
 
     def update_decisions(self):
         if self.is_living:
@@ -328,7 +323,7 @@ class Monster(pygame.sprite.Sprite):
         for auxilary_sprites_row in self.entity_auxilary_sprites:
             for auxilary_sprite in auxilary_sprites_row:
                 auxilary_sprite.tile_index = self.tile_index
-                auxilary_sprite.update_position(self.position)
+                auxilary_sprite.update_position(self.map_position)
     
     def update_abilities(self):
         for ability in self.abilities:
@@ -506,7 +501,7 @@ class Monster(pygame.sprite.Sprite):
                 
         if not self.is_preparing_attack and not self.is_attacking:
             self.is_preparing_attack = True
-            self.facing_direction = util.get_facing_direction(self.position,player_position)
+            self.facing_direction = util.get_facing_direction(self.map_position,entity_manager.hero.map_position)
             self.monster_ai.reset_obstacle_avoidance_flags()
             self.monster_ai.end_pathfinding()
 
@@ -559,7 +554,7 @@ class Monster(pygame.sprite.Sprite):
     
     def emit_los_particle_and_wake_up_if_player_is_seen(self):
         if util.monster_has_line_of_sight(self.map_position):
-            hero_sector = util.get_facing_direction(self.position,player_position)
+            hero_sector = util.get_facing_direction(self.map_position,entity_manager.hero.map_position)
             
             if self.monster_ai.is_idle:
                 if self.facing_direction+1 == 8 and hero_sector in [7,0,1]:

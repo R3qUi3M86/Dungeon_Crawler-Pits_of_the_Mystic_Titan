@@ -59,9 +59,6 @@ BOSS_ENTRY = "boss entry cutscene"
 CUTSCENE_PLACE_INDEX = 18,17
 CUTSCENE_TILE_INDICES = [(19,9),(19,10),(20,10),(20,11),(21,11),(21,12),(21,13),(22,14),(22,15),(22,16),(22,17),(22,18),(22,19),(22,20),(21,21),(21,22),(21,23),(20,23),(20,24),(20,24),(19,24),(19,25)]
 
-#Wall hider
-WALL_HIDER_POSITION = player_position[0], player_position[1] - 48
-
 ####################
 ##### Entities #####
 ####################

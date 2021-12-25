@@ -147,7 +147,7 @@ class Ability():
         travel_speed = util.get_travel_speed(random_angle, movement_speed)
         self.travel_speed = travel_speed
         self.monster.speed_vector = travel_speed
-        self.monster.rect = self.blur_image_surf.get_rect(midbottom = (self.monster.image_position))
+        self.monster.rect = self.blur_image_surf.get_rect(midbottom = (self.monster.position))
         
         sound_player.play_ability_use_sound(self.NAME)
 
@@ -193,7 +193,7 @@ class Ability():
             if self.NAME is TELEPORT_BLUR:
                 self.monster.IMAGE_DISPLAY_CORRECTION = self.monster_original_img_disp_corr
                 self.monster.image = self.monster_original_image
-                self.monster.rect = self.monster.image.get_rect(midbottom = (self.monster.image_position))
+                self.monster.rect = self.monster.image.get_rect(midbottom = (self.monster.position))
                 self.monster.can_collide_with_player = True
         self.use_speed_timer += 0.0167 * t_ctrl.dt
 

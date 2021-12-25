@@ -195,7 +195,7 @@ class Projectile(pygame.sprite.Sprite):
 
     def update_owned_sprites_position(self):
         for auxilary_sprite in self.entity_auxilary_sprites:
-            auxilary_sprite.update_position(self.position)
+            auxilary_sprite.update_position(self.map_position)
 
     #Getters
     def get_image_and_set_collider_image(self):

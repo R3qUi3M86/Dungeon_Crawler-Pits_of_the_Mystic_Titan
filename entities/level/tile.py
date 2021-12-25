@@ -2,19 +2,22 @@ import pygame
 import random
 import math
 from entities.level.level import *
+from entities.colliders.collider import Collider
 from images.level.cave_images import *
 from images.misc.colliders import *
 from utilities.constants import *
 from utilities import level_painter
 from utilities import entity_manager
+from utilities import util
+from utilities import t_ctrl
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self,type,tile_index,pos,size,vicinity_matrix, wall_mode = HIDDEN):
+    def __init__(self,type,tile_index,size,vicinity_matrix, wall_mode = HIDDEN):
         super().__init__()
         self.TYPE = type
         self.tile_index = tile_index
-        self.position = pos
-        self.map_position = int(self.tile_index[1] * level_painter.TILE_SIZE[1]+level_painter.TILE_SIZE[1]//2+screen_width//2), int(self.tile_index[0] * level_painter.TILE_SIZE[0]+level_painter.TILE_SIZE[0]//2 + screen_height//2)
+        self.map_position = int(self.tile_index[1] * level_painter.TILE_SIZE[X]+screen_width//2), int(self.tile_index[0] * level_painter.TILE_SIZE[Y] + screen_height//2)
+        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
         self.size = size
         self.vicinity_matrix = vicinity_matrix
         self.passable = self.get_passable()
@@ -22,6 +25,9 @@ class Tile(pygame.sprite.Sprite):
 
         self.animation_timer = 0
         self.animation_timer_limit = 0
+        
+        ###Object ID###
+        self.id = -1
         
         self.is_convex = False
         self.is_hiding_player_prim = False
@@ -38,8 +44,11 @@ class Tile(pygame.sprite.Sprite):
         self.alpha_image3 = self.image.convert_alpha()
         self.alpha_image3.set_alpha(220)
         self.cluster_x_y = self.get_cluster_x_y()
-        self.mask = self.get_tile_mask()
-        self.rect = self.image.get_rect(topleft = (self.position))
+        self.rect = self.image.get_rect(center = (self.map_position))
+        self.disp_rect = self.image.get_rect(center = (self.position))
+
+        if wall_mode == HIDDEN:
+            self.tile_collider = Collider(self.map_position, self.id, self.TYPE, image=self.get_collider_img())
 
 
     def update(self):
@@ -54,12 +63,12 @@ class Tile(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(self.image_unscaled, tile_size)
                 self.animation_timer_limit = 1+random.choice([0.1,0.2,0.3,0.4])
                 self.animation_timer = 0
-            self.animation_timer += 0.0167
+            self.animation_timer += 0.0167*t_ctrl.dt
 
 
     def update_position(self):
-        self.position = math.floor(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0] - level_painter.TILE_SIZE[X]//2), math.floor(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1] - level_painter.TILE_SIZE[Y]//2)
-        self.rect.topleft = self.position
+        self.position = math.floor(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0]), math.floor(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1])
+        self.disp_rect.center = self.position
 
     ###############
     ### Getters ###
@@ -388,77 +397,81 @@ class Tile(pygame.sprite.Sprite):
         else:
             return blank
 
-    def get_tile_mask(self):
+    def get_collider_img(self):
         if self.passable == True:
-            return pygame.mask.from_surface(empty_tile_image)
+            return empty_tile_image
         else:
             if self.TYPE in IMPASSABLE_TILES:
                 if self.TYPE is FLOOR_PIT:
-                    return pygame.mask.from_surface(floor_pit_collider)
+                    return floor_pit_collider
                 
                 elif self.TYPE in LIQUIDS:
                     if self.image_unscaled in [blue_water_border_right, lava_border_right]:
-                        return pygame.mask.from_surface(liquid_border_right_collider)
+                        return liquid_border_right_collider
                     elif self.image_unscaled in [blue_water_border_left, lava_border_left]:
-                        return pygame.mask.from_surface(liquid_border_left_collider)
+                        return liquid_border_left_collider
                     elif self.image_unscaled in blue_water_border_top_images or self.image_unscaled in lava_border_top_images:
-                        return pygame.mask.from_surface(liquid_border_top_collider)
+                        return liquid_border_top_collider
                     elif self.image_unscaled in blue_water_border_bottom_images or self.image_unscaled in lava_border_bottom_images:
-                        return pygame.mask.from_surface(liquid_border_bottom_collider)
+                        return liquid_border_bottom_collider
                     elif self.image_unscaled in blue_water_border_convex_images[0] or self.image_unscaled in blue_water_border_convex_images[1] or self.image_unscaled in lava_border_convex_images[0] or self.image_unscaled in lava_border_convex_images[1]:
-                        return pygame.mask.from_surface(liquid_border_convex_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]])
+                        return liquid_border_convex_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]]
                     elif self.image_unscaled in blue_water_border_concave_images[0] or self.image_unscaled in blue_water_border_concave_images[1] or self.image_unscaled in lava_border_concave_images[0] or self.image_unscaled in lava_border_concave_images[1]:
-                        return pygame.mask.from_surface(liquid_border_concave_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]])
+                        return liquid_border_concave_colliders[self.cluster_x_y[0]][self.cluster_x_y[1]]
+                    else:
+                        return level_tile_collider
                 
                 elif self.TYPE is WALL:
                     if self.image_unscaled in wall_bottom_lower_hidden or self.image_unscaled in [wall_corner_bottom_lower_left_water_bottom_border_hidden, wall_corner_bottom_lower_right_water_bottom_border_hidden, wall_corner_bottom_lower_left_lava_bottom_border_hidden, wall_corner_bottom_lower_right_lava_bottom_border_hidden]:
-                        return pygame.mask.from_surface(wall_bottom_mid_floor_collider)
+                        return wall_bottom_mid_floor_collider
                     elif self.image_unscaled is wall_corner_bottom_lower_left_hidden:
-                        return pygame.mask.from_surface(wall_corner_bottom_left_floor_collider)
+                        return wall_corner_bottom_left_floor_collider
                     elif self.image_unscaled is wall_corner_bottom_lower_right_hidden:
-                        return pygame.mask.from_surface(wall_corner_bottom_right_floor_collider)
+                        return wall_corner_bottom_right_floor_collider
                     elif self.image_unscaled in [wall_corner_bottom_lower_left_water_left_border_hidden, wall_corner_bottom_lower_left_lava_left_border_hidden]:
-                        return pygame.mask.from_surface(wall_corner_bottom_left_water_left_border_collider)
+                        return wall_corner_bottom_left_water_left_border_collider
                     elif self.image_unscaled in [wall_corner_bottom_lower_right_water_right_border_hidden, wall_corner_bottom_lower_right_lava_right_border_hidden]:
-                        return pygame.mask.from_surface(wall_corner_bottom_right_water_right_border_collider)
+                        return wall_corner_bottom_right_water_right_border_collider
                     elif self.image_unscaled in [wall_corner_bottom_lower_left_water_top_border_hidden, wall_corner_bottom_lower_left_lava_top_border_hidden]:
-                        return pygame.mask.from_surface(small_collider_top_left)
+                        return small_collider_top_left
                     elif self.image_unscaled in [wall_corner_bottom_lower_right_water_top_border_hidden, wall_corner_bottom_lower_right_lava_top_border_hidden]:
-                        return pygame.mask.from_surface(small_collider_top_right)
+                        return small_collider_top_right
                     elif self.image_unscaled in [wall_corner_bottom_lower_left_floor_convex_hidden, wall_bottom_lower_left_water_border_hidden, wall_corner_bottom_lower_right_water_left_border_hidden, wall_corner_bottom_lower_left_lava_floor_convex_hidden, wall_bottom_lower_left_lava_border_hidden, wall_corner_bottom_lower_right_lava_left_border_hidden]:
-                        return pygame.mask.from_surface(small_collider_bottom_left)
+                        return small_collider_bottom_left
                     elif self.image_unscaled in [wall_corner_bottom_lower_right_floor_convex_hidden, wall_corner_bottom_lower_left_water_right_border_hidden, wall_bottom_lower_right_water_border_hidden, wall_corner_bottom_lower_right_lava_floor_convex_hidden, wall_corner_bottom_lower_left_lava_right_border_hidden, wall_bottom_lower_right_lava_border_hidden]:
-                        return pygame.mask.from_surface(small_collider_bottom_right)
+                        return small_collider_bottom_right
                     elif self.image_unscaled in [wall_corner_bottom_lower_right_water_convex_hidden, wall_corner_bottom_lower_right_lava_convex_hidden]:
-                        return pygame.mask.from_surface(small_dual_collider_ne_sw)
+                        return small_dual_collider_ne_sw
                     elif self.image_unscaled in [wall_corner_bottom_lower_left_water_convex_hidden, wall_corner_bottom_lower_left_lava_convex_hidden]:
-                        return pygame.mask.from_surface(small_dual_collider_nw_se)
+                        return small_dual_collider_nw_se
                     elif self.image_unscaled in wall_left:
-                        return pygame.mask.from_surface(wall_left_collider)
+                        return wall_left_collider
                     elif self.image_unscaled in wall_right:
-                        return pygame.mask.from_surface(wall_right_collider)
+                        return wall_right_collider
                     elif self.image_unscaled in wall_top_floor or self.image_unscaled in [wall_top_left_convex_water_top_border, wall_top_right_convex_water_top_border, wall_top_left_convex_lava_top_border, wall_top_right_convex_lava_top_border]:
-                        return pygame.mask.from_surface(wall_top_floor_collider)
+                        return wall_top_floor_collider
                     elif self.image_unscaled is wall_top_left_convex_floor:
-                        return pygame.mask.from_surface(wall_top_left_convex_floor_collider)
+                        return wall_top_left_convex_floor_collider
                     elif self.image_unscaled is wall_top_right_convex_floor:
-                        return pygame.mask.from_surface(wall_top_right_convex_floor_collider)
+                        return wall_top_right_convex_floor_collider
                     elif self.image_unscaled in [wall_top_left_convex_water_left_border, wall_top_left_convex_lava_left_border]:
-                        return pygame.mask.from_surface(wall_top_left_convex_water_left_border_collider)
+                        return wall_top_left_convex_water_left_border_collider
                     elif self.image_unscaled in [wall_top_right_convex_water_right_border, wall_top_right_convex_lava_right_border]:
-                        return pygame.mask.from_surface(wall_top_right_convex_water_right_border_collider)
+                        return wall_top_right_convex_water_right_border_collider
                     elif self.image_unscaled in [wall_top_left_convex_water_floor_convex, wall_top_right_convex_water_left_border, wall_top_water_left_border, wall_top_left_convex_lava_floor_convex, wall_top_right_convex_lava_left_border, wall_top_lava_left_border]:
-                        return pygame.mask.from_surface(wall_top_small_left_collider)
+                        return wall_top_small_left_collider
                     elif self.image_unscaled in [wall_top_left_convex_water_right_border, wall_top_right_convex_water_floor_convex, wall_top_water_right_border, wall_top_left_convex_lava_right_border, wall_top_right_convex_lava_floor_convex, wall_top_lava_right_border]:
-                        return pygame.mask.from_surface(wall_top_small_right_collider)
+                        return wall_top_small_right_collider
                     elif self.image_unscaled in [wall_top_left_convex_water_convex, wall_top_left_convex_lava_convex]:
-                        return pygame.mask.from_surface(wall_top_left_convex_water_convex_collider)
+                        return wall_top_left_convex_water_convex_collider
                     elif self.image_unscaled in [wall_top_right_convex_water_convex, wall_top_right_convex_lava_convex]:
-                        return pygame.mask.from_surface(wall_top_right_convex_water_convex_collider)
+                        return wall_top_right_convex_water_convex_collider
                     else:         
-                        return pygame.mask.from_surface(level_tile_collider)
+                        return level_tile_collider
+                elif self.TYPE in [ENTRANCE, EXIT]:
+                    return wall_bottom_mid_floor_collider
                 else:         
-                    return pygame.mask.from_surface(level_tile_collider)
+                    return level_tile_collider
 
     #Wall image getters
     def get_bottom_lower_wall_hidden_section_image(self):

@@ -175,7 +175,7 @@ def get_tile_offset(prevous_tile_index, tile_index):
     return offset_x,offset_y
 
 def get_tile_index(map_pos):
-    return int(map_pos[1]-screen_height//2)//level_painter.TILE_SIZE[Y] , int(map_pos[0]-screen_width//2)//level_painter.TILE_SIZE[X]
+    return int((map_pos[1]+24)-screen_height//2)//level_painter.TILE_SIZE[Y] , int((map_pos[0]+24)-screen_width//2)//level_painter.TILE_SIZE[X]
 
 def monster_has_line_of_sight(monster_map_pos, 
                               particle_speed = 10, 

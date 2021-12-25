@@ -112,7 +112,7 @@ def initialize_game():
 def initialize_player():
     hero.tile_index = level_painter.player_starting_tile
     hero.prevous_tile_index = level_painter.player_starting_tile
-    hero.map_position = TILE_SIZE[X]//2+(48*hero.tile_index[1])+screen_width//2, TILE_SIZE[Y]//2+(48*hero.tile_index[0]+screen_height//2)
+    hero.map_position = int(hero.tile_index[1] * level_painter.TILE_SIZE[X]+screen_width//2), int(hero.tile_index[0] * level_painter.TILE_SIZE[Y] + screen_height//2)
     if hero.weapons[SWORD] == None:
         give_item_to_player(Item((0,0),SWORD))
         picked_up_item_names.pop(0)
@@ -309,6 +309,8 @@ def finish_init():
     update_far_proximity_non_player_entities_position(far_proximity_character_sprites_list)
     update_far_proximity_non_player_entities_position(far_proximity_item_sprites_list)
     update_far_proximity_non_player_entities_position(far_proximity_projectile_sprites_list)
+    update_far_proximity_primary_walls_position()
+    update_far_proximity_secondary_walls_position()
 
 #Getters
 def get_entity_sprite_group_by_id_from_matrix_cell(entity_id, tile_index, type=SHADOW):
@@ -420,33 +422,23 @@ def update_all_objects_in_far_proximity():
     for projectile_sprite in far_proximity_projectile_sprites_list:
         projectile_sprite.update()
 
-    for primary_wall_sprite in far_proximity_primary_wall_sprites_list:
-        primary_wall_sprite.update()
-    
-    for secondary_wall_sprite in far_proximity_secondary_wall_sprites_list:
-        secondary_wall_sprite.update()
-
     for liquid_sprite in far_proximity_level_liquids_sprites_list:
         liquid_sprite.update()
 
 
 def update_all_objects_position_in_far_proximity():
-    if round(hero.speed_scalar[0],2) != 0.00 or round(hero.speed_scalar[1],2) != 0.00:
-        hero.update_position(hero.speed_vector)
-        update_far_proximity_non_player_entities_position(far_proximity_character_sprites_list)
-        update_far_proximity_non_player_entities_position(far_proximity_item_sprites_list)
-        update_far_proximity_non_player_entities_position(far_proximity_projectile_sprites_list)
-        update_far_proximity_primary_walls_position()
-        update_far_proximity_secondary_walls_position()
+    hero.update_position(hero.speed_vector)
+    update_far_proximity_non_player_entities_position(far_proximity_character_sprites_list)
+    update_far_proximity_non_player_entities_position(far_proximity_item_sprites_list)
+    update_far_proximity_non_player_entities_position(far_proximity_projectile_sprites_list)
+    update_far_proximity_primary_walls_position()
+    update_far_proximity_secondary_walls_position()
+    update_far_proximity_liquids_position()
 
 def update_far_proximity_non_player_entities_position(entities, vector=None):
     for entity in entities:
         if entity is not hero:
             entity.update_position(vector)
-
-def update_far_proximity_level_colliders_position():
-    for tile in far_proximity_level_collider_sprites_list:
-        tile.update_position()
 
 def update_far_proximity_primary_walls_position():
     for tile in far_proximity_primary_wall_sprites_list:
@@ -454,6 +446,10 @@ def update_far_proximity_primary_walls_position():
 
 def update_far_proximity_secondary_walls_position():
     for tile in far_proximity_secondary_wall_sprites_list:
+        tile.update_position()
+
+def update_far_proximity_liquids_position():
+    for tile in far_proximity_level_liquids_sprites_list:
         tile.update_position()
 
 def update_all_nearby_monsters_and_self_direct_proximity_monsters_lists(direct_proximity_matrix):
@@ -1260,6 +1256,7 @@ def drop_item(dropping_entity, dropped_item):
     item.map_position = dropping_entity.map_position[0], dropping_entity.map_position[1]+1
     item.update_position()
     put_item_in_matrices_and_lists(item)
+    hero.direct_proximity_items = get_direct_proximity_objects_list(hero.direct_proximity_index_matrix, ITEM)
 
 def put_item_in_matrices_and_lists(new_item):
     global sorting_timer
@@ -1369,7 +1366,7 @@ def use_puzzle():
         
         if puzzle_key:
             puzzle_object.image = puzzle_object.item_animation_images[1]
-            puzzle_object.rect = puzzle_object.image.get_rect(midbottom = (puzzle_object.image_position))
+            puzzle_object.rect = puzzle_object.image.get_rect(midbottom = (puzzle_object.position))
             sound_player.puzzle_solved_sound.play()
             menu.game_won = True
         else:

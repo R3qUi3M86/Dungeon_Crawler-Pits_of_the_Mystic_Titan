@@ -21,10 +21,6 @@ def wall_hider_collision():
         else:
             wall_hider_timer += 1 * t_ctrl.dt
 
-    for item in entity_manager.far_proximity_item_sprites_list:
-        if item.is_falling_apart:
-            item_vs_level_collision(item)
-
 #Collision types
 def player_vs_monster_movement_collision():
     hero = entity_manager.hero
@@ -44,14 +40,14 @@ def character_vs_level_collision(character):
     global moving_to_next_level
 
     for level_collision_sprite in character.direct_proximity_collision_tiles:        
-        if character.can_collide and not (level_collision_sprite.TYPE in LIQUIDS and FLYING in character.abilities) and character.entity_collider_omni.rect.colliderect(level_collision_sprite.rect):
+        if character.can_collide and not (level_collision_sprite.TYPE in LIQUIDS and FLYING in character.abilities) and character.entity_collider_omni.rect.colliderect(level_collision_sprite.tile_collider.rect):
             if character is entity_manager.hero and level_collision_sprite.is_exit_tile and not moving_to_next_level:
                 moving_to_next_level = True
             
-            collision_matrix = get_collision_matrix(character,level_collision_sprite)
+            collision_matrix = get_collision_matrix(character,level_collision_sprite.tile_collider)
 
             if any_sector_collider_collides(collision_matrix):
-                correct_character_position_by_vector(character,level_collision_sprite, collision_matrix)
+                correct_character_position_by_vector(character,level_collision_sprite.tile_collider, collision_matrix)
                 character.has_collided = True
                  
                 if character.TYPE == MONSTER and character.monster_ai.is_path_finding == False and character.monster_ai.path_finding_is_ready:
@@ -125,7 +121,7 @@ def player_vs_item_collision():
                 collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
                 bump_entity_back(hero, item_sprite, collision_matrix)
                 item_sprite.destroy_item()
-            elif not item_sprite.is_falling_apart and pygame.sprite.collide_mask(hero.entity_collider_omni, item_sprite.entity_collider_omni):
+            elif item_sprite.can_collide and not item_sprite.is_pickable and not item_sprite.is_destructible and pygame.sprite.collide_mask(hero.entity_collider_omni, item_sprite.entity_collider_omni):
                 collision_matrix = get_collision_matrix(entity_manager.hero, item_sprite)
                 bump_entity_back(hero, item_sprite, collision_matrix)
                 hero.has_collided = True
@@ -146,6 +142,7 @@ def item_vs_level_collision(item_sprite):
     for collision_tile in item_sprite.direct_proximity_collision_tiles:
         if item_sprite.entity_small_square_collider.rect.colliderect(collision_tile.rect):
             item_sprite.speed = 0,0
+            item_sprite.has_collided = True
 
 #Movement vector adjustment
 def slow_down_player(factor=3):
@@ -172,13 +169,22 @@ def adjust_monster_movement_vector(monster, collision_matrix):
         monster.monster_ai.avoid_obstacle(SECTOR_SW)
 
 def adjust_player_speed_scalar(original_speed_scalar, correction_vector,factor=30):
-    speed_scalar_x = correction_vector[0]*factor
-    speed_scalar_y = correction_vector[1]*factor
+    speed_scalar_x = correction_vector[0]*factor*t_ctrl.dt
+    speed_scalar_y = correction_vector[1]*factor*t_ctrl.dt
+    if speed_scalar_x > 30:
+        speed_scalar_x = 30
+    elif speed_scalar_x < -30:
+        speed_scalar_x = -30
+    if speed_scalar_y > 30:
+        speed_scalar_y = 30
+    elif speed_scalar_y < -30:
+        speed_scalar_y = -30
+
     entity_manager.hero.speed_scalar = original_speed_scalar[0]+speed_scalar_x, original_speed_scalar[1]+speed_scalar_y
 
 #Character bounce-back
 def correct_character_position_by_vector(current_entity_sprite,colliding_entity_sprite, collision_matrix):
-    colliding_tile_index = colliding_entity_sprite.tile_index
+    colliding_tile_index = util.get_tile_index(colliding_entity_sprite.map_position)
     east_tile_index = colliding_tile_index[0],colliding_tile_index[1]+1
     west_tile_index = colliding_tile_index[0],colliding_tile_index[1]-1
     south_tile_index = colliding_tile_index[0]+1,colliding_tile_index[1]
@@ -210,7 +216,7 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
     original_speed_scalar = 0,0
     if current_entity_sprite == entity_manager.hero:
         original_speed_scalar = entity_manager.hero.speed_scalar
-    
+
     speed_vector = current_entity_sprite.speed_vector
     speed_correction_vector = 0,0
     correction_vector = 0,0
@@ -401,12 +407,9 @@ def correct_character_position_by_vector(current_entity_sprite,colliding_entity_
             map_pos = entity_manager.hero.map_position
             entity_manager.hero.map_position = round(map_pos[0] + correction_vector[0],2),round(map_pos[1] + correction_vector[1],2)
             entity_manager.hero.tile_index = util.get_tile_index(entity_manager.hero.map_position)
-            # entity_manager.update_far_proximity_non_player_entities_position(entity_manager.far_proximity_entity_sprites_list)
-            entity_manager.update_far_proximity_level_colliders_position()
-            # entity_manager.update_far_proximity_primary_walls_position()
-            # entity_manager.update_far_proximity_secondary_walls_position()
+            entity_manager.hero.update_colliders_position()
         else:
-            current_entity_sprite.update_position((-2*correction_vector[0],-2*correction_vector[1]))
+            current_entity_sprite.update_position(correction_vector)
             if entity_manager.level_sprites_matrix[colliding_tile_index[0]][colliding_tile_index[1]].is_convex == False:
                 current_entity_sprite.facing_direction = util.get_facing_direction(current_entity_sprite.map_position,current_entity_sprite.current_tile_position)
             else:
@@ -458,14 +461,14 @@ def bump_entity_back(player_sprite, entity_sprite, collision_matrix):
         bounce_vector = get_bounce_vector_for_static_player(player_sprite, entity_sprite)
 
     if entity_sprite.TYPE is not ITEM:
-        entity_sprite.update_position((-bounce_vector[0],-bounce_vector[1]))
+        entity_sprite.speed_vector = bounce_vector[0]/t_ctrl.dt, bounce_vector[1]/t_ctrl.dt
         adjust_player_speed_scalar(entity_manager.hero.speed_scalar,(-bounce_vector[0],-bounce_vector[1]),15)
     else:
         if entity_sprite.is_destructible:
             hero_x_speed = entity_manager.hero.speed_vector[0]
             hero_y_speed = entity_manager.hero.speed_vector[1]
             hero_abs_speed = sqrt(hero_x_speed*hero_x_speed+hero_y_speed*hero_y_speed)
-            entity_sprite.speed = (-hero_abs_speed*bounce_vector[0],-hero_abs_speed*bounce_vector[1])
+            entity_sprite.speed = (hero_abs_speed*bounce_vector[0],hero_abs_speed*bounce_vector[1])
         else:
             adjust_player_speed_scalar(entity_manager.hero.speed_scalar,(-bounce_vector[0],-bounce_vector[1]),8)
 

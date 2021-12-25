@@ -19,8 +19,9 @@ class Shadow(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
     #Update functions    
-    def update_position(self,position):
-        self.position = position
+    def update_position(self,map_pos):
+        self.map_position = map_pos
+        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
         self.rect.center = self.position
 
     #Image getters

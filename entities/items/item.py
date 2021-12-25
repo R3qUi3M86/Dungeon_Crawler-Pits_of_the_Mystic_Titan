@@ -7,6 +7,7 @@ from utilities.constants import *
 from utilities import util
 from utilities import level_painter
 from utilities import entity_manager
+from utilities import collision_manager
 from utilities import t_ctrl
 from sounds import sound_player
 
@@ -29,9 +30,8 @@ class Item(pygame.sprite.Sprite):
         ###Position variables###
         self.tile_index = tile_index
         self.prevous_tile_index = tile_index
-        self.position = self.get_position()
-        self.map_position = round(self.position[0]+entity_manager.hero.map_position[0]-player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
-        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
+        self.map_position = self.get_map_pos()
+        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1] + self.IMAGE_DISPLAY_CORRECTION,2)
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
 
@@ -47,20 +47,20 @@ class Item(pygame.sprite.Sprite):
 
         ###Owned sprites###
         #Colliders
-        self.entity_small_square_collider  = Collider(self.position, self.id, SQUARE, size=SIZE_SMALL)
-        self.entity_tiny_omni_collider = Collider(self.position, self.id, ENTITY_OMNI, size=SIZE_TINY)
-        self.entity_collider_omni  = Collider(self.position, self.id, ENTITY_OMNI)
+        self.entity_small_square_collider  = Collider(self.map_position, self.id, SQUARE, size=SIZE_SMALL)
+        self.entity_tiny_omni_collider = Collider(self.map_position, self.id, ENTITY_OMNI, size=SIZE_TINY)
+        self.entity_collider_omni  = Collider(self.map_position, self.id, ENTITY_OMNI)
 
         #Shadow
         self.shadow_size = self.get_shadow_size()
         self.shadow = Shadow(self.position, self.map_position, self.id, self.shadow_size, self.tile_index)
 
         #Sprite lists
-        self.entity_auxilary_sprites = [self.entity_small_square_collider, self.shadow, self.entity_tiny_omni_collider, self.entity_collider_omni]
+        self.entity_collider_sprites = [self.entity_small_square_collider, self.entity_tiny_omni_collider, self.entity_collider_omni]
 
         ###Initial sprite definition###
         self.image = self.item_static_image
-        self.rect = self.image.get_rect(midbottom = (self.image_position))
+        self.rect = self.image.get_rect(midbottom = (self.position))
 
         #####General variables#####
         ###Status flags###
@@ -76,6 +76,7 @@ class Item(pygame.sprite.Sprite):
         self.is_falling_apart = False
         self.is_destroyed = False
         self.can_collide = self.get_can_collide()
+        self.has_collided = False
 
         ###Item properties###
         #General
@@ -113,26 +114,69 @@ class Item(pygame.sprite.Sprite):
 
     def update_position(self, vector=None):
         if vector:
-            self.position = round((self.position[0]-vector[0]),2),round((self.position[1] - vector[1]),2)
-            self.map_position = round(self.position[0] + entity_manager.hero.map_position[0] - player_position[0],2), round(self.position[1]+entity_manager.hero.map_position[1]-player_position[1],2)
-            self.tile_index = util.get_tile_index(self.map_position)
-        else:
-            self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
-        
-        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
-        self.rect.midbottom = self.image_position
-        self.update_owned_sprites_position()
-        if self.tile_index != self.prevous_tile_index:
-            self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
-            self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
-            entity_manager.move_entity_in_all_matrices(self.id, ITEM, self.prevous_tile_index, self.tile_index)
-            self.prevous_tile_index = self.tile_index
+            traveled_distance_x = 0
+            traveled_distance_y = 0
+            frame_travel_x = vector[0] * t_ctrl.dt
+            frame_travel_y = vector[1] * t_ctrl.dt
+            x_travel = vector[0]
+            y_travel = vector[1]
 
-    def update_owned_sprites_position(self):
-        for auxilary_sprite in self.entity_auxilary_sprites:
-                auxilary_sprite.update_position(self.position)
+            if abs(x_travel) > 6 and abs(x_travel) > abs(y_travel):
+                proportion = y_travel/x_travel
+                if x_travel > 0:
+                    x_travel = 6
+                else:
+                    x_travel = -6
+                y_travel = x_travel * proportion
+        
+            elif abs(y_travel) > 3 and abs(y_travel) > abs(x_travel):
+                proportion = x_travel/y_travel
+                if y_travel > 0:
+                    y_travel = 3
+                else:
+                    y_travel = -3
+                x_travel = y_travel * proportion
+
+            while 1:
+                if abs(frame_travel_x) - abs(traveled_distance_x) <= abs(x_travel):
+                    x_travel = frame_travel_x - traveled_distance_x
+                if abs(frame_travel_y) - abs(traveled_distance_y) <= abs(y_travel):
+                    y_travel = frame_travel_y - traveled_distance_y
+
+                traveled_distance_x += x_travel
+                traveled_distance_y += y_travel
+
+                self.map_position = round(self.map_position[0]+x_travel,2), round(self.map_position[1]+y_travel,2)
+                self.tile_index = util.get_tile_index(self.map_position)
+            
+                if self.tile_index != self.prevous_tile_index:
+                    self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
+                    self.direct_proximity_collision_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix)
+                    entity_manager.move_entity_in_all_matrices(self.id, ITEM, self.prevous_tile_index, self.tile_index)
+                    self.prevous_tile_index = self.tile_index
+
+                self.update_colliders_position()
+                collision_manager.item_vs_level_collision(self)
+
+                if self.has_collided or (abs(traveled_distance_x) >= abs(frame_travel_x) and abs(traveled_distance_y) >= abs(frame_travel_y)):
+                    break
+
+            self.has_collided = False
+
+        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1] + self.IMAGE_DISPLAY_CORRECTION  ,2)   
+        self.rect.midbottom = self.position
+        self.shadow.update_position(self.map_position)
+
+    def update_colliders_position(self):
+        for collider_sprite in self.entity_collider_sprites:
+                collider_sprite.update_position(self.map_position)
 
     #Getters
+    def get_map_pos(self):
+        if self.NAME is WALL_TORCH:
+            return int(self.tile_index[1] * level_painter.TILE_SIZE[X]+screen_width//2), int(self.tile_index[0] * level_painter.TILE_SIZE[Y] + screen_height//2 - level_painter.TILE_SIZE[Y]//2)
+        return int(self.tile_index[1] * level_painter.TILE_SIZE[X]+screen_width//2), int(self.tile_index[0] * level_painter.TILE_SIZE[Y] + screen_height//2)
+
     def get_img_display_correction(self):
         if self.NAME is GOLD_COINS:
             return 8
@@ -160,12 +204,6 @@ class Item(pygame.sprite.Sprite):
 
         else:
             return 0
-
-    def get_position(self):
-        if self.NAME is WALL_TORCH:
-            return level_painter.get_tile_position(self.tile_index)[0]+24, level_painter.get_tile_position(self.tile_index)[1]
-        else:
-            return level_painter.get_tile_position(self.tile_index)[0]+24, level_painter.get_tile_position(self.tile_index)[1]+24
 
     def get_is_pickable(self):
         if self.is_weapon:
