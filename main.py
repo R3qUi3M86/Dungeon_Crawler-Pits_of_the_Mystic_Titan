@@ -259,6 +259,7 @@ def start_new_game():
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
+    t_ctrl.last_time = time.time()
     main_game_loop()
 
 def start_next_level():
@@ -268,6 +269,7 @@ def start_next_level():
     level_painter.level_layout = level_painter.levels[next_level_index]
     play_music(next_level_index)
     entity_manager.initialize_game()
+    t_ctrl.last_time = time.time()
     main_game_loop()
 
 #Main game loop

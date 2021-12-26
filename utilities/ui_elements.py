@@ -1,3 +1,4 @@
+from time import time
 import pygame
 from settings import *
 from images.ui import ui
@@ -218,7 +219,10 @@ def fade_in():
     if alpha == 0:
         fading_in = False
     else:
-        fade_overlay.set_alpha(alpha-5)
+        alpha = alpha - int(5*t_ctrl.dt)
+        if alpha < 0:
+            alpha = 0
+        fade_overlay.set_alpha(alpha)
   
     screen.blit(fade_overlay,(0,0))
 
@@ -233,6 +237,9 @@ def fade_out():
         fading_out = False
         fading_in = True
     else:
-        fade_overlay.set_alpha(alpha+5)
+        alpha = alpha + int(5*t_ctrl.dt)
+        if alpha > 255:
+            alpha = 255
+        fade_overlay.set_alpha(alpha+int(5*t_ctrl.dt))
   
     screen.blit(fade_overlay,(0,0))
