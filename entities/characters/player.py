@@ -32,9 +32,8 @@ class Hero(pygame.sprite.Sprite):
         self.direct_proximity_monsters = []
         self.direct_proximity_items = []
         self.direct_proximity_projectiles = []
-        self.position = position
+        self.position = position[0], position[1] + self.IMAGE_DISPLAY_CORRECTION
         self.map_position = 0,0
-        self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
 
         ###Object ID###
         self.id = PLAYER_ID
@@ -81,7 +80,7 @@ class Hero(pygame.sprite.Sprite):
 
         ###Initial sprite definition###
         self.image = self.character_walk[self.character_walk_index[0]][self.character_walk_index[1]]
-        self.rect = self.image.get_rect(midbottom = (self.image_position))
+        self.rect = self.image.get_rect(midbottom = (self.position))
 
         ###General variables###
         #Status flags
@@ -100,7 +99,7 @@ class Hero(pygame.sprite.Sprite):
 
         ###Character properties###
         #General
-        self.maxhealth = 2500
+        self.maxhealth = 25
         self.health = self.maxhealth
 
         #Combat
@@ -137,7 +136,7 @@ class Hero(pygame.sprite.Sprite):
     def update(self):
         self.increment_all_items_cooldown()
         self.update_animation()
-        self.rect = self.image.get_rect(midbottom = (self.image_position))
+        self.rect = self.image.get_rect(midbottom = (self.position))
 
     def update_position(self,vector):
         traveled_distance_x = 0
