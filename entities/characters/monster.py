@@ -303,10 +303,10 @@ class Monster(pygame.sprite.Sprite):
         if not self.is_summoned:
             if self.is_living:
                 self.character_walk_forward_animation()
-
+            
             if self.is_in_pain and not self.is_attacking:
                 self.character_pain_animation()
-            
+
             elif self.is_attacking:
                 self.character_attack_animation()
             
@@ -508,7 +508,7 @@ class Monster(pygame.sprite.Sprite):
         elif self.is_preparing_attack:
             self.monster_ai.increment_attack_decision_timer()
         
-        elif self.is_attacking and self.is_in_pain and self.attack_can_be_interrupted and self.attack_interupted():
+        if self.is_attacking and self.is_in_pain and self.attack_can_be_interrupted and self.attack_interupted():
                 self.interrupt_attack()
 
     def take_damage(self, damage):

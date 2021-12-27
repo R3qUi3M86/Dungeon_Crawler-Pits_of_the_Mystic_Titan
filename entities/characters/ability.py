@@ -69,11 +69,17 @@ class Ability():
             self.use_summon_monster_ability()
 
     def set_blur_visual_effects(self):
+        self.monster_original_image.fill((0,0,0,0))
         self.monster_original_image.blit(self.monster.image, (0,0))
+        self.monster_1_blur_image.fill((0,0,0,0))
         self.monster_1_blur_image.blit(self.monster.image, (0,0))
+        self.monster_2_blur_image.fill((0,0,0,0))
         self.monster_2_blur_image.blit(self.monster.image, (0,0))
+        self.monster_3_blur_image.fill((0,0,0,0))
         self.monster_3_blur_image.blit(self.monster.image, (0,0))
+        self.monster_4_blur_image.fill((0,0,0,0))
         self.monster_4_blur_image.blit(self.monster.image, (0,0))
+        self.monster_5_blur_image.fill((0,0,0,0))
         self.monster_5_blur_image.blit(self.monster.image, (0,0))
         self.monster_1_blur_image.set_alpha(80)
         self.monster_2_blur_image.set_alpha(80)
