@@ -49,6 +49,8 @@ class Tile(pygame.sprite.Sprite):
 
         if wall_mode == HIDDEN:
             self.tile_collider = Collider(self.map_position, self.id, self.TYPE, image=self.get_collider_img())
+        else:
+            self.tile_collider = Collider(self.map_position, self.id, self.TYPE, image=level_tile_collider)
 
 
     def update(self):

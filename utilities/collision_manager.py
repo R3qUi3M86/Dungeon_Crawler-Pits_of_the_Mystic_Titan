@@ -60,17 +60,17 @@ def character_vs_level_collision(character):
 def wall_hider_vs_obscuring_walls_collision():
     for secondary_wall_sprite in entity_manager.far_proximity_secondary_wall_sprites_list:
         if hero_is_above_wall_grid(secondary_wall_sprite.tile_index):
-            if entity_manager.hero.wall_hider_collider_primary.rect.colliderect(secondary_wall_sprite):
+            if entity_manager.hero.wall_hider_collider_primary.rect.colliderect(secondary_wall_sprite.tile_collider):
                 secondary_wall_sprite.is_hiding_player_prim = True
             else:
                 secondary_wall_sprite.is_hiding_player_prim = False
 
-            if entity_manager.hero.wall_hider_collider_secondary.rect.colliderect(secondary_wall_sprite):
+            if entity_manager.hero.wall_hider_collider_secondary.rect.colliderect(secondary_wall_sprite.tile_collider):
                 secondary_wall_sprite.is_hiding_player_sec = True
             else:
                 secondary_wall_sprite.is_hiding_player_sec = False
         
-            if entity_manager.hero.wall_hider_collider_tertiary.rect.colliderect(secondary_wall_sprite):
+            if entity_manager.hero.wall_hider_collider_tertiary.rect.colliderect(secondary_wall_sprite.tile_collider):
                 secondary_wall_sprite.is_hiding_player_tert = True
             else:
                 secondary_wall_sprite.is_hiding_player_tert = False

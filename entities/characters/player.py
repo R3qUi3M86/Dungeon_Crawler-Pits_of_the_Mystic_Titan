@@ -75,7 +75,7 @@ class Hero(pygame.sprite.Sprite):
         self.shadow = Shadow(player_position, self.map_position, PLAYER_ID, SIZE_SMALL)
 
         #Sprite lists
-        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se]
+        self.entity_collider_sprites     = [self.entity_collider_omni,self.entity_collider_nw,self.entity_collider_ne,self.entity_collider_sw,self.entity_collider_se, self.wall_hider_collider_primary, self.wall_hider_collider_secondary, self.wall_hider_collider_tertiary]
         self.entity_auxilary_sprites     = [[self.shadow],self.entity_collider_sprites]
 
         ###Initial sprite definition###

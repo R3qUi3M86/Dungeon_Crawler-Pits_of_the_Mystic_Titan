@@ -1,5 +1,5 @@
 import pygame
-from pygame.constants import DOUBLEBUF
+from pygame.constants import DOUBLEBUF, FULLSCREEN, SCALED
 
 starting_new_game = False
 
@@ -12,7 +12,7 @@ starting_new_game = False
 screen_width = 1280
 screen_height = 720
 
-screen = pygame.display.set_mode((screen_width, screen_height))
+screen = pygame.display.set_mode((screen_width, screen_height)) #FULLSCREEN
 screen_info = pygame.display.Info()
 driver = pygame.display.get_driver()
 #print(screen_info)
