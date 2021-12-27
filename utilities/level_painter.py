@@ -35,7 +35,7 @@ def paint_level():
 
     level_surface = get_level_surface()
     level_walls_primary_surface = get_level_surface(PRIMARY_OVERLAY)
-    level_walls_secondary_surface = get_level_surface(SECONDARY_OVERLAY)
+    #level_walls_secondary_surface = get_level_surface(SECONDARY_OVERLAY)
 
     create_all_level_tiles()
     generate_pathfinding_matrix(IMPASSABLE_TILES)
@@ -122,7 +122,7 @@ def get_proximity_matrix_for_tile_index(index_x_y):
 
 def get_level_surface(surface_type=HIDDEN):
     if surface_type is HIDDEN:
-        return pygame.Surface((((len(level_layout[0])*TILE_SIZE[0])+screen_width,(len(level_layout)*TILE_SIZE[1])+screen_height)))
+        return pygame.Surface((len(level_layout[0])*TILE_SIZE[0]+screen_width, len(level_layout)*TILE_SIZE[1]+screen_height),depth=16)
     # else:
     #     return pygame.Surface((((len(level_layout[0])*TILE_SIZE[0])+screen_width,(len(level_layout)*TILE_SIZE[1])+screen_height)), pygame.SRCALPHA, 32)
 

@@ -186,7 +186,6 @@ def increment_sprite_sorting_timer():
         entity_manager.order_sprites()
         entity_manager.sorting_timer = 0
 
-
 def draw_sprites():
     translation_vector = level_painter.get_level_surface_translation_vector()
     screen.blit(level_painter.level_surface, (0,0), (-translation_vector[0],-translation_vector[1],screen_width,screen_height))
@@ -201,8 +200,6 @@ def draw_sprites():
             screen.blit(tile.image,tile.disp_rect)
 
     for shadow in entity_manager.far_proximity_shadow_sprite_group_list:
-        #shadow.draw(screen)
-        #screen.blit(shadow.sprite.image,shadow.sprite.position, special_flags=BLEND_RGB_ADD)
         screen.blit(shadow.sprite.image,shadow.sprite.rect, special_flags=BLEND_ALPHA_SDL2)
 
     if cutscene_manager.playing_cutscene:
@@ -211,9 +208,6 @@ def draw_sprites():
     for row in entity_manager.sorted_entity_matrix: 
         for entity in row:
             entity.draw(screen)
-            # if entity.sprite.TYPE is PROJECTILE:
-            #     img = entity.sprite.projectile_collider.image
-            #     screen.blit(img, entity.sprite.projectile_collider.rect)
 
     if wall_drawing_mode == VISIBLE:
         for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
@@ -225,8 +219,7 @@ def draw_sprites():
                 screen.blit(tile.alpha_image3,tile.disp_rect)
             else:
                 screen.blit(tile.image,tile.disp_rect)
-
-              
+           
 def draw_ui():
     screen.blit(ui_elements.central_light,(0,0))
     ui_elements.draw_damage_overlay()
