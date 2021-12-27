@@ -18,7 +18,7 @@ consumable_use_image_index = 0
 
 fading_in = False
 fading_out = False
-fade_overlay = pygame.Surface(screen.get_size())
+fade_overlay = pygame.Surface((screen_width, screen_height))
 fade_overlay.fill((0,0,0))
 fade_overlay.set_alpha(0)
 
