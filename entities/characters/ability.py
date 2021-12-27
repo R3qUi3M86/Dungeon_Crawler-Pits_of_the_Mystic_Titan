@@ -33,17 +33,8 @@ class Ability():
         self.blur_image_surf = pygame.Surface((161, 145), SRCALPHA)
         self.monster_original_img_disp_corr = owner.IMAGE_DISPLAY_CORRECTION
         self.monster_original_image = pygame.Surface(self.monster.image.get_size(),SRCALPHA)
-        self.monster_1_blur_image = pygame.Surface(self.monster.image.get_size(),SRCALPHA)
-        self.monster_2_blur_image = pygame.Surface(self.monster.image.get_size(),SRCALPHA)
-        self.monster_3_blur_image = pygame.Surface(self.monster.image.get_size(),SRCALPHA)
-        self.monster_4_blur_image = pygame.Surface(self.monster.image.get_size(),SRCALPHA)
-        self.monster_5_blur_image = pygame.Surface(self.monster.image.get_size(),SRCALPHA)
+        self.monster_blur_image = pygame.Surface(self.monster.image.get_size(),SRCALPHA)
         self.monster_current_pos = owner.map_position
-        self.monster_1_frame_back_pos = owner.map_position
-        self.monster_2_frame_back_pos = owner.map_position
-        self.monster_3_frame_back_pos = owner.map_position
-        self.monster_4_frame_back_pos = owner.map_position
-        self.monster_5_frame_back_pos = owner.map_position
         self.travel_speed = None
 
     #Updates
@@ -71,21 +62,9 @@ class Ability():
     def set_blur_visual_effects(self):
         self.monster_original_image.fill((0,0,0,0))
         self.monster_original_image.blit(self.monster.image, (0,0))
-        self.monster_1_blur_image.fill((0,0,0,0))
-        self.monster_1_blur_image.blit(self.monster.image, (0,0))
-        self.monster_2_blur_image.fill((0,0,0,0))
-        self.monster_2_blur_image.blit(self.monster.image, (0,0))
-        self.monster_3_blur_image.fill((0,0,0,0))
-        self.monster_3_blur_image.blit(self.monster.image, (0,0))
-        self.monster_4_blur_image.fill((0,0,0,0))
-        self.monster_4_blur_image.blit(self.monster.image, (0,0))
-        self.monster_5_blur_image.fill((0,0,0,0))
-        self.monster_5_blur_image.blit(self.monster.image, (0,0))
-        self.monster_1_blur_image.set_alpha(80)
-        self.monster_2_blur_image.set_alpha(80)
-        self.monster_3_blur_image.set_alpha(80)
-        self.monster_4_blur_image.set_alpha(80)
-        self.monster_5_blur_image.set_alpha(80)
+        self.monster_blur_image.fill((0,0,0,0))
+        self.monster_blur_image.blit(self.monster.image, (0,0))
+        self.monster_blur_image.set_alpha(80)
 
     def apply_blur_visual_effect(self):
         self.monster.IMAGE_DISPLAY_CORRECTION = 38
@@ -110,28 +89,28 @@ class Ability():
 
         if y_1_delta <= 0:
             if self.use_speed_timer <= self.use_speed-0.0167*5:
-                self.blur_image_surf.blit(self.monster_2_blur_image,(blur_5_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_5_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*4:
-                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_4_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_4_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*3:
-                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_3_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_3_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*2:
-                self.blur_image_surf.blit(self.monster_2_blur_image,(blur_2_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_2_pos))
             if self.use_speed_timer <= self.use_speed-0.0167:
-                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_1_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_1_pos))
             self.blur_image_surf.blit(self.monster_original_image,(35,35))
         else:
             self.blur_image_surf.blit(self.monster_original_image,(35,35))
             if self.use_speed_timer <= self.use_speed-0.0167:
-                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_1_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_1_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*2:
-                self.blur_image_surf.blit(self.monster_2_blur_image,(blur_2_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_2_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*3:
-                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_3_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_3_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*4:
-                self.blur_image_surf.blit(self.monster_1_blur_image,(blur_4_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_4_pos))
             if self.use_speed_timer <= self.use_speed-0.0167*5:
-                self.blur_image_surf.blit(self.monster_2_blur_image,(blur_5_pos))
+                self.blur_image_surf.blit(self.monster_blur_image,(blur_5_pos))
 
         self.monster.image = self.blur_image_surf
 

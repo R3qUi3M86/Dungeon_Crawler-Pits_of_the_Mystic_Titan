@@ -37,12 +37,14 @@ class Tile(pygame.sprite.Sprite):
         self.is_animated = False
         self.image_unscaled = self.get_tile_image()
         self.image = pygame.transform.scale(self.image_unscaled, size)
-        self.alpha_image1 = self.image.convert_alpha()
-        self.alpha_image1.set_alpha(150)
-        self.alpha_image2 = self.image.convert_alpha()
-        self.alpha_image2.set_alpha(185)
-        self.alpha_image3 = self.image.convert_alpha()
-        self.alpha_image3.set_alpha(220)
+        if self.wall_mode is SECONDARY_OVERLAY and self.image is not empty_tile_image:
+            self.alpha_image1 = self.image.convert_alpha()
+            self.alpha_image1.set_alpha(150)
+            self.alpha_image2 = self.image.convert_alpha()
+            self.alpha_image2.set_alpha(185)
+            self.alpha_image3 = self.image.convert_alpha()
+            self.alpha_image3.set_alpha(220)
+        
         self.cluster_x_y = self.get_cluster_x_y()
         self.rect = self.image.get_rect(center = (self.map_position))
         self.disp_rect = self.image.get_rect(center = (self.position))

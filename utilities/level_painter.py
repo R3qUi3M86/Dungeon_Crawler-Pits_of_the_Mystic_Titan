@@ -51,10 +51,10 @@ def paint_level():
     #         if tile != 0:
     #             level_surface.blit(tile.image,(tile.map_position))
 
-    for row in entity_manager.secondary_wall_sprites_matrix:
-        for tile in row:
-            if tile != 0:
-                level_walls_secondary_surface.blit(tile.image,(tile.rect))
+    # for row in entity_manager.secondary_wall_sprites_matrix:
+    #     for tile in row:
+    #         if tile != 0:
+    #             level_walls_secondary_surface.blit(tile.image,(tile.rect))
 
 def create_all_level_tiles():
     set_player_tile_index()
@@ -123,8 +123,8 @@ def get_proximity_matrix_for_tile_index(index_x_y):
 def get_level_surface(surface_type=HIDDEN):
     if surface_type is HIDDEN:
         return pygame.Surface((((len(level_layout[0])*TILE_SIZE[0])+screen_width,(len(level_layout)*TILE_SIZE[1])+screen_height)))
-    else:
-        return pygame.Surface((((len(level_layout[0])*TILE_SIZE[0])+screen_width,(len(level_layout)*TILE_SIZE[1])+screen_height)), pygame.SRCALPHA, 32)
+    # else:
+    #     return pygame.Surface((((len(level_layout[0])*TILE_SIZE[0])+screen_width,(len(level_layout)*TILE_SIZE[1])+screen_height)), pygame.SRCALPHA, 32)
 
 def get_level_surface_translation_vector():
     return math.floor(screen_width//2-entity_manager.hero.map_position[0]),math.floor(screen_height//2-entity_manager.hero.map_position[1])
