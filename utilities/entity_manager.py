@@ -1408,7 +1408,6 @@ def remove_projectile_from_from_matrices_and_lists(projectile):
 
     tile_index = projectile.tile_index
     far_proximity_matrix_index = get_far_proximity_entity_and_shadow_matrix_index(tile_index)
-
     remove_entity_shadow_from_the_game(projectile)
 
     projectile_sprite_group = get_entity_sprite_group_by_id_from_matrix_cell(projectile.id, tile_index, type=PROJECTILE)

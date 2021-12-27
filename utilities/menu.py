@@ -26,7 +26,7 @@ entering_game = False
 going_to_main_menu = False
 
 #Background image
-menu_background_image = pygame.transform.scale(menu_background,(1400,934))
+menu_background_image = pygame.transform.scale(menu_background,(1480,854))
 background_pos = -100,-67
 background_velocity = 0,0
 angle = 0
@@ -34,27 +34,27 @@ angle = 0
 #Text images
 title_img = game_title_text
 title_rect = title_img.get_rect()
-title_rect.center = (screen_width//2, 154)
+title_rect.center = (screen_width//2, 134)
 
 settings_text_img = settings_text
 settings_text_rect = settings_text_img.get_rect()
-settings_text_rect.center = (screen_width//2, 154)
+settings_text_rect.center = (screen_width//2, 134)
 
 game_paused_img = game_paused_text
 game_paused_rect = game_paused_img.get_rect()
-game_paused_rect.center = (screen_width//2, 154)
+game_paused_rect.center = (screen_width//2, 134)
 
 sound_volume_img = sound_volume_text
 sound_volume_rect = sound_volume_img.get_rect()
-sound_volume_rect.center = (screen_width//2+100, 300)
+sound_volume_rect.center = (screen_width//2+100, 280)
 
 leave_question_img = leave_question_text
 leave_question_rect = leave_question_img.get_rect()
-leave_question_rect.center = (screen_width//2, 320)
+leave_question_rect.center = (screen_width//2, 300)
 
 quit_question_img = quit_question_text
 quit_question_rect = quit_question_img.get_rect()
-quit_question_rect.center = (screen_width//2, 300)
+quit_question_rect.center = (screen_width//2, 280)
 
 scores_img = scores_text
 scores_rect = scores_img.get_rect()
@@ -63,23 +63,23 @@ scores_rect.center = (screen_width//2, screen_height//2)
 #Button images and rects
 new_game_button_img = new_game_button[0]
 new_game_rect = new_game_button_img.get_rect()
-new_game_rect.center = (screen_width//2,330)
+new_game_rect.center = (screen_width//2,310)
 
 settings_button_img = settings_button[0]
 settings_rect = settings_button_img.get_rect()
-settings_rect.center = (screen_width//2,420)
+settings_rect.center = (screen_width//2,400)
 
 quit_button_img = quit_button[0]
 quit_rect = quit_button_img.get_rect()
-quit_rect.center = (screen_width//2,510)
+quit_rect.center = (screen_width//2,490)
 
 effects_button_img = effects_button[0]
 effects_rect = effects_button_img.get_rect()
-effects_rect.center = (screen_width//2-400,400)
+effects_rect.center = (screen_width//2-400,380)
 
 music_button_img = music_button[0]
 music_rect = music_button_img.get_rect()
-music_rect.center = (screen_width//2-400,490)
+music_rect.center = (screen_width//2-400,470)
 
 back_button_img = back_button[0]
 back_rect = back_button_img.get_rect()
@@ -87,19 +87,19 @@ back_rect.center = (screen_width-120,screen_height-80)
 
 resume_button_img = resume_button[0]
 resume_rect = resume_button_img.get_rect()
-resume_rect.center = (screen_width//2,330)
+resume_rect.center = (screen_width//2,310)
 
 leave_game_button_img = leave_game_button[0]
 leave_game_rect = leave_game_button_img.get_rect()
-leave_game_rect.center = (screen_width//2,510)
+leave_game_rect.center = (screen_width//2,490)
 
 yes_button_img = yes_button[0]
 yes_rect = yes_button_img.get_rect()
-yes_rect.center = (screen_width//2-120,460)
+yes_rect.center = (screen_width//2-120,440)
 
 no_button_img = no_button[0]
 no_rect = no_button_img.get_rect()
-no_rect.center = (screen_width//2+150,460)
+no_rect.center = (screen_width//2+150,440)
 
 #Button animation
 new_game_button_index = 0

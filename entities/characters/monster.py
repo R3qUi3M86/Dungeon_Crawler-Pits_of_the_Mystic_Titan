@@ -620,8 +620,8 @@ class Monster(pygame.sprite.Sprite):
     #Conditions
     def leaving_far_proximity_matrix_margin(self):
         hero_tile_index = entity_manager.hero.tile_index
-        tile_row_offset = screen_height//2//TILE_SIZE[Y]+far_matrix_offset_y//3
-        tile_col_offset = screen_width//2//TILE_SIZE[X]+far_matrix_offset_x//3
+        tile_row_offset = int(screen_height/2/TILE_SIZE[Y])+1
+        tile_col_offset = int(screen_width/2/TILE_SIZE[X])+1
         if abs(self.tile_index[0]-hero_tile_index[0]) > tile_row_offset or abs(self.tile_index[1]-hero_tile_index[1]) > tile_col_offset:
             return True
         return False

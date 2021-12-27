@@ -25,13 +25,15 @@ fade_overlay.set_alpha(0)
 PALE_WHITE_COLOR = (180,200,200)
 PALE_ORANGE_COLOR = (210,200,150)
 
-HEALTH_BAR_POS = 273,740
+HEALTH_BAR_POS = screen_width//2,screen_height-30
 HEALTH_BAR_SIZE = 654,35
 HEALTH_LENGTH = 644
 EMPTY_HEALH_BAR_X_POS = -654
 
 health_surface = pygame.Surface(HEALTH_BAR_SIZE)
 health_surface.set_colorkey((0,0,255))
+health_surf_rect = health_surface.get_rect()
+health_surf_rect.center = HEALTH_BAR_POS
 ui.health_bar_health_mask.set_colorkey((0,255,0))
 ui.health_bar_empty.set_colorkey((0,0,255))
 
@@ -61,7 +63,7 @@ CONSUMABLE_IMAGE_POS = CONSUMABLE_COUNTER_BOX_POS[0] + CONSUMABLE_IMAGE_OFFSET[0
 CONSUMABLE_NUMBER_OFFSET = -39, -6
 CONSUMABLE_NUMBER_POS = CONSUMABLE_IMAGE_POS[0] + CONSUMABLE_NUMBER_OFFSET[0], CONSUMABLE_IMAGE_POS[1] + CONSUMABLE_NUMBER_OFFSET[1]
 
-PICKUP_TEXT_POS = screen_width//2, HEALTH_BAR_POS[1] - 25
+PICKUP_TEXT_POS = screen_width//2, HEALTH_BAR_POS[1] - 40
 PICKUP_TEXT = "You have found "
 
 # DARK_COLOR = (30,30,30)
@@ -100,10 +102,10 @@ def draw_health_bar():
     health_surface.fill((0,0,255))
     health_surface.blit(ui.health_bar_health,(-health_step*missing_health,0))
     health_surface.blit(ui.health_bar_health_mask,(0,0))
-    screen.blit(ui.outer_shadow, HEALTH_BAR_POS)
-    screen.blit(ui.health_bar_empty, HEALTH_BAR_POS)
-    screen.blit(health_surface, HEALTH_BAR_POS)
-    screen.blit(ui.inner_shadow,HEALTH_BAR_POS)
+    screen.blit(ui.outer_shadow, health_surf_rect)
+    screen.blit(ui.health_bar_empty, health_surf_rect)
+    screen.blit(health_surface, health_surf_rect)
+    screen.blit(ui.inner_shadow, health_surf_rect)
 
 def draw_boss_hp_bar():
     health_step = BOSS_HP_LENGTH / (entity_manager.boss.maxhealth)

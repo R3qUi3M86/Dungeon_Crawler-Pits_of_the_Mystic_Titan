@@ -163,7 +163,6 @@ class Projectile(pygame.sprite.Sprite):
 
                 self.map_position = round(self.map_position[0] + x_travel,2), round(self.map_position[1] + y_travel,2)
                 self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
-                self.update_owned_sprites_position()
                 self.tile_index = util.get_tile_index(self.map_position)
 
                 if self.tile_index != self.prevous_tile_index:
@@ -175,15 +174,15 @@ class Projectile(pygame.sprite.Sprite):
                     self.prevous_tile_index = self.tile_index
               
                 if self.leaving_far_proximity_matrix_margin():
-                    self.has_impacted = True
-                    entity_manager.remove_projectile_from_from_matrices_and_lists(self)
+                    break
 
                 collision_manager.projectile_vs_entity_collision(self)
                 collision_manager.projectile_vs_level_collision(self)
 
             if len(self.projectile_dynamic_images) >= 2:
                 self.travel_animation()
-            
+
+            self.update_owned_sprites_position()            
             self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION       
             self.rect.midbottom = self.image_position
 
@@ -298,8 +297,8 @@ class Projectile(pygame.sprite.Sprite):
     #Conditions
     def leaving_far_proximity_matrix_margin(self):
         hero_tile_index = entity_manager.hero.tile_index
-        tile_row_offset = screen_height//2//TILE_SIZE[Y]+far_matrix_offset_y//3
-        tile_col_offset = screen_width//2//TILE_SIZE[X]+far_matrix_offset_x//3
+        tile_row_offset = int((screen_height/2)/TILE_SIZE[Y])+1
+        tile_col_offset = int((screen_width/2)/TILE_SIZE[X])+1
         if abs(self.tile_index[0]-hero_tile_index[0]) > tile_row_offset or abs(self.tile_index[1]-hero_tile_index[1]) > tile_col_offset:
             return True
         return False

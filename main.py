@@ -255,7 +255,7 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.levels[0] #level_painter.test_map #
+    level_painter.level_layout = level_painter.test_map #level_painter.levels[0] #
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
@@ -285,7 +285,7 @@ def main_game_loop():
         entity_manager.update_all_objects_in_far_proximity()
         collision_manager.wall_hider_collision()
 
-        #Events
+        #Eventsa
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -339,7 +339,7 @@ def main_game_loop():
 
         #util.increment_print_matrix_timer(entity_manager.far_proximity_level_sprite_matrix, "S")
         #util.increment_print_matrix_timer(entity_manager.level_sprites_matrix, "S", True)
-        #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_sprite_group_matrix, "S")
+        util.increment_print_matrix_timer(entity_manager.far_proximity_entity_sprite_group_matrix, "S")
 
         #Other
         t_ctrl.adjust_delta_time()

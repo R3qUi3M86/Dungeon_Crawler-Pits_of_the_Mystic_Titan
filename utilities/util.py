@@ -249,6 +249,8 @@ def print_matrix(matrix, mode="S", add_monsters=False, add_items=False):
                         for object in cell:
                             if object.sprite.TYPE == PLAYER:
                                 row_string = row_string+"P"
+                            elif object.sprite.TYPE == PROJECTILE:
+                                row_string = row_string+"+"
                             elif object.sprite.TYPE == MONSTER:
                                 row_string = row_string+"M"
                             elif object.sprite.TYPE == ITEM:

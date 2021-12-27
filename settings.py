@@ -9,8 +9,8 @@ starting_new_game = False
 # screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
 
 #Windowed mode
-screen_width = 1200
-screen_height = 800
+screen_width = 1280
+screen_height = 720
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 screen_info = pygame.display.Info()
@@ -18,8 +18,8 @@ driver = pygame.display.get_driver()
 #print(screen_info)
 #print(driver)
 
-far_matrix_offset_x = 4
-far_matrix_offset_y = 5
+far_matrix_offset_x = 7
+far_matrix_offset_y = 6
 
 player_position = screen_width//2, screen_height//2
 
