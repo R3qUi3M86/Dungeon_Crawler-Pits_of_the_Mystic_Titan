@@ -24,7 +24,7 @@ PROJECTILE_GLOW_DICT = {CROSSBOW_BOLT:GREEN_GLOW, NECRO_BALL:RED_GLOW, MAGIC_MIS
 PROJECTILE_SHADOW_SIZE_DICT = {CROSSBOW_BOLT:SIZE_SMALL, NECRO_BALL:SIZE_MEDIUM, MAGIC_MISSILE:SIZE_MEDIUM, SPIKE_BALL:SIZE_MEDIUM, SPIKE_SHARD:SIZE_TINY, WHIRLWIND:SIZE_TINY, RED_ORB:SIZE_LARGE}
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, tile_index, position, map_pos, damage, angle, name, launched_by):
+    def __init__(self, tile_index, map_pos, damage, angle, name, launched_by):
         super().__init__()
         ###Constants###
         self.IMAGE_DISPLAY_CORRECTION = PROJECTILE_DISPLAY_CORRECTION[name]
@@ -35,8 +35,9 @@ class Projectile(pygame.sprite.Sprite):
         self.launched_by = launched_by
         self.tile_index = tile_index
         self.prevous_tile_index = tile_index
-        self.position = position
         self.map_position = map_pos
+        self.prev_map_pos = map_pos
+        self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
         self.image_position = self.position[0], self.position[1] + self.IMAGE_DISPLAY_CORRECTION
         self.direct_proximity_index_matrix = util.get_vicinity_matrix_indices_for_index(self.tile_index)
         self.direct_proximity_wall_like_tiles = entity_manager.get_direct_proximity_objects_list(self.direct_proximity_index_matrix, WALL_LIKE)
@@ -161,6 +162,7 @@ class Projectile(pygame.sprite.Sprite):
                 traveled_distance_x += x_travel
                 traveled_distance_y += y_travel
 
+                self.prev_map_pos = self.map_position
                 self.map_position = round(self.map_position[0] + x_travel,2), round(self.map_position[1] + y_travel,2)
                 self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
                 self.tile_index = util.get_tile_index(self.map_position)
@@ -269,7 +271,7 @@ class Projectile(pygame.sprite.Sprite):
     #Special behaviours
     def launch_spike_shards(self):
         for i in range(12):
-            combat_manager.launch_projectile(self.tile_index,self.position,self.map_position,i*30,self,MONSTER,-2)
+            combat_manager.launch_projectile(self.tile_index,self.prev_map_pos,i*30,self,MONSTER,-4)
 
     def deal_aoe_damage(self):
         if not entity_manager.hero.is_dead and not entity_manager.hero.is_overkilled and util.elipses_intersect(self.map_position,entity_manager.hero.map_position,(80,44), entity_manager.hero.size):
