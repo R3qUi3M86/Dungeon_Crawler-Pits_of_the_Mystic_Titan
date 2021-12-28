@@ -90,7 +90,7 @@ def draw_damage_overlay():
     if entity_manager.hero.has_taken_damage == True:
         index = int(entity_manager.hero.damage_timer/(entity_manager.hero.damage_timer_limit/4))
         screen.blit(damage_overlay[index],(0,0))
-        entity_manager.hero.damage_timer += 0.0167 * t_ctrl.dt
+        entity_manager.hero.damage_timer += 0.02 * t_ctrl.dt
     if entity_manager.hero.damage_timer >= entity_manager.hero.damage_timer_limit:
         entity_manager.hero.damage_timer = 0
         entity_manager.hero.has_taken_damage = False

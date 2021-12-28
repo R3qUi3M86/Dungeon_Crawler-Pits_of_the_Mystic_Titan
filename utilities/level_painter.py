@@ -116,7 +116,7 @@ def get_proximity_matrix_for_tile_index(index_x_y):
                 cell = WALL
             vicinity_matrix_row.append(cell)
         
-        vicinity_matrix.append(deepcopy(vicinity_matrix_row))
+        vicinity_matrix.append(vicinity_matrix_row)
 
     return vicinity_matrix
 

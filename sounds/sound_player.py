@@ -305,6 +305,6 @@ def increment_ambient_sound_timer():
         else:
             random.choice(ambient_lava_sounds).play()
 
-    ambient_sound_timer += 0.0167 * t_ctrl.dt
+    ambient_sound_timer += 0.02 * t_ctrl.dt
         
 

@@ -1,4 +1,4 @@
-import pygame, time
+import pygame
 from pygame.constants import BLEND_ALPHA_SDL2
 from utilities.text_printer import *
 from utilities.constants import *
@@ -168,7 +168,7 @@ def check_win_conditions():
             if game_won_delay == 0:
                 cutscene_manager.overkill_kill_all_monsters()
                 cutscene_manager.destroy_all_projectiles()
-            game_won_delay += 0.0167 * t_ctrl.dt
+            game_won_delay += 0.02 * t_ctrl.dt
 
     elif menu.game_won and ui_elements.fading_in:
         play_music(-1)
@@ -248,11 +248,11 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.levels[0] #level_painter.test_map #
+    level_painter.level_layout = level_painter.test_map #level_painter.levels[0] #
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
-    t_ctrl.last_time = time.time()
+    t_ctrl.last_time = pygame.time.get_ticks()
     main_game_loop()
 
 def start_next_level():
@@ -262,7 +262,7 @@ def start_next_level():
     level_painter.level_layout = level_painter.levels[next_level_index]
     play_music(next_level_index)
     entity_manager.initialize_game()
-    t_ctrl.last_time = time.time()
+    t_ctrl.last_time = pygame.time.get_ticks()
     main_game_loop()
 
 #Main game loop
@@ -335,13 +335,14 @@ def main_game_loop():
         #util.increment_print_matrix_timer(entity_manager.far_proximity_entity_sprite_group_matrix, "S")
 
         #Other
-        t_ctrl.adjust_delta_time()
         increment_ambient_sound_timer()
         pygame.display.flip()
-        clock.tick(60)
         if entity_manager.hero.tile_index in level_painter.cutscene_tile_indices and level_painter.level_layout is level_painter.level_04_map and not cutscene_manager.playing_cutscene:
             cutscene_manager.playing_cutscene = True
             level_painter.cutscene_tile_indices = []
+
+        clock.tick(50)
+        t_ctrl.adjust_delta_time()
 
 def main():
     play_music(-1)

@@ -103,7 +103,7 @@ class Projectile(pygame.sprite.Sprite):
             entity_manager.remove_projectile_from_from_matrices_and_lists(self)
         
         elif self.has_impacted:
-            self.tick_cooldown += 0.0167 * t_ctrl.dt
+            self.tick_cooldown += 0.02 * t_ctrl.dt
             if self.NAME is WHIRLWIND:
                 self.travel_animation()
                 self.pull_player_into_whirlwind()

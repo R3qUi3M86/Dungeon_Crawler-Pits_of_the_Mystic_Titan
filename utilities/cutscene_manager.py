@@ -80,7 +80,7 @@ def play_boss_entry_cutscene():
             narrator_voice_lines[2].play()
         elif voice_line_timer >= 10:
             init_cutscene_animation = True
-        voice_line_timer += 0.0167 * t_ctrl.dt
+        voice_line_timer += 0.02 * t_ctrl.dt
 
     else:
         if portal_animation_timer == 0 and portal_is_opening ==  True:
@@ -96,7 +96,7 @@ def play_boss_entry_cutscene():
 
         if portal_is_opening:
             screen.blit(portal_animation[int(portal_animation_index)],(portal_animation_rect))
-            portal_animation_timer += 0.0167 * t_ctrl.dt
+            portal_animation_timer += 0.02 * t_ctrl.dt
             portal_animation_index = (len(portal_animation)-1)*portal_animation_timer/portal_animation_timer_limit
             if portal_animation_index >= len(portal_animation):
                 portal_is_opening = False
@@ -105,7 +105,7 @@ def play_boss_entry_cutscene():
 
         elif not portal_is_opening and not portal_is_closing and not boss_entering:
             screen.blit(portal_open_animation[int(portal_animation_index)],(portal_animation_rect))
-            portal_animation_timer += 0.0167 * t_ctrl.dt
+            portal_animation_timer += 0.02 * t_ctrl.dt
             portal_animation_index = (len(portal_open_animation)-1)*portal_animation_timer/0.6
             if portal_animation_index >= len(portal_open_animation) and portal_tick < 3:
                 portal_tick += 1
@@ -116,7 +116,7 @@ def play_boss_entry_cutscene():
 
         elif boss_entering and not portal_is_closing:
             screen.blit(boss_entry_animation[int(boss_entry_animation_index)],portal_animation_rect)
-            boss_entry_animation_timer += 0.0167 * t_ctrl.dt
+            boss_entry_animation_timer += 0.02 * t_ctrl.dt
             boss_entry_animation_index = (len(boss_entry_animation)-1)*boss_entry_animation_timer/boss_entry_animation_timer_limit
             if boss_entry_animation_timer >= boss_entry_animation_timer_limit:
                 entity_manager.summon_new_monster(IRON_LICH,(cutscene_tile_index[0], cutscene_tile_index[1]),BOSS_ENTRY)
@@ -128,7 +128,7 @@ def play_boss_entry_cutscene():
         
         elif portal_is_closing:
             screen.blit(portal_animation[int(portal_animation_index)],(portal_animation_rect))
-            portal_animation_timer -= 0.0167 * t_ctrl.dt
+            portal_animation_timer -= 0.02 * t_ctrl.dt
             portal_animation_index = (len(portal_animation)-1)*portal_animation_timer/portal_animation_timer_limit
             if portal_animation_index < 0:
                 reset_cutscene_flags()

@@ -768,4 +768,4 @@ def menu():
 
         #Other
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(50)

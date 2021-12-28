@@ -64,7 +64,7 @@ class Tile(pygame.sprite.Sprite):
                 self.image = pygame.transform.scale(self.image_unscaled, tile_size)
                 self.animation_timer_limit = 1+random.choice([0.1,0.2,0.3,0.4])
                 self.animation_timer = 0
-            self.animation_timer += 0.0167*t_ctrl.dt
+            self.animation_timer += 0.02*t_ctrl.dt
 
 
     def update_position(self):

@@ -127,7 +127,7 @@ class Hero(pygame.sprite.Sprite):
         self.currency = {GOLD_COINS:0}
         
         #Movement
-        self.speed = 3
+        self.speed = 3.5
         self.speed_scalar = 0,0
         self.speed_vector = 0,0
         self.facing_direction = SECTOR_S
@@ -302,7 +302,7 @@ class Hero(pygame.sprite.Sprite):
 
     def character_melee_attack_animation(self):
         weapon = self.weapons[self.selected_weapon]
-        self.character_attack_index[1] += 0.05 * weapon.attack_speed * t_ctrl.dt
+        self.character_attack_index[1] += 0.02 * weapon.attack_speed * t_ctrl.dt
         
         if not self.has_attacked and self.character_attack_index[1] >= 1:
             self.has_attacked = True
@@ -332,7 +332,7 @@ class Hero(pygame.sprite.Sprite):
                 weapon.increment_chainfire_cooldown()
 
         elif weapon.chainfire == 0:
-            self.character_attack_index[1] += 0.025 * weapon.attack_speed * t_ctrl.dt
+            self.character_attack_index[1] += 0.02 * weapon.attack_speed * t_ctrl.dt
             if self.character_attack_index[1] >= 2:
                 self.is_attacking = False
                 self.character_attack_index[1] = 1

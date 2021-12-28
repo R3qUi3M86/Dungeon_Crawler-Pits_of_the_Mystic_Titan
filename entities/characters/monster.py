@@ -34,8 +34,8 @@ INTERRUPT_CHANCE_DICT = {ETTIN:50, DARK_BISHOP:70, IRON_LICH:10}
 SELECTED_WEAPON_DICT = {ETTIN:ETTIN_MACE, DARK_BISHOP:BISHOP_MAGIC_MISSILE, IRON_LICH:SPIKE_BALL_SPELL}
 WEAPON_NAMES_DICT = {ETTIN:[ETTIN_MACE], DARK_BISHOP:[BISHOP_MAGIC_MISSILE], IRON_LICH:[SPIKE_BALL_SPELL,WHIRLWIND_SPELL,RED_ORB_SPELL]}
 ABILITIES_DICT = {ETTIN:[None], DARK_BISHOP:[FLYING, TELEPORT_BLUR], IRON_LICH:[FLYING, SUMMON_MONSTER]}
-SPEED_DICT = {ETTIN:1.4, DARK_BISHOP:1.3, IRON_LICH:1.5}
-REFLEX_DICT = {ETTIN:1.2, DARK_BISHOP:1.6, IRON_LICH:3}
+SPEED_DICT = {ETTIN:1.7, DARK_BISHOP:1.5, IRON_LICH:1.8}
+REFLEX_DICT = {ETTIN:2, DARK_BISHOP:2.2, IRON_LICH:3.6}
 
 monster_walk = {ETTIN:ettin_walk, DARK_BISHOP:dark_bishop_walk, IRON_LICH:iron_lich_walk}
 monster_attack = {ETTIN:ettin_attack, DARK_BISHOP:dark_bishop_attack, IRON_LICH:iron_lich_attack}
@@ -411,7 +411,7 @@ class Monster(pygame.sprite.Sprite):
             sound_player.play_monster_atk_prep_sound(self.NAME)
         
         weapon = self.weapons[self.selected_weapon]
-        self.character_attack_index[1] += 0.1 * weapon.attack_speed * t_ctrl.dt
+        self.character_attack_index[1] += 0.02 * weapon.attack_speed * t_ctrl.dt
 
         if self.character_attack_index[1] >= 3:
             self.interrupt_attack()
@@ -441,7 +441,7 @@ class Monster(pygame.sprite.Sprite):
         new_char_img_surf.set_alpha(int(255*self.summon_flash_timer/self.summon_flash_timer_limit))
         self.image = new_char_img_surf
         
-        self.summon_flash_timer += 0.0167 * t_ctrl.dt
+        self.summon_flash_timer += 0.02 * t_ctrl.dt
         self.summon_flash_index = (len(self.summon_flash)-1)*self.summon_flash_timer/self.summon_flash_timer_limit
         if self.summon_flash_timer >= self.summon_flash_timer_limit:
             self.is_summoned = False
@@ -558,15 +558,15 @@ class Monster(pygame.sprite.Sprite):
             
             if self.monster_ai.is_idle:
                 if self.facing_direction+1 == 8 and hero_sector in [7,0,1]:
-                    self.monster_ai.direction_change_decision_timer_limit = 60
+                    self.monster_ai.direction_change_decision_timer_limit = 50
                     self.monster_ai.is_waking_up = True
                 
                 elif self.facing_direction+2 == 8 and hero_sector in [6,7,0]:
-                    self.monster_ai.direction_change_decision_timer_limit = 60
+                    self.monster_ai.direction_change_decision_timer_limit = 50
                     self.monster_ai.is_waking_up = True
                 
                 elif hero_sector in [self.facing_direction-1,self.facing_direction,self.facing_direction+1]:
-                    self.monster_ai.direction_change_decision_timer_limit = 60
+                    self.monster_ai.direction_change_decision_timer_limit = 50
                     self.monster_ai.is_waking_up = True
 
     def increment_all_weapons_cooldown(self):
@@ -583,7 +583,11 @@ class Monster(pygame.sprite.Sprite):
             weapon = self.weapons[weapon_name]
             eta_use = weapon.use_cooldown_limit - weapon.use_cooldown
             
-            if smallest_eta_use == None or smallest_eta_use > eta_use or weapon.use_cooldown == 0:
+            if weapon.is_ready_to_use:
+                smallest_eta_use = 0
+                smallest_eta_use_weap_name = weapon_name
+
+            elif smallest_eta_use == None or smallest_eta_use > eta_use:
                 smallest_eta_use = eta_use
                 smallest_eta_use_weap_name = weapon_name
 
@@ -609,7 +613,7 @@ class Monster(pygame.sprite.Sprite):
     def increment_make_noise_timer(self):
         if self.noise_timer == 0:
             self.noise_timer_limit += random.choice(range(6))
-        self.noise_timer += 0.0167 * t_ctrl.dt
+        self.noise_timer += 0.02 * t_ctrl.dt
 
         if self.noise_timer >= self.noise_timer_limit:
             self.noise_timer_limit = 5

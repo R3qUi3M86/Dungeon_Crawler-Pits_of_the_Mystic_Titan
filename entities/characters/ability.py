@@ -88,28 +88,28 @@ class Ability():
         self.blur_image_surf.fill((0,0,0,0))
 
         if y_1_delta <= 0:
-            if self.use_speed_timer <= self.use_speed-0.0167*5:
+            if self.use_speed_timer <= self.use_speed-0.02*5:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_5_pos))
-            if self.use_speed_timer <= self.use_speed-0.0167*4:
+            if self.use_speed_timer <= self.use_speed-0.02*4:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_4_pos))
-            if self.use_speed_timer <= self.use_speed-0.0167*3:
+            if self.use_speed_timer <= self.use_speed-0.02*3:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_3_pos))
-            if self.use_speed_timer <= self.use_speed-0.0167*2:
+            if self.use_speed_timer <= self.use_speed-0.02*2:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_2_pos))
-            if self.use_speed_timer <= self.use_speed-0.0167:
+            if self.use_speed_timer <= self.use_speed-0.02:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_1_pos))
             self.blur_image_surf.blit(self.monster_original_image,(35,35))
         else:
             self.blur_image_surf.blit(self.monster_original_image,(35,35))
-            if self.use_speed_timer <= self.use_speed-0.0167:
+            if self.use_speed_timer <= self.use_speed-0.02:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_1_pos))
-            if self.use_speed_timer <= self.use_speed-0.0167*2:
+            if self.use_speed_timer <= self.use_speed-0.02*2:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_2_pos))
-            if self.use_speed_timer <= self.use_speed-0.0167*3:
+            if self.use_speed_timer <= self.use_speed-0.02*3:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_3_pos))
-            if self.use_speed_timer <= self.use_speed-0.0167*4:
+            if self.use_speed_timer <= self.use_speed-0.02*4:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_4_pos))
-            if self.use_speed_timer <= self.use_speed-0.0167*5:
+            if self.use_speed_timer <= self.use_speed-0.02*5:
                 self.blur_image_surf.blit(self.monster_blur_image,(blur_5_pos))
 
         self.monster.image = self.blur_image_surf
@@ -180,10 +180,10 @@ class Ability():
                 self.monster.image = self.monster_original_image
                 self.monster.rect = self.monster.image.get_rect(midbottom = (self.monster.position))
                 self.monster.can_collide_with_player = True
-        self.use_speed_timer += 0.0167 * t_ctrl.dt
+        self.use_speed_timer += 0.02 * t_ctrl.dt
 
     def increment_cooldown_timer(self):
         if self.cooldown_timer >= self.cooldown:
             self.is_ready_to_use = True
             self.cooldown_timer = 0
-        self.cooldown_timer += 0.0167 * t_ctrl.dt
+        self.cooldown_timer += 0.02 * t_ctrl.dt
