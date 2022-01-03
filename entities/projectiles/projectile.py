@@ -61,7 +61,7 @@ class Projectile(pygame.sprite.Sprite):
 
         ###Owned sprites###
         #Colliders
-        self.projectile_collider = Collider(self.position, self.id, PROJECTILE)
+        self.projectile_collider = Collider(self.map_position, self.id, PROJECTILE)
 
         #Shadow
         self.shadow = Shadow(self.position, self.map_position, self.id, PROJECTILE_SHADOW_SIZE_DICT[name], self.tile_index, PROJECTILE_GLOW_DICT[name])
@@ -220,7 +220,7 @@ class Projectile(pygame.sprite.Sprite):
         self.projectile_collider.image = pygame.transform.scale(self.projectile_collider.image, (self.projectile_collider.image.get_width()*scaling_factor,self.projectile_collider.image.get_height()))
         self.projectile_collider.image = pygame.transform.rotate(self.projectile_collider.image, self.angle)
         self.projectile_collider.mask = pygame.mask.from_surface(self.projectile_collider.image)
-        self.projectile_collider.rect = self.projectile_collider.image.get_rect(center = (self.position))
+        self.projectile_collider.rect = self.projectile_collider.image.get_rect(center = (self.map_position))
 
     def get_direct_proximity_characters_list(self):
         if self.launched_by is PLAYER:

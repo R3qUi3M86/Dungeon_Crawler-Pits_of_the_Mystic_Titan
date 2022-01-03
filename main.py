@@ -209,6 +209,9 @@ def draw_sprites():
         for entity in row:
             entity.draw(screen)
 
+    # for projectile in entity_manager.far_proximity_projectile_sprites_list:
+    #     screen.blit(projectile.projectile_collider.image, projectile.projectile_collider.screen_rect)
+
     if wall_drawing_mode == VISIBLE:
         for tile in entity_manager.far_proximity_secondary_wall_sprites_list:
             if tile.is_hiding_player_prim:
@@ -248,7 +251,7 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.levels[0] #level_painter.test_map #
+    level_painter.level_layout = level_painter.test_map #level_painter.levels[0] #
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
@@ -317,11 +320,11 @@ def main_game_loop():
         ################
         ####Debuging####
         ################
-        debug_text(f"{entity_manager.hero.map_position}")
+        #debug_text(f"{entity_manager.hero.map_position}")
         debug_text(f"{entity_manager.hero.tile_index}",x = 10, y = 30)
         #debug_text(f"109 pos: {entity_manager.hero.direct_proximity_collision_tiles[1].map_position}",x = 10, y = 30)
         #debug_text(f"{entity_manager.hero.tile_index}", x=10, y=30)
-        #debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
+        debug_text(f"hero map pos: {entity_manager.hero.map_position}",x = 10, y = 45)
         #debug_text(f"mon 0 pos: {entity_manager.get_entity_sprite_by_id(1).position}",x = 10, y = 45)
         #debug_text(f"mon 0 map_pos: {entity_manager.get_entity_sprite_by_id(1).map_position}",x = 10, y = 60)
         #debug_text(f"mon 0 tile_index: {entity_manager.get_entity_sprite_by_id(1).tile_index}", x=10, y=75)

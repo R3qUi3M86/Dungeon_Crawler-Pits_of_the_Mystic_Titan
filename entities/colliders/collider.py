@@ -1,11 +1,13 @@
 import pygame
 from utilities.constants import *
 from images.misc.colliders import *
+from utilities import entity_manager
 
 class Collider(pygame.sprite.Sprite):
     def __init__(self, map_position, id, type, sector=None, size=SIZE_SMALL, image=None):
         super().__init__()
         self.map_position = map_position
+        self.position = None
         self.id = id
         self.sector = sector
         self.size = size
@@ -17,6 +19,7 @@ class Collider(pygame.sprite.Sprite):
             self.image = image
 
         self.rect = self.image.get_rect(center = (self.map_position))
+        #self.screen_rect = self.image.get_rect(center = (self.map_position))
         self.mask = pygame.mask.from_surface(self.image)
 
     #Update functions
@@ -25,7 +28,10 @@ class Collider(pygame.sprite.Sprite):
     #     self.rect.center = self.position
 
     def update_position(self, map_pos):
+        self.map_position = map_pos
         self.rect.center = map_pos
+        #self.position = round(self.map_position[0] - entity_manager.hero.map_position[0] + player_position[0],2), round(self.map_position[1] - entity_manager.hero.map_position[1] + player_position[1],2)
+        #self.screen_rect = self.image.get_rect(center = (self.position))
 
     #Misc
     def get_image(self):
