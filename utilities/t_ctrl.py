@@ -10,4 +10,4 @@ def adjust_delta_time():
     new_time = time.get_ticks()
     dt = new_time - last_time
     last_time = new_time
-    dt = (dt/1000) * 50
+    dt = (dt/1000) * 60

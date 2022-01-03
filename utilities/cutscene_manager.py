@@ -72,13 +72,13 @@ def play_boss_entry_cutscene():
             sound_player.fadeout_music()
             deactivate_all_monsters()
             narrator_voice_lines[0].play()
-        elif voice_line_timer >= 4 and not narrator_line_1: 
+        elif voice_line_timer >= 5 and not narrator_line_1: 
             narrator_line_1 = True
             narrator_voice_lines[1].play()
-        elif voice_line_timer >= 7 and not narrator_line_2: 
+        elif voice_line_timer >= 8.5 and not narrator_line_2: 
             narrator_line_2 = True
             narrator_voice_lines[2].play()
-        elif voice_line_timer >= 10:
+        elif voice_line_timer >= 12:
             init_cutscene_animation = True
         voice_line_timer += 0.02 * t_ctrl.dt
 

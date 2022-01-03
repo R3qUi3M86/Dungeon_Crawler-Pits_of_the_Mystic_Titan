@@ -248,7 +248,7 @@ def start_new_game():
     entity_manager.clear_all_lists()
     entity_manager.create_new_player()
     play_music(0)
-    level_painter.level_layout = level_painter.test_map #level_painter.levels[0] #
+    level_painter.level_layout = level_painter.levels[0] #level_painter.test_map #
     level_painter.cutscene_place_index = CUTSCENE_PLACE_INDEX
     level_painter.cutscene_tile_indices = CUTSCENE_TILE_INDICES
     entity_manager.initialize_game()
@@ -341,7 +341,7 @@ def main_game_loop():
             cutscene_manager.playing_cutscene = True
             level_painter.cutscene_tile_indices = []
 
-        clock.tick(50)
+        clock.tick(60)
         t_ctrl.adjust_delta_time()
 
 def main():
