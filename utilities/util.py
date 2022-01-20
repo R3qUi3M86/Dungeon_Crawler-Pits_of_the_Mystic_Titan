@@ -82,26 +82,13 @@ def get_facing_direction(current_entity_pos,other_entity_pos):
         return SECTOR_SE
 
 def get_travel_speed(angle, speed):
-    x_factor = math.cos(math.radians(angle))
-    y_factor = 0.55*math.sin(math.radians(angle))
+    x_factor = 0.55*math.cos(math.radians(angle))
+    y_factor = math.sin(math.radians(angle))
+    total_speed = speed*0.55/math.sqrt((x_factor*x_factor)+(y_factor*y_factor))
+    y_speed = total_speed*math.sin(math.radians(angle))
+    x_speed = total_speed*math.cos(math.radians(angle)) 
 
-    x_factored_speed = x_factor*speed
-    y_factored_speed = y_factor*speed
-
-    total_factored_speed = math.sqrt((x_factored_speed*x_factored_speed)+(y_factored_speed*y_factored_speed))
-
-    x_factor_travel = math.cos(math.radians(angle))
-    y_factor_travel = math.sin(math.radians(angle))
-
-    travel_speed = x_factor_travel*total_factored_speed, -y_factor_travel*total_factored_speed
-
-    return travel_speed
-
-def get_elipse_travel_speed(angle, speed):
-    x_factor = math.cos(math.radians(angle))
-    y_factor = 0.55*math.sin(math.radians(angle))
-
-    travel_speed = x_factor*speed, -y_factor*speed
+    travel_speed = x_speed, -y_speed
 
     return travel_speed
 

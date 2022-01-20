@@ -249,7 +249,6 @@ def play_monster_noise_sound(monster_name):
 
 def play_monster_atk_prep_sound(monster_name):
     if MONSTER_ATKPREP_SOUNDS[monster_name]:
-        MONSTER_ATKPREP_SOUNDS[monster_name].stop()
         MONSTER_ATKPREP_SOUNDS[monster_name].play()
 
 def play_melee_attack_sound(attacking_entity_name, hit):

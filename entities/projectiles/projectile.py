@@ -85,10 +85,7 @@ class Projectile(pygame.sprite.Sprite):
         self.speed = PROJECTILE_SPEED_DICT[self.NAME]
         self.size = PROJECTILE_SIZE_DICT[self.NAME]
         
-        if self.NAME is not SPIKE_SHARD:
-            self.travel_speed = util.get_travel_speed(self.angle, self.speed)
-        else:
-            self.travel_speed = util.get_elipse_travel_speed(self.angle, self.speed)
+        self.travel_speed = util.get_travel_speed(self.angle, self.speed)
         
         self.delta_travel_speed = 0,0
         self.image = self.get_image_and_set_collider_image()
@@ -137,20 +134,20 @@ class Projectile(pygame.sprite.Sprite):
             x_travel = self.travel_speed[0] + self.delta_travel_speed[0]
             y_travel = self.travel_speed[1] + self.delta_travel_speed[1]
 
-            if abs(x_travel) > 25 and abs(x_travel) > abs(y_travel):
+            if abs(x_travel) > 28 and abs(x_travel) > abs(y_travel):
                 proportion = y_travel/x_travel
                 if x_travel > 0:
-                    x_travel = 25
+                    x_travel = 28
                 else:
-                    x_travel = -25
+                    x_travel = -28
                 y_travel = x_travel * proportion
             
-            elif abs(y_travel) > 15 and abs(y_travel) > abs(x_travel):
+            elif abs(y_travel) > 14 and abs(y_travel) > abs(x_travel):
                 proportion = x_travel/y_travel
                 if y_travel > 0:
-                    y_travel = 15
+                    y_travel = 14
                 else:
-                    y_travel = -15
+                    y_travel = -14
                 x_travel = y_travel * proportion
             
             while not self.has_impacted and (abs(traveled_distance_x) < abs(frame_travel_x) or abs(traveled_distance_y) < abs(frame_travel_y)):
@@ -270,8 +267,8 @@ class Projectile(pygame.sprite.Sprite):
 
     #Special behaviours
     def launch_spike_shards(self):
-        for i in range(12):
-            combat_manager.launch_projectile(self.tile_index,self.prev_map_pos,i*30,self,MONSTER,-4)
+        for i in range(18):
+            combat_manager.launch_projectile(self.tile_index,self.prev_map_pos,i*20,self,MONSTER,-4)
 
     def deal_aoe_damage(self):
         if not entity_manager.hero.is_dead and not entity_manager.hero.is_overkilled and util.elipses_intersect(self.map_position,entity_manager.hero.map_position,(80,44), entity_manager.hero.size):
