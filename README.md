@@ -22,11 +22,11 @@ Features:
 - decoration
 
 Key controls:
-WSAD - movement
-1 - change to sword
-2 - change to crossbow
-3 - change to necrolight
-Spacebar - use health potion
-F - use pedestal
-LMB - attack
-TAB - hide/show walls
+- WSAD - movement
+- 1 - change to sword
+- 2 - change to crossbow
+- 3 - change to necrolight
+- Spacebar - use health potion
+- F - use pedestal
+- LMB - attack
+- TAB - hide/show walls
